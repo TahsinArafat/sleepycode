@@ -1,9 +1,9 @@
 export * as SessionRunnerModel from "./model.js"
 
-import { makeLocationNode } from "@opencode/util/effect/app-node"
-import { LanguageModel } from "@opencode/ai"
-import { Model } from "@opencode/schema/model"
-import { Provider } from "@opencode/schema/provider"
+import { makeLocationNode } from "@sleepy-ai/util/effect/app-node"
+import { LanguageModel } from "@sleepy-ai/ai"
+import { Model } from "@sleepy-ai/schema/model"
+import { Provider } from "@sleepy-ai/schema/provider"
 import { Context, Effect, Layer, Schema } from "effect"
 import { ModelResolver } from "../../model-resolver.js"
 import { SessionSchema } from "../schema.js"
@@ -40,7 +40,7 @@ export interface Interface {
   ) => Effect.Effect<Resolved, Error>
 }
 
-export class Service extends Context.Service<Service, Interface>()("@opencode/SessionRunnerModel") {}
+export class Service extends Context.Service<Service, Interface>()("@sleepy-ai/SessionRunnerModel") {}
 
 /** Builds a Resolved whose catalog identity mirrors the route model. Test or embedding seam. */
 export const resolved = (

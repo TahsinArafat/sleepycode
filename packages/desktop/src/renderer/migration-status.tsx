@@ -1,7 +1,7 @@
-import { OpenCode, type MigrationV1StatusOutput } from "@opencode/client/promise"
-import { useLanguage } from "@opencode/app/desktop"
-import { Loader } from "@opencode/ui/loader"
-import { showToast, toaster, Toast } from "@opencode/ui/toast"
+import { SleepyCode, type MigrationV1StatusOutput } from "@sleepy-ai/client/promise"
+import { useLanguage } from "@sleepy-ai/app/desktop"
+import { Loader } from "@sleepy-ai/ui/loader"
+import { showToast, toaster, Toast } from "@sleepy-ai/ui/toast"
 import { createRoot, createSignal, onCleanup, onMount } from "solid-js"
 import type { ServerReadyData } from "../shared/ipc-contract"
 
@@ -83,7 +83,7 @@ export function MigrationStatus(props: { server: ServerReadyData }) {
     if (abort.signal.aborted) return
 
     // The main process credentials sidecar requests; see `wireRendererHeaders`.
-    const client = OpenCode.make({ baseUrl: props.server.url })
+    const client = SleepyCode.make({ baseUrl: props.server.url })
 
     void (async () => {
       while (true) {

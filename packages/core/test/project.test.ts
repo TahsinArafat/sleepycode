@@ -3,15 +3,15 @@ import { $ } from "bun"
 import fs from "fs/promises"
 import path from "path"
 import { Effect, Stream } from "effect"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { Database } from "@opencode/core/database/database"
-import { Project } from "@opencode/core/project"
-import { ProjectSchema } from "@opencode/core/project/schema"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Hash } from "@opencode/util/hash"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Bus } from "@sleepy-ai/core/bus"
+import { Database } from "@sleepy-ai/core/database/database"
+import { Project } from "@sleepy-ai/core/project"
+import { ProjectSchema } from "@sleepy-ai/core/project/schema"
+import { ProjectTable } from "@sleepy-ai/core/project/sql"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { Hash } from "@sleepy-ai/util/hash"
 import { tmpdir } from "./fixture/tmpdir"
 import { testEffect } from "./lib/effect"
 
@@ -256,19 +256,19 @@ describe("Project archiving", () => {
         .values([
           {
             id: Project.ID.make("updated"),
-            worktree: abs("/opencode-missing-updated"),
+            worktree: abs("/sleepycode-missing-updated"),
             sandboxes: [],
             time_active: old,
           },
           {
             id: Project.ID.make("active"),
-            worktree: abs("/opencode-missing-active"),
+            worktree: abs("/sleepycode-missing-active"),
             sandboxes: [],
             time_updated: old,
           },
           {
             id: Project.ID.make("idle"),
-            worktree: abs("/opencode-missing-idle"),
+            worktree: abs("/sleepycode-missing-idle"),
             sandboxes: [],
             time_updated: old,
             time_active: old,
@@ -293,7 +293,7 @@ describe("Project archiving", () => {
         .insert(ProjectTable)
         .values({
           id: Project.ID.global,
-          worktree: abs("/opencode-missing-global"),
+          worktree: abs("/sleepycode-missing-global"),
           sandboxes: [],
           time_updated: 1,
           time_active: 1,
@@ -329,7 +329,7 @@ async function initRepo(dir: string, opts?: { commit?: boolean; remote?: string 
   await $`git init`.cwd(dir).quiet()
   await $`git config core.fsmonitor false`.cwd(dir).quiet()
   await $`git config commit.gpgsign false`.cwd(dir).quiet()
-  await $`git config user.email test@opencode.test`.cwd(dir).quiet()
+  await $`git config user.email test@sleepycode.test`.cwd(dir).quiet()
   await $`git config user.name Test`.cwd(dir).quiet()
   if (opts?.commit) await $`git commit --allow-empty -m root`.cwd(dir).quiet()
   if (opts?.remote) await $`git remote add origin ${opts.remote}`.cwd(dir).quiet()
@@ -585,7 +585,7 @@ describe("Project.resolve", () => {
         (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
       )
       yield* Effect.promise(() => initRepo(tmp.path, { commit: true, remote: "git@github.com:owner/repo.git" }))
-      yield* Effect.promise(() => Bun.write(path.join(tmp.path, ".git", "opencode"), "old-id"))
+      yield* Effect.promise(() => Bun.write(path.join(tmp.path, ".git", "sleepycode"), "old-id"))
       const project = yield* Project.Service
 
       const result = yield* project.resolve(abs(tmp.path))
@@ -606,7 +606,7 @@ describe("Project.resolve", () => {
 
       yield* project.resolve(abs(tmp.path))
 
-      expect(yield* Effect.promise(() => Bun.file(path.join(tmp.path, ".git", "opencode")).exists())).toBe(false)
+      expect(yield* Effect.promise(() => Bun.file(path.join(tmp.path, ".git", "sleepycode")).exists())).toBe(false)
     }),
   )
 
@@ -711,7 +711,7 @@ describe("Project.resolve", () => {
         Effect.promise(() => $`rm -rf ${worktree}`.quiet().nothrow()).pipe(Effect.ignore),
       )
       yield* Effect.promise(() => initRepo(tmp.path, { commit: true, remote: "git@github.com:owner/repo.git" }))
-      yield* Effect.promise(() => Bun.write(path.join(tmp.path, ".git", "opencode"), "old-id"))
+      yield* Effect.promise(() => Bun.write(path.join(tmp.path, ".git", "sleepycode"), "old-id"))
       yield* Effect.promise(() => $`git worktree add ${worktree} -b test-${Date.now()}`.cwd(tmp.path).quiet())
       const project = yield* Project.Service
       const db = (yield* Database.Service).db

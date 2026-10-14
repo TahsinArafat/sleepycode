@@ -18,15 +18,15 @@ if (!semver.satisfies(process.versions.bun, expectedBunVersionRange)) {
 }
 
 const env = {
-  OPENCODE_CHANNEL: process.env["OPENCODE_CHANNEL"],
-  OPENCODE_BUMP: process.env["OPENCODE_BUMP"],
-  OPENCODE_VERSION: process.env["OPENCODE_VERSION"],
-  OPENCODE_RELEASE: process.env["OPENCODE_RELEASE"],
+  SLEEPYCODE_CHANNEL: process.env["SLEEPYCODE_CHANNEL"],
+  SLEEPYCODE_BUMP: process.env["SLEEPYCODE_BUMP"],
+  SLEEPYCODE_VERSION: process.env["SLEEPYCODE_VERSION"],
+  SLEEPYCODE_RELEASE: process.env["SLEEPYCODE_RELEASE"],
 }
 const CHANNEL = await (async () => {
-  if (env.OPENCODE_CHANNEL) return env.OPENCODE_CHANNEL
-  if (env.OPENCODE_BUMP) return "latest"
-  if (env.OPENCODE_VERSION && !env.OPENCODE_VERSION.startsWith("0.0.0-")) return "latest"
+  if (env.SLEEPYCODE_CHANNEL) return env.SLEEPYCODE_CHANNEL
+  if (env.SLEEPYCODE_BUMP) return "latest"
+  if (env.SLEEPYCODE_VERSION && !env.SLEEPYCODE_VERSION.startsWith("0.0.0-")) return "latest"
   const branch = await $`git branch --show-current`.text().then((x) => x.trim())
   if (!branch) return "detached"
   const channel = branch.replace(/[^a-zA-Z0-9._-]/g, "-")
@@ -36,9 +36,9 @@ const CHANNEL = await (async () => {
 const IS_PREVIEW = CHANNEL !== "latest"
 
 const VERSION = await (async () => {
-  if (env.OPENCODE_VERSION) return env.OPENCODE_VERSION
+  if (env.SLEEPYCODE_VERSION) return env.SLEEPYCODE_VERSION
   if (IS_PREVIEW) return `0.0.0-${CHANNEL}-${previewBuildNumber()}`
-  const version = await fetch("https://registry.npmjs.org/@opencode%2fcli/latest")
+  const version = await fetch("https://registry.npmjs.org/@sleepycode%2fcli/latest")
     .then((res) => {
       if (!res.ok) throw new Error(res.statusText)
       return res.json()
@@ -46,7 +46,7 @@ const VERSION = await (async () => {
     .then((data: any) => data.version)
   if (semver.lt(version, "2.0.0")) return "2.0.0"
   const [major, minor, patch] = version.split(".").map((x: string) => Number(x) || 0)
-  const t = env.OPENCODE_BUMP?.toLowerCase()
+  const t = env.SLEEPYCODE_BUMP?.toLowerCase()
   if (t === "major") return `${major + 1}.0.0`
   if (t === "minor") return `${major}.${minor + 1}.0`
   return `${major}.${minor}.${patch + 1}`
@@ -60,7 +60,7 @@ function previewBuildNumber() {
   return runNumber
 }
 
-const bot = ["actions-user", "opencode", "opencode-agent[bot]"]
+const bot = ["actions-user", "sleepycode", "sleepycode-agent[bot]"]
 const teamPath = path.resolve(import.meta.dir, "../../../.github/TEAM_MEMBERS")
 const team = [
   ...(await Bun.file(teamPath)
@@ -81,10 +81,10 @@ export const Script = {
     return IS_PREVIEW
   },
   get release(): boolean {
-    return !!env.OPENCODE_RELEASE
+    return !!env.SLEEPYCODE_RELEASE
   },
   get team() {
     return team
   },
 }
-console.log(`opencode script`, JSON.stringify(Script, null, 2))
+console.log(`sleepycode script`, JSON.stringify(Script, null, 2))

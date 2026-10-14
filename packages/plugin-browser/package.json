@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/plugin-browser",
+  "name": "@sleepy-ai/plugin-browser",
   "version": "2.0.29",
-  "description": "OpenCode's desktop browser plugin",
+  "description": "SleepyCode's desktop browser plugin",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -27,8 +27,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@opencode/plugin": "workspace:*",
-    "@opencode/schema": "workspace:*",
+    "@sleepy-ai/plugin": "workspace:*",
+    "@sleepy-ai/schema": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

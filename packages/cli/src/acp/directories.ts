@@ -1,15 +1,15 @@
 import { isAbsolute, join, resolve } from "node:path"
 import { isDeepStrictEqual } from "node:util"
-import type { OpenCodeClient } from "@opencode/client/effect"
-import type { Permission } from "@opencode/schema/permission"
-import { AbsolutePath } from "@opencode/schema/schema"
-import type { Session } from "@opencode/schema/session"
-import { FSUtil } from "@opencode/util/fs-util"
+import type { SleepyCodeClient } from "@sleepy-ai/client/effect"
+import type { Permission } from "@sleepy-ai/schema/permission"
+import { AbsolutePath } from "@sleepy-ai/schema/schema"
+import type { Session } from "@sleepy-ai/schema/session"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
 import { Effect, Option, Schema } from "effect"
 import { ACPClient } from "./client"
 import { ACPError } from "./error"
 
-const key = "opencode.acp.additionalDirectories"
+const key = "sleepycode.acp.additionalDirectories"
 const decodeStored = Schema.decodeUnknownOption(Schema.Array(Schema.String))
 
 // Permission resources treat `*` and `?` as wildcards.
@@ -39,7 +39,7 @@ export function list(session: Pick<Session.Info, "metadata">) {
 }
 
 export const activate = Effect.fnUntraced(function* (
-  client: OpenCodeClient,
+  client: SleepyCodeClient,
   session: Session.Info,
   directories: readonly string[],
 ) {

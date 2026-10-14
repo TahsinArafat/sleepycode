@@ -1,6 +1,6 @@
-import { Database } from "@opencode/core/database/database"
-import { ModelsDev } from "@opencode/core/models-dev"
-import { PersistentPty } from "@opencode/core/persistent-pty"
+import { Database } from "@sleepy-ai/core/database/database"
+import { ModelsDev } from "@sleepy-ai/core/models-dev"
+import { PersistentPty } from "@sleepy-ai/core/persistent-pty"
 import { Schema } from "effect"
 
 export const ServerOptions = Schema.Struct({

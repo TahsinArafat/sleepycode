@@ -1,6 +1,6 @@
-import type { OpenCode } from "./client.js"
+import type { SleepyCode } from "./client.js"
 
-type Client = ReturnType<typeof OpenCode.make>
+type Client = ReturnType<typeof SleepyCode.make>
 
 export type { RpcApi, RpcCallOptions, RpcClient, RpcEventPayload } from "./rpc.js"
 

@@ -1,7 +1,7 @@
-import { Database } from "@opencode/core/database/database"
-import { Project } from "@opencode/core/project"
-import { upsertProject } from "@opencode/core/project/sql"
-import { makeGlobalNode } from "@opencode/util/effect/app-node"
+import { Database } from "@sleepy-ai/core/database/database"
+import { Project } from "@sleepy-ai/core/project"
+import { upsertProject } from "@sleepy-ai/core/project/sql"
+import { makeGlobalNode } from "@sleepy-ai/util/effect/app-node"
 import { Effect, Layer } from "effect"
 
 export const globalProjectNode = makeGlobalNode({

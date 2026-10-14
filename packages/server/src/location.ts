@@ -1,10 +1,10 @@
-import { FileSystem } from "@opencode/core/filesystem"
-import { Location } from "@opencode/core/location"
-import { Plugin } from "@opencode/core/plugin"
-import { LocationServiceMap } from "@opencode/core/location-services"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { LocationNotFoundError, InvalidRequestError, ServiceUnavailableError } from "@opencode/protocol/errors"
+import { FileSystem } from "@sleepy-ai/core/filesystem"
+import { Location } from "@sleepy-ai/core/location"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { LocationServiceMap } from "@sleepy-ai/core/location-services"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { Session } from "@sleepy-ai/core/session"
+import { LocationNotFoundError, InvalidRequestError, ServiceUnavailableError } from "@sleepy-ai/protocol/errors"
 import { Effect, Layer, Schema } from "effect"
 import { HttpServerRequest } from "effect/http"
 import { HttpApiMiddleware } from "effect/http-api"
@@ -13,7 +13,7 @@ import { missingSession } from "./handlers/session-error"
 export type LocationServices = Layer.Success<ReturnType<(typeof LocationServiceMap.Service)["get"]>>
 
 export class LocationMiddleware extends HttpApiMiddleware.Service<LocationMiddleware, { provides: LocationServices }>()(
-  "@opencode/HttpApiLocation",
+  "@sleepy-ai/HttpApiLocation",
   { error: [LocationNotFoundError] },
 ) {}
 
@@ -72,7 +72,7 @@ export function requestRef(request: HttpServerRequest.HttpServerRequest): Locati
   const query = new URL(request.url, "http://localhost").searchParams
   const directory =
     query.get("location[directory]") ||
-    (request.headers["x-opencode-directory"] ? decode(request.headers["x-opencode-directory"]) : process.cwd())
+    (request.headers["x-sleepycode-directory"] ? decode(request.headers["x-sleepycode-directory"]) : process.cwd())
   return Location.Ref.make({
     directory: AbsolutePath.make(directory),
   })

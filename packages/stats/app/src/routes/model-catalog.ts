@@ -1,4 +1,4 @@
-import { STEALTH_MODELS, statModel } from "@opencode/stats-core/domain/model-normalization"
+import { STEALTH_MODELS, statModel } from "@sleepy-ai/stats-core/domain/model-normalization"
 import { query } from "@solidjs/router"
 
 export const modelCatalogSourceUrl = "https://models.opencode.ai/catalog.json"
@@ -58,7 +58,7 @@ export type ModelCatalog = {
   models: ModelCatalogEntry[]
   aliases?: ModelCatalogEntry[]
   labs: ModelCatalogLab[]
-  // Stealth models stay out of the lab catalog, but their OpenCode listings publish limits and modalities.
+  // Stealth models stay out of the lab catalog, but their SleepyCode listings publish limits and modalities.
   stealthSpecs: Record<string, ModelCatalogSpecs>
 }
 
@@ -204,7 +204,7 @@ export function buildModelCatalog(payload: unknown, pricingPayload?: unknown, la
       cost:
         costs.get(catalogIdKey(model.id)) ??
         costs.get(`${model.lab}/${model.slug}`) ??
-        costs.get(`opencode-go/${model.slug}`) ??
+        costs.get(`sleepycode-go/${model.slug}`) ??
         costs.get(model.slug) ??
         model.cost,
     }))
@@ -248,8 +248,8 @@ export function buildModelCatalog(payload: unknown, pricingPayload?: unknown, la
 function readStealthModelSpecs(payload: unknown): Record<string, ModelCatalogSpecs> {
   if (!isRecord(payload)) return {}
   return Object.fromEntries(
-    // Later entries win, so the opencode listing takes precedence over opencode-go.
-    ["opencode-go", "opencode"]
+    // Later entries win, so the sleepycode listing takes precedence over sleepycode-go.
+    ["sleepycode-go", "sleepycode"]
       .map((provider) => payload[provider])
       .flatMap((provider) => (isRecord(provider) && isRecord(provider.models) ? Object.entries(provider.models) : []))
       .flatMap(([id, value]) => {

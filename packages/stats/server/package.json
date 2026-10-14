@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/stats-server",
+  "name": "@sleepy-ai/stats-server",
   "version": "2.0.29",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@effect/platform-node": "catalog:",
-    "@opencode/stats-core": "workspace:*",
+    "@sleepy-ai/stats-core": "workspace:*",
     "effect": "catalog:",
     "sst": "catalog:"
   },

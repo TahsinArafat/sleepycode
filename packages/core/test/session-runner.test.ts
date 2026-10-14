@@ -15,78 +15,78 @@ import {
   InvalidRequestError,
   RateLimitError,
   UnknownProviderError,
-} from "@opencode/ai"
-import { OpenAIChat } from "@opencode/ai/protocols/openai-chat"
-import { AnthropicMessages, OpenAIResponses } from "@opencode/ai/protocols"
-import { compileRequest } from "@opencode/ai/route/client"
-import { TestLLM } from "@opencode/ai/testing"
-import type { SessionHooks } from "@opencode/plugin/effect/session"
-import { Database } from "@opencode/core/database/database"
-import { makeLocationNode } from "@opencode/util/effect/app-node"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNodePlatform } from "@opencode/core/effect/app-node-platform"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { Event } from "@opencode/schema/event"
-import { App } from "@opencode/core/app"
-import { Permission } from "@opencode/core/permission"
-import { EventTable } from "@opencode/core/event/sql"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { Form } from "@opencode/core/form"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { Snapshot } from "@opencode/core/snapshot"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionCompaction } from "@opencode/core/session/compaction"
-import { SessionInbox } from "@opencode/core/session/inbox"
-import { SessionMessage } from "@opencode/core/session/message"
-import { SessionModelTransport } from "@opencode/core/session/model-transport"
-import { SessionProviderContext } from "@opencode/core/session/provider-context"
-import { Money } from "@opencode/schema/money"
-import { SessionProjector } from "@opencode/core/session/projector"
-import { SessionExecution } from "@opencode/core/session/execution"
-import { SessionRunCoordinator } from "@opencode/core/session/run-coordinator"
-import { SessionRunner } from "@opencode/core/session/runner/index"
-import { SessionRunnerLLM } from "@opencode/core/session/runner/llm"
-import { SessionRunnerModel } from "@opencode/core/session/runner/model"
-import { SessionUsage } from "@opencode/core/session/usage"
-import { PluginSupervisor } from "@opencode/core/plugin/supervisor"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
-import { PluginPromise } from "@opencode/core/plugin/promise"
-import { OptimizePlugin } from "@opencode/core/plugin/optimize"
-import { IdentityPlugin } from "@opencode/core/plugin/identity"
-import { QuestionTool } from "@opencode/core/tool/plugin/question"
-import { Agent } from "@opencode/core/agent"
-import { Config } from "@opencode/core/config"
-import { Document, Info } from "@opencode/schema/config"
-import { ConfigCompaction } from "@opencode/schema/config/compaction"
-import { Tool } from "@opencode/core/tool"
-import type { Info as ToolInfo } from "@opencode/schema/tool"
-import { InstructionStateTable, SessionInboxTable, SessionMessageTable, SessionTable } from "@opencode/core/session/sql"
-import { InstructionEntry } from "@opencode/core/session/instruction-entry"
-import { SessionStore } from "@opencode/core/session/store"
-import { Instructions } from "@opencode/core/instructions/index"
-import { InstructionBuiltIns } from "@opencode/core/instructions/builtins"
-import { InstructionDiscovery } from "@opencode/core/instruction-discovery"
-import { SkillInstructions } from "@opencode/core/skill/instructions"
-import { ReferenceInstructions } from "@opencode/core/reference/instructions"
-import { McpInstructions } from "@opencode/core/mcp/instructions"
-import { SessionSystemPrompt } from "@opencode/core/session/system-prompt"
-import { ID, Model } from "@opencode/core/model"
-import { Location } from "@opencode/core/location"
-import { Provider } from "@opencode/core/provider"
+} from "@sleepy-ai/ai"
+import { OpenAIChat } from "@sleepy-ai/ai/protocols/openai-chat"
+import { AnthropicMessages, OpenAIResponses } from "@sleepy-ai/ai/protocols"
+import { compileRequest } from "@sleepy-ai/ai/route/client"
+import { TestLLM } from "@sleepy-ai/ai/testing"
+import type { SessionHooks } from "@sleepy-ai/plugin/effect/session"
+import { Database } from "@sleepy-ai/core/database/database"
+import { makeLocationNode } from "@sleepy-ai/util/effect/app-node"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNodePlatform } from "@sleepy-ai/core/effect/app-node-platform"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Bus } from "@sleepy-ai/core/bus"
+import { Event } from "@sleepy-ai/schema/event"
+import { App } from "@sleepy-ai/core/app"
+import { Permission } from "@sleepy-ai/core/permission"
+import { EventTable } from "@sleepy-ai/core/event/sql"
+import { Project } from "@sleepy-ai/core/project"
+import { ProjectTable } from "@sleepy-ai/core/project/sql"
+import { Form } from "@sleepy-ai/core/form"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { Session } from "@sleepy-ai/core/session"
+import { Snapshot } from "@sleepy-ai/core/snapshot"
+import { SessionEvent } from "@sleepy-ai/core/session/event"
+import { SessionCompaction } from "@sleepy-ai/core/session/compaction"
+import { SessionInbox } from "@sleepy-ai/core/session/inbox"
+import { SessionMessage } from "@sleepy-ai/core/session/message"
+import { SessionModelTransport } from "@sleepy-ai/core/session/model-transport"
+import { SessionProviderContext } from "@sleepy-ai/core/session/provider-context"
+import { Money } from "@sleepy-ai/schema/money"
+import { SessionProjector } from "@sleepy-ai/core/session/projector"
+import { SessionExecution } from "@sleepy-ai/core/session/execution"
+import { SessionRunCoordinator } from "@sleepy-ai/core/session/run-coordinator"
+import { SessionRunner } from "@sleepy-ai/core/session/runner/index"
+import { SessionRunnerLLM } from "@sleepy-ai/core/session/runner/llm"
+import { SessionRunnerModel } from "@sleepy-ai/core/session/runner/model"
+import { SessionUsage } from "@sleepy-ai/core/session/usage"
+import { PluginSupervisor } from "@sleepy-ai/core/plugin/supervisor"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { PluginHooks } from "@sleepy-ai/core/plugin/hooks"
+import { PluginPromise } from "@sleepy-ai/core/plugin/promise"
+import { OptimizePlugin } from "@sleepy-ai/core/plugin/optimize"
+import { IdentityPlugin } from "@sleepy-ai/core/plugin/identity"
+import { QuestionTool } from "@sleepy-ai/core/tool/plugin/question"
+import { Agent } from "@sleepy-ai/core/agent"
+import { Config } from "@sleepy-ai/core/config"
+import { Document, Info } from "@sleepy-ai/schema/config"
+import { ConfigCompaction } from "@sleepy-ai/schema/config/compaction"
+import { Tool } from "@sleepy-ai/core/tool"
+import type { Info as ToolInfo } from "@sleepy-ai/schema/tool"
+import { InstructionStateTable, SessionInboxTable, SessionMessageTable, SessionTable } from "@sleepy-ai/core/session/sql"
+import { InstructionEntry } from "@sleepy-ai/core/session/instruction-entry"
+import { SessionStore } from "@sleepy-ai/core/session/store"
+import { Instructions } from "@sleepy-ai/core/instructions/index"
+import { InstructionBuiltIns } from "@sleepy-ai/core/instructions/builtins"
+import { InstructionDiscovery } from "@sleepy-ai/core/instruction-discovery"
+import { SkillInstructions } from "@sleepy-ai/core/skill/instructions"
+import { ReferenceInstructions } from "@sleepy-ai/core/reference/instructions"
+import { McpInstructions } from "@sleepy-ai/core/mcp/instructions"
+import { SessionSystemPrompt } from "@sleepy-ai/core/session/system-prompt"
+import { ID, Model } from "@sleepy-ai/core/model"
+import { Location } from "@sleepy-ai/core/location"
+import { Provider } from "@sleepy-ai/core/provider"
 import { Cause, Context, DateTime, Deferred, Effect, Exit, Fiber, Layer, Queue, Schema, Scope, Stream } from "effect"
 import { TestClock } from "effect/testing"
 import { asc, desc, eq, sql } from "drizzle-orm"
 import { testEffect } from "./lib/effect"
 import { promptLocationNode } from "./fixture/prompt-location"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
+import { LocationServiceMap } from "@sleepy-ai/core/location-service-map"
 import { Expected } from "./lib/session-message"
 import { permissionLayer } from "./lib/permission"
 import { agentHost, modelHost, host, noProviders } from "./plugin/host"
-import { CodeModeInstructions } from "@opencode/core/codemode/instructions"
+import { CodeModeInstructions } from "@sleepy-ai/core/codemode/instructions"
 
 const emptyCodeMode = `${CodeModeInstructions.render({ total: 0, shown: 0, namespaces: [] })}\n\n`
 type ToolBarrier = {
@@ -4718,13 +4718,13 @@ describe("SessionRunnerLLM", () => {
     yield* s.runPrompt("Run correlated request")
 
     expect(s.requests[0]?.http?.headers).toEqual({
-      "x-opencode-session-id": sessionID,
+      "x-sleepycode-session-id": sessionID,
       "x-session-affinity": sessionID,
       "X-Session-Id": sessionID,
       "User-Agent": App.useragent(App.make()),
-      "x-opencode-project": Project.ID.global,
-      "x-opencode-session": sessionID,
-      "x-opencode-client": "opencode",
+      "x-sleepycode-project": Project.ID.global,
+      "x-sleepycode-session": sessionID,
+      "x-sleepycode-client": "sleepycode",
     })
   })
 
@@ -4740,12 +4740,12 @@ describe("SessionRunnerLLM", () => {
     yield* s.runPrompt("Run child request")
 
     expect(s.requests[0]?.http?.headers).toMatchObject({
-      "x-opencode-session-id": sessionID,
-      "x-opencode-parent-session-id": parentID,
+      "x-sleepycode-session-id": sessionID,
+      "x-sleepycode-parent-session-id": parentID,
       "x-session-affinity": parentID,
       "X-Session-Id": parentID,
       "x-parent-session-id": parentID,
-      "x-opencode-session": parentID,
+      "x-sleepycode-session": parentID,
     })
     expect(s.requests[0]?.promptCacheKey).toBe(parentID)
   })

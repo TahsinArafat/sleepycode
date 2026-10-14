@@ -1,8 +1,8 @@
-import { Plugin } from "@opencode/plugin/tui"
+import { Plugin } from "@sleepy-ai/plugin/tui"
 import { createLatexCodeBlockRenderer } from "./markdown"
 
 export default Plugin.define({
-  id: "opencode.latex",
+  id: "sleepycode.latex",
   setup(context) {
     const render = createLatexCodeBlockRenderer(context.renderer, () => ({
       text: context.theme.text.base,

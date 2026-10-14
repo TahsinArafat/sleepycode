@@ -1,7 +1,7 @@
-import { Instance } from "@opencode/core/instance/service"
-import { LocationServiceMap } from "@opencode/core/location-services"
-import { Session } from "@opencode/core/session"
-import { LocationNotFoundError, InvalidRequestError, SessionNotFoundError } from "@opencode/protocol/errors"
+import { Instance } from "@sleepy-ai/core/instance/service"
+import { LocationServiceMap } from "@sleepy-ai/core/location-services"
+import { Session } from "@sleepy-ai/core/session"
+import { LocationNotFoundError, InvalidRequestError, SessionNotFoundError } from "@sleepy-ai/protocol/errors"
 import { Effect, Layer } from "effect"
 import { HttpRouter, HttpServerRequest } from "effect/http"
 import { HttpApiMiddleware } from "effect/http-api"
@@ -10,7 +10,7 @@ import { locationErrors, requestRef, sessionInfo, type LocationServices } from "
 export class FormLocationMiddleware extends HttpApiMiddleware.Service<
   FormLocationMiddleware,
   { provides: LocationServices }
->()("@opencode/HttpApiFormLocation", {
+>()("@sleepy-ai/HttpApiFormLocation", {
   error: [InvalidRequestError, SessionNotFoundError, LocationNotFoundError],
 }) {}
 

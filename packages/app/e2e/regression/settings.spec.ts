@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test"
-import type { ConfigEntry, OpenCodeEvent, WorktreeDirectory } from "@opencode/client/promise"
+import type { ConfigEntry, SleepyCodeEvent, WorktreeDirectory } from "@sleepy-ai/client/promise"
 import { NO_PROVIDER, REMOTE_SERVER, SERVER, holdRoute, project, session } from "../utils/app"
-import { mockOpenCodeServer } from "../utils/mock-server"
+import { mockSleepyCodeServer } from "../utils/mock-server"
 import { mockRemoteServer, mockWorkspace, openSettings, type WorkspaceInput } from "../utils/workspace"
 
 const directory = "C:/Projects/settings-demo"
@@ -25,8 +25,8 @@ function open(page: Page, input: Partial<WorkspaceInput> = {}) {
     project: { icon: { color: "orange", override }, commands: { start: "echo setup" }, sandboxes },
     provider: NO_PROVIDER,
     configEntries: [
-      { type: "document", path: "/home/test/.config/opencode/opencode.jsonc", info: { shell: "/bin/zsh" } },
-      { type: "directory", path: "/home/test/.config/opencode" },
+      { type: "document", path: "/home/test/.config/sleepycode/sleepycode.jsonc", info: { shell: "/bin/zsh" } },
+      { type: "directory", path: "/home/test/.config/sleepycode" },
     ],
     shells: [
       { path: "/bin/zsh", name: "zsh", acceptable: true },
@@ -135,7 +135,7 @@ test("single-server settings expose scoped pages without a server picker", async
 })
 
 test("project list menus rename, close, edit, add, and stay inside the scrollport", async ({ page }) => {
-  const projects = ["rebase", "dinocms", "opencode", "Playground"].map((name, index) =>
+  const projects = ["rebase", "dinocms", "sleepycode", "Playground"].map((name, index) =>
     project({ id: `project-${index}`, directory: `/projects/${name}`, name }),
   )
 
@@ -503,7 +503,7 @@ test("worktrees follow inventory events, wait for session counts, and delete by 
   // SAFETY: a worktree.updated event carries only the project ID, which is all the app reads from it.
   await view.push([
     { id: "evt_settings_worktree_updated", created: Date.now(), type: "worktree.updated", data: { projectID } },
-  ] as OpenCodeEvent[])
+  ] as SleepyCodeEvent[])
   expect((await listed).ok()).toBe(true)
   await expect(settings.getByText(discovered, { exact: true })).toBeVisible()
   expect((await read).ok()).toBe(true)
@@ -632,12 +632,12 @@ test.describe("worktrees prefetch", () => {
 const lsp: ConfigEntry[] = [
   {
     type: "document",
-    path: "/config/opencode.json",
+    path: "/config/sleepycode.json",
     info: { lsp: { typescript: { command: ["typescript-language-server", "--stdio"], extensions: [".ts", ".tsx"] } } },
   },
   {
     type: "document",
-    path: `${directory}/opencode.jsonc`,
+    path: `${directory}/sleepycode.jsonc`,
     info: { lsp: { typescript: { disabled: true }, rust: { command: ["rust-analyzer"], extensions: [".rs"] } } },
   },
 ]
@@ -686,7 +686,7 @@ for (const row of ["configured", "disabled", "failure"] as const) {
   })
 }
 
-// Zen and the Console account share the id `opencode`: the provider comes from models.dev, the
+// Zen and the Console account share the id `sleepycode`: the provider comes from models.dev, the
 // integration carries the account sign-in.
 for (const row of [
   { name: "a fresh install offers the Console sign-in", paid: false, connections: [], console: true },
@@ -708,8 +708,8 @@ for (const row of [
       provider: {
         all: [
           {
-            id: "opencode",
-            name: "OpenCode Zen",
+            id: "sleepycode",
+            name: "SleepyCode Zen",
             models: {
               "claude-sonnet-4-6": {
                 id: "claude-sonnet-4-6",
@@ -719,20 +719,20 @@ for (const row of [
             },
           },
         ],
-        connected: ["opencode"],
+        connected: ["sleepycode"],
         default: {},
       },
       integrations: [
         {
-          id: "opencode",
-          name: "OpenCode Console",
+          id: "sleepycode",
+          name: "SleepyCode Console",
           methods: [
-            { id: "device", type: "oauth", label: "OpenCode Console account" },
+            { id: "device", type: "oauth", label: "SleepyCode Console account" },
             { type: "key", label: "API key (service account)" },
           ],
           connections: row.connections,
         },
-        { id: "opencode-go", name: "OpenCode Go", methods: [{ type: "key" }], connections: [] },
+        { id: "sleepycode-go", name: "SleepyCode Go", methods: [{ type: "key" }], connections: [] },
         { id: "anthropic", name: "Anthropic", methods: [{ type: "key" }], connections: [] },
       ],
     })
@@ -741,31 +741,31 @@ for (const row of [
     await expect(settings.getByRole("heading", { name: "Popular providers" })).toBeVisible()
     const connected = settings.locator('[data-component="connected-providers-section"]')
 
-    if (row.paid) await expect(connected.getByText("OpenCode Zen", { exact: true })).toBeVisible()
+    if (row.paid) await expect(connected.getByText("SleepyCode Zen", { exact: true })).toBeVisible()
 
     if (!row.paid) await expect(settings.getByText("No connected providers")).toBeVisible()
     // Anthropic only exists in the integration fixture, so its row proves the integration list has loaded.
     await expect(settings.getByText("Anthropic", { exact: true })).toBeVisible()
-    await expect(settings.getByText("OpenCode Console", { exact: true })).toHaveCount(row.console ? 1 : 0)
+    await expect(settings.getByText("SleepyCode Console", { exact: true })).toHaveCount(row.console ? 1 : 0)
   })
 }
 
 const consoleIntegrations = [
   {
-    id: "opencode",
-    name: "OpenCode Console",
+    id: "sleepycode",
+    name: "SleepyCode Console",
     methods: [
-      { id: "device", type: "oauth", label: "OpenCode Console account" },
+      { id: "device", type: "oauth", label: "SleepyCode Console account" },
       { type: "key", label: "API key (service account)" },
     ],
     connections: [],
   },
-  { id: "opencode-go", name: "OpenCode Go", methods: [{ type: "key" }], connections: [] },
+  { id: "sleepycode-go", name: "SleepyCode Go", methods: [{ type: "key" }], connections: [] },
 ]
 
 for (const row of [
-  { provider: "OpenCode Console", connect: "Connect OpenCode Console", signIn: "Connecting to OpenCode Console" },
-  { provider: "OpenCode Go", connect: "Connect OpenCode Go", signIn: "Connecting to OpenCode Go" },
+  { provider: "SleepyCode Console", connect: "Connect SleepyCode Console", signIn: "Connecting to SleepyCode Console" },
+  { provider: "SleepyCode Go", connect: "Connect SleepyCode Go", signIn: "Connecting to SleepyCode Go" },
 ]) {
   test(`providers: ${row.provider} signs in from the Console intro`, async ({ page, context }) => {
     const url = "https://auth.example.test/device?user_code=ABCD-EFGH"
@@ -773,7 +773,7 @@ for (const row of [
     const { settings } = await open(page, { integrations: consoleIntegrations, onIntegrationOAuth: () => ({ url }) })
 
     // Registered after the mock server so it sees the sign-in request first.
-    const start = await holdRoute(page, (url) => url.pathname === "/api/integration/opencode/connect/oauth", {
+    const start = await holdRoute(page, (url) => url.pathname === "/api/integration/sleepycode/connect/oauth", {
       method: "POST",
     })
 
@@ -785,7 +785,7 @@ for (const row of [
     const intro = page.getByRole("dialog", { name: row.connect, exact: true })
     const container = page.locator('[data-slot="dialog-container"]')
     await expect(
-      intro.getByText("Sign in with your OpenCode Console account to use the available models."),
+      intro.getByText("Sign in with your SleepyCode Console account to use the available models."),
     ).toBeVisible()
     await expect(intro.getByRole("button", { name: "Use API key", exact: true })).toBeVisible()
     expect((await container.boundingBox())?.height).toBe(512)
@@ -896,10 +896,10 @@ test("providers: adding a Go account uses a Go key, and a lone sign-in starts on
 
   const { settings } = await open(page, {
     integrations: [
-      ...consoleIntegrations.filter((integration) => integration.id !== "opencode-go"),
+      ...consoleIntegrations.filter((integration) => integration.id !== "sleepycode-go"),
       {
-        id: "opencode-go",
-        name: "OpenCode Go",
+        id: "sleepycode-go",
+        name: "SleepyCode Go",
         methods: [{ type: "key" }],
         connections: [{ type: "credential", id: "cred_go", label: "Go key", method: "key" }],
       },
@@ -920,7 +920,7 @@ test("providers: adding a Go account uses a Go key, and a lone sign-in starts on
   await settings.getByRole("tab", { name: "Providers", exact: true }).click()
   await settings.getByRole("button", { name: "Show more providers", exact: true }).click()
   const dialog = page.getByRole("dialog")
-  await dialog.locator('[data-provider-id="opencode-go"]').click()
+  await dialog.locator('[data-provider-id="sleepycode-go"]').click()
   await dialog.getByRole("button", { name: "Add another account", exact: true }).click()
   await expect(dialog.getByPlaceholder("API key")).toBeVisible()
   expect(attempts).toEqual([])
@@ -1015,28 +1015,28 @@ test("providers: switching to a Zen API key does not wait for a Console workspac
       state.active === "cred_console"
         ? {
             all: [
-              { id: "opencode", integrationID: "opencode", name: "Anomaly / OpenCode", models: {} },
-              { id: "console-google", integrationID: "opencode", name: "Anomaly / Google", models: {} },
+              { id: "sleepycode", integrationID: "sleepycode", name: "Anomaly / SleepyCode", models: {} },
+              { id: "console-google", integrationID: "sleepycode", name: "Anomaly / Google", models: {} },
             ],
-            connected: ["opencode", "console-google"],
+            connected: ["sleepycode", "console-google"],
             default: {},
           }
         : {
             all: [
               {
-                id: "opencode",
-                name: "OpenCode Zen",
+                id: "sleepycode",
+                name: "SleepyCode Zen",
                 models: { paid: { id: "paid", name: "Paid", cost: { input: 3 } } },
               },
             ],
-            connected: ["opencode"],
+            connected: ["sleepycode"],
             default: {},
           },
     integrations: () => [
       {
-        id: "opencode",
-        name: "OpenCode Console",
-        methods: [{ id: "device", type: "oauth", label: "OpenCode Console account" }],
+        id: "sleepycode",
+        name: "SleepyCode Console",
+        methods: [{ id: "device", type: "oauth", label: "SleepyCode Console account" }],
         connections: accounts.toSorted((a, b) => Number(b.id === state.active) - Number(a.id === state.active)),
       },
     ],
@@ -1046,7 +1046,7 @@ test("providers: switching to a Zen API key does not wait for a Console workspac
   })
 
   await settings.getByRole("tab", { name: "Providers", exact: true }).click()
-  const trigger = settings.getByRole("button", { name: "Manage OpenCode Console accounts", exact: true })
+  const trigger = settings.getByRole("button", { name: "Manage SleepyCode Console accounts", exact: true })
   await expect(trigger).toHaveText("Anomaly")
   await trigger.click()
 
@@ -1057,12 +1057,12 @@ test("providers: switching to a Zen API key does not wait for a Console workspac
       catalogReads.push(request.url())
   })
   await page.getByRole("menuitemradio", { name: "Zen key", exact: true }).click()
-  await expect(page.getByText("OpenCode Console account switched")).toBeVisible()
+  await expect(page.getByText("SleepyCode Console account switched")).toBeVisible()
   // One refresh after the switch; a Console workspace poll would keep reading the catalog.
   expect(catalogReads).toHaveLength(1)
 })
 
-test("providers: connecting OpenCode Go keeps the Console row in place", async ({ page, context }) => {
+test("providers: connecting SleepyCode Go keeps the Console row in place", async ({ page, context }) => {
   await context.route("https://auth.example.test/**", (route) => route.fulfill({ body: "Sign in" }))
 
   // After the sign-in the server reloads the workspace, briefly serving only the free catalog.
@@ -1070,10 +1070,10 @@ test("providers: connecting OpenCode Go keeps the Console row in place", async (
 
   const workspace = {
     all: [
-      { id: "opencode", integrationID: "opencode", name: "Anomaly / OpenCode", models: {} },
-      { id: "console-google", integrationID: "opencode", name: "Anomaly / Google", models: {} },
+      { id: "sleepycode", integrationID: "sleepycode", name: "Anomaly / SleepyCode", models: {} },
+      { id: "console-google", integrationID: "sleepycode", name: "Anomaly / Google", models: {} },
     ],
-    connected: ["opencode", "console-google"],
+    connected: ["sleepycode", "console-google"],
     default: {},
   }
 
@@ -1081,14 +1081,14 @@ test("providers: connecting OpenCode Go keeps the Console row in place", async (
     if (state.pendingReads > 0) {
       state.pendingReads--
 
-      return { all: [{ id: "opencode", name: "OpenCode", models: {} }], connected: ["opencode"], default: {} }
+      return { all: [{ id: "sleepycode", name: "SleepyCode", models: {} }], connected: ["sleepycode"], default: {} }
     }
 
     if (!state.authorized) return workspace
 
     return {
-      all: [...workspace.all, { id: "opencode-go", integrationID: "opencode-go", name: "OpenCode Go", models: {} }],
-      connected: [...workspace.connected, "opencode-go"],
+      all: [...workspace.all, { id: "sleepycode-go", integrationID: "sleepycode-go", name: "SleepyCode Go", models: {} }],
+      connected: [...workspace.connected, "sleepycode-go"],
       default: {},
     }
   }
@@ -1097,14 +1097,14 @@ test("providers: connecting OpenCode Go keeps the Console row in place", async (
     provider: catalog,
     integrations: () => [
       {
-        id: "opencode",
-        name: "OpenCode Console",
-        methods: [{ id: "device", type: "oauth", label: "OpenCode Console account" }],
+        id: "sleepycode",
+        name: "SleepyCode Console",
+        methods: [{ id: "device", type: "oauth", label: "SleepyCode Console account" }],
         connections: [{ type: "credential", id: "cred_console", label: "Anomaly", method: "oauth" }],
       },
       {
-        id: "opencode-go",
-        name: "OpenCode Go",
+        id: "sleepycode-go",
+        name: "SleepyCode Go",
         methods: [{ type: "key" }],
         connections: state.authorized ? [{ type: "credential", id: "cred_go", label: "Anomaly", method: "oauth" }] : [],
       },
@@ -1122,25 +1122,25 @@ test("providers: connecting OpenCode Go keeps the Console row in place", async (
 
   await settings.getByRole("tab", { name: "Providers", exact: true }).click()
   const connected = settings.locator('[data-component="connected-providers-section"]')
-  await expect(connected.getByText("OpenCode Console", { exact: true })).toBeVisible()
+  await expect(connected.getByText("SleepyCode Console", { exact: true })).toBeVisible()
   await connected.evaluate((element) => {
     new MutationObserver(() => {
-      if (!element.textContent?.includes("OpenCode Console")) element.dataset.flashed = ""
+      if (!element.textContent?.includes("SleepyCode Console")) element.dataset.flashed = ""
     }).observe(element, { childList: true, subtree: true, characterData: true })
   })
 
   await settings
-    .locator(".settings-provider-row", { hasText: "OpenCode Go" })
+    .locator(".settings-provider-row", { hasText: "SleepyCode Go" })
     .getByRole("button", { name: "Connect", exact: true })
     .click()
   const popup = page.waitForEvent("popup")
   await page.getByRole("button", { name: "Continue in the browser", exact: true }).click()
   await popup
-  await expect(page.getByText("OpenCode Go connected", { exact: true })).toBeVisible()
+  await expect(page.getByText("SleepyCode Go connected", { exact: true })).toBeVisible()
   await expect(page.getByRole("dialog")).toHaveCount(0)
 
-  await expect(connected.getByText("OpenCode Go", { exact: true })).toBeVisible()
-  await expect(connected.getByText("OpenCode Console", { exact: true })).toBeVisible()
+  await expect(connected.getByText("SleepyCode Go", { exact: true })).toBeVisible()
+  await expect(connected.getByText("SleepyCode Console", { exact: true })).toBeVisible()
   await expect(connected).not.toHaveAttribute("data-flashed")
 })
 
@@ -1159,18 +1159,18 @@ test("providers: switching Console accounts keeps the list until the new workspa
       state.pendingReads--
 
       return {
-        all: [{ id: "opencode", name: "OpenCode", models: { free: { id: "free", name: "Free", cost: { input: 0 } } } }],
-        connected: ["opencode"],
+        all: [{ id: "sleepycode", name: "SleepyCode", models: { free: { id: "free", name: "Free", cost: { input: 0 } } } }],
+        connected: ["sleepycode"],
         default: {},
       }
     }
 
     return {
       all: [
-        { id: "opencode", integrationID: "opencode", name: `${workspace()} / OpenCode`, models: {} },
-        { id: "console-google", integrationID: "opencode", name: `${workspace()} / Google`, models: {} },
+        { id: "sleepycode", integrationID: "sleepycode", name: `${workspace()} / SleepyCode`, models: {} },
+        { id: "console-google", integrationID: "sleepycode", name: `${workspace()} / Google`, models: {} },
       ],
-      connected: ["opencode", "console-google"],
+      connected: ["sleepycode", "console-google"],
       default: {},
     }
   }
@@ -1179,9 +1179,9 @@ test("providers: switching Console accounts keeps the list until the new workspa
     provider: catalog,
     integrations: () => [
       {
-        id: "opencode",
-        name: "OpenCode Console",
-        methods: [{ id: "device", type: "oauth", label: "OpenCode Console account" }],
+        id: "sleepycode",
+        name: "SleepyCode Console",
+        methods: [{ id: "device", type: "oauth", label: "SleepyCode Console account" }],
         connections: accounts.toSorted((a, b) => Number(b.id === state.active) - Number(a.id === state.active)),
       },
     ],
@@ -1193,7 +1193,7 @@ test("providers: switching Console accounts keeps the list until the new workspa
 
   await settings.getByRole("tab", { name: "Providers", exact: true }).click()
   const connected = settings.locator('[data-component="connected-providers-section"]')
-  const trigger = connected.getByRole("button", { name: "Manage OpenCode Console accounts", exact: true })
+  const trigger = connected.getByRole("button", { name: "Manage SleepyCode Console accounts", exact: true })
   await expect(trigger).toHaveText("Clara")
   await connected.evaluate((element) => {
     new MutationObserver(() => {
@@ -1203,7 +1203,7 @@ test("providers: switching Console accounts keeps the list until the new workspa
 
   await trigger.click()
   await page.getByRole("menuitemradio", { name: "Anomaly", exact: true }).click()
-  await expect(page.getByText("OpenCode Console account switched")).toBeVisible()
+  await expect(page.getByText("SleepyCode Console account switched")).toBeVisible()
   await expect(trigger).toHaveText("Anomaly")
   await expect(connected).not.toHaveAttribute("data-flashed")
 })
@@ -1233,7 +1233,7 @@ test("the add server dialog keeps focus above fullscreen settings", async ({ pag
 test("the add server dialog pairs from a one-time link and explains a spent one", async ({ page }) => {
   const paired = "http://127.0.0.1:4098"
   await mockRemoteServer(page, { directory: "/remote/settings-demo" })
-  await mockOpenCodeServer(page, {
+  await mockSleepyCodeServer(page, {
     server: paired,
     directory: "/remote/paired",
     project: project({ id: "proj_paired", directory: "/remote/paired" }),
@@ -1263,7 +1263,7 @@ test("the add server dialog pairs from a one-time link and explains a spent one"
 
   const spent = await addServer()
   await expect(spent.getByRole("alert")).toHaveText(
-    "This pairing link expired or was already used. Run opencode pair to get a new one.",
+    "This pairing link expired or was already used. Run sleepycode pair to get a new one.",
   )
 })
 
@@ -1278,7 +1278,7 @@ test("a pairing code with several addresses keeps the first one that works with 
     [first, { code: "spent-by-the-other-address", token: "session-token" }],
     [second, { code: "one-time-code", token: "session-token" }],
   ] as const) {
-    await mockOpenCodeServer(page, {
+    await mockSleepyCodeServer(page, {
       server,
       directory: "/remote/paired",
       project: project({ id: "proj_paired", directory: "/remote/paired" }),

@@ -113,10 +113,10 @@
       }
     }
   },
-  "opencode-go": {
-    "id": "opencode-go",
-    "name": "OpenCode Go",
-    "env": ["OPENCODE_API_KEY"],
+  "sleepycode-go": {
+    "id": "sleepycode-go",
+    "name": "SleepyCode Go",
+    "env": ["SLEEPYCODE_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
     "models": {
       "minimax-m3": {

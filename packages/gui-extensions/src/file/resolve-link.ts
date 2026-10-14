@@ -1,4 +1,4 @@
-import { parsePathLineSuffix } from "@opencode/util/path"
+import { parsePathLineSuffix } from "@sleepy-ai/util/path"
 import type { Files, LineRange } from "../sdk"
 
 export type ParsedFileLink = {

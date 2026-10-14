@@ -1,5 +1,5 @@
 import { Effect, Option, Schema } from "effect"
-import { Tool } from "@opencode/schema/tool"
+import { Tool } from "@sleepy-ai/schema/tool"
 import { Route } from "../route/client.js"
 import { Auth } from "../route/auth.js"
 import { Endpoint } from "../route/endpoint.js"
@@ -736,7 +736,7 @@ const detectSupportsStore = (provider: string, baseURL: string | undefined): boo
   const isVercelAiGateway =
     p === "vercel-ai-gateway" || url.includes("ai-gateway.vercel.sh") || url.includes("vercel.sh")
   const isAntLing = p === "ant-ling" || url.includes("api.ant-ling.com")
-  const isOpencode = p === "opencode" || url.includes("opencode.ai")
+  const isSleepycode = p === "sleepycode" || url.includes("opencode.ai")
   const isGemini = url.includes("generativelanguage.googleapis.com")
   const isNonStandard =
     isGemini ||
@@ -748,7 +748,7 @@ const detectSupportsStore = (provider: string, baseURL: string | undefined): boo
     isDeepSeek ||
     isZai ||
     isMoonshot ||
-    isOpencode ||
+    isSleepycode ||
     isCloudflareWorkersAI ||
     isCloudflareAiGateway ||
     isVercelAiGateway ||

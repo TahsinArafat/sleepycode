@@ -1,5 +1,5 @@
 {
-  "name": "@opencode/console-function",
+  "name": "@sleepy-ai/console-function",
   "version": "2.0.29",
   "$schema": "https://json.schemastore.org/package.json",
   "private": true,
@@ -17,6 +17,6 @@
     "@typescript/native-preview": "catalog:"
   },
   "dependencies": {
-    "@opencode/console-resource": "workspace:*"
+    "@sleepy-ai/console-resource": "workspace:*"
   }
 }

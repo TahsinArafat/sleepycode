@@ -1,12 +1,12 @@
 import { Effect } from "effect"
 import path from "node:path"
-import { define } from "@opencode/plugin/effect/plugin"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Global } from "@opencode/util/global"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
+import { Global } from "@sleepy-ai/util/global"
 import { Provider } from "../../provider.js"
 
 // Ambient inputs the AWS default credential chain can turn into credentials
-// without any key stored in opencode. Mirrors the presence checks the AWS CLI
+// without any key stored in sleepycode. Mirrors the presence checks the AWS CLI
 // and SDK use before consulting shared config.
 const CHAIN_ENV = [
   "AWS_PROFILE",
@@ -17,10 +17,10 @@ const CHAIN_ENV = [
 ]
 
 const isBedrock = (item: { readonly package: string }) =>
-  item.package.startsWith("@opencode/ai/providers/amazon-bedrock")
+  item.package.startsWith("@sleepy-ai/ai/providers/amazon-bedrock")
 
 export const AmazonBedrockPlugin = define({
-  id: "opencode.provider.amazon.bedrock",
+  id: "sleepycode.provider.amazon.bedrock",
   effect: Effect.fn(function* (ctx) {
     const fs = yield* FSUtil.Service
     const paths = [

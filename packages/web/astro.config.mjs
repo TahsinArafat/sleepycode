@@ -31,7 +31,7 @@ export default defineConfig({
     configSchema(),
     solidJs(),
     starlight({
-      title: "OpenCode",
+      title: "SleepyCode",
       defaultLocale: "root",
       locales: {
         root: {
@@ -327,7 +327,7 @@ function configSchema() {
     name: "configSchema",
     hooks: {
       "astro:build:done": async () => {
-        // V1 schemas are frozen in the console app since packages/opencode lives on the v1 branch.
+        // V1 schemas are frozen in the console app since packages/sleepycode lives on the v1 branch.
         copyFileSync("../console/app/public/config.json", "./dist/config.json")
         copyFileSync("../console/app/public/tui.json", "./dist/tui.json")
       },

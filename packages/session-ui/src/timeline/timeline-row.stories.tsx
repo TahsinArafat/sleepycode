@@ -1,4 +1,4 @@
-import type { SessionMessageAssistant, SessionMessageInfo } from "@opencode/client/promise"
+import type { SessionMessageAssistant, SessionMessageInfo } from "@sleepy-ai/client/promise"
 import { createMemo } from "solid-js"
 import { createStore } from "solid-js/store"
 import type { SessionDocument } from "../document"
@@ -25,7 +25,7 @@ import {
 } from "../storybook/current-session-fixtures"
 
 export default {
-  title: "OpenCode/Conversation/Message states",
+  title: "SleepyCode/Conversation/Message states",
   id: "current-session-timeline-rows",
   component: SessionTimeline,
   parameters: {
@@ -476,7 +476,7 @@ const MovedLocation = {
           {
             id: "msg_story_location",
             type: "location-switched",
-            location: { directory: `/Users/usrnk1/Developer/opencode/${"nested-directory/".repeat(24)}session` },
+            location: { directory: `/Users/usrnk1/Developer/sleepycode/${"nested-directory/".repeat(24)}session` },
             time: { created: 1_735_689_633_000 },
           },
         ],

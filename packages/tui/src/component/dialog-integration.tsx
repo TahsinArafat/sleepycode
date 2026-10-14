@@ -11,8 +11,8 @@ import type {
   FormFields,
   FormValue,
   LocationRef,
-} from "@opencode/client"
-import { openUrl } from "@opencode/util/open"
+} from "@sleepy-ai/client"
+import { openUrl } from "@sleepy-ai/util/open"
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useClipboard } from "../context/clipboard"
@@ -38,8 +38,8 @@ import {
 } from "../util/form"
 
 const INTEGRATION_PRIORITY: Record<string, number> = {
-  "opencode-go": 0,
-  opencode: 1,
+  "sleepycode-go": 0,
+  sleepycode: 1,
   openai: 2,
   "github-copilot": 3,
   anthropic: 4,

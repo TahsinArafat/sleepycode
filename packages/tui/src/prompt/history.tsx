@@ -1,7 +1,7 @@
 import path from "path"
 import { onMount } from "solid-js"
 import { createStore, produce, unwrap } from "solid-js/store"
-import type { PromptInput } from "@opencode/schema"
+import type { PromptInput } from "@sleepy-ai/schema"
 import type { Types } from "effect"
 import { createSimpleContext } from "../context/helper"
 import { useTuiPaths } from "../context/runtime"

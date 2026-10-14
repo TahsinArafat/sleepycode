@@ -8,8 +8,8 @@ import type {
   SessionMessageCompaction,
   SessionMessageInfo,
   SessionMessageUser,
-} from "@opencode/client/promise"
-import type { SessionV1 } from "@opencode/schema/session-v1"
+} from "@sleepy-ai/client/promise"
+import type { SessionV1 } from "@sleepy-ai/schema/session-v1"
 import type { Share } from "./share"
 
 type Entry<Type extends Share.Data["type"]> = Extract<Share.Data, { type: Type }>["data"]
@@ -38,7 +38,7 @@ async function mapFromLegacySession(blob: {
   parts: Entry<"part">[]
 }) {
   const [{ SessionV1 }, { Option, Schema }] = await Promise.all([
-    import("@opencode/schema/session-v1"),
+    import("@sleepy-ai/schema/session-v1"),
     import("effect"),
   ])
   const session = Schema.decodeUnknownSync(SessionV1.SessionInfo)(legacySessionDefaults(blob.session))

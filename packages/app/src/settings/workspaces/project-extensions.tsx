@@ -1,7 +1,7 @@
-import { Icon } from "@opencode/ui/icon"
-import { Switch } from "@opencode/ui/switch"
-import { Tabs } from "@opencode/ui/tabs"
-import { Button } from "@opencode/ui/button"
+import { Icon } from "@sleepy-ai/ui/icon"
+import { Switch } from "@sleepy-ai/ui/switch"
+import { Tabs } from "@sleepy-ai/ui/tabs"
+import { Button } from "@sleepy-ai/ui/button"
 import { useQuery } from "@tanstack/solid-query"
 import {
   type Component,

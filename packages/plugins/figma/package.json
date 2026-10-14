@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/plugin-figma",
+  "name": "@sleepy-ai/plugin-figma",
   "version": "2.0.29",
-  "description": "Figma MCP integration and official Figma skills for OpenCode",
+  "description": "Figma MCP integration and official Figma skills for SleepyCode",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -30,7 +30,7 @@
     "gray-matter": "4.0.3"
   },
   "peerDependencies": {
-    "@opencode/plugin": "^2.0.27 || ^0.0.0-dev"
+    "@sleepy-ai/plugin": "^2.0.27 || ^0.0.0-dev"
   },
   "devDependencies": {
     "@tsconfig/bun": "1.0.9",

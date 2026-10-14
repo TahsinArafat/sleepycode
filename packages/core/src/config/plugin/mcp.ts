@@ -1,14 +1,14 @@
 export * as ConfigMcpPlugin from "./mcp.js"
 
-import { define } from "@opencode/plugin/effect/plugin"
-import { Document, type Entry } from "@opencode/schema/config"
-import type { ServerConfig } from "@opencode/schema/mcp"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { Document, type Entry } from "@sleepy-ai/schema/config"
+import type { ServerConfig } from "@sleepy-ai/schema/mcp"
 import { Effect, Stream } from "effect"
 import { Config } from "../../config.js"
 import { Mcp } from "../../mcp/index.js"
 
 export const Plugin = define({
-  id: "opencode.config.mcp",
+  id: "sleepycode.config.mcp",
   effect: Effect.fn(function* (ctx) {
     yield* register(ctx.event.subscribe())
   }),

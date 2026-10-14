@@ -1,6 +1,6 @@
 import type { APIEvent } from "@solidjs/start/server"
 import { z } from "zod"
-import { Resource } from "@opencode/console-resource"
+import { Resource } from "@sleepy-ai/console-resource"
 import { timingSafeEqual } from "node:crypto"
 
 const DISCORD_ALERT_ROLE_ID = "1520924666359713863"

@@ -1,16 +1,16 @@
 import { EOL } from "node:os"
 import { Effect } from "effect"
-import { OpenCode, type McpServer } from "@opencode/client"
+import { SleepyCode, type McpServer } from "@sleepy-ai/client"
 import { Commands } from "../../commands"
 import { Runtime } from "../../../framework/runtime"
-import { Service } from "@opencode/client/effect/service"
+import { Service } from "@sleepy-ai/client/effect/service"
 import { ServerConnection } from "../../../services/server-connection"
 
 export default Runtime.handler(
   Commands.commands.mcp.commands.list,
   Effect.fn("cli.mcp.list")(function* () {
     const { endpoint } = yield* ServerConnection.resolve()
-    const client = OpenCode.make({ baseUrl: endpoint.url, headers: Service.headers(endpoint) })
+    const client = SleepyCode.make({ baseUrl: endpoint.url, headers: Service.headers(endpoint) })
     const response = yield* Effect.promise(() => client.mcp.list({ location: { directory: process.cwd() } }))
     const servers = response.data.toSorted((a, b) => a.name.localeCompare(b.name))
     if (servers.length === 0) {

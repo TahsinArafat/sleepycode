@@ -1,4 +1,4 @@
-import { Logo } from "@opencode/ui/logo"
+import { Logo } from "@sleepy-ai/ui/logo"
 import "./wordmark.css"
 
 export function NewSessionWordmark() {

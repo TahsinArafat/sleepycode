@@ -2,29 +2,29 @@ import { expect, test } from "bun:test"
 import { mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 import type { TerminalColors } from "@opentui/core"
-import { allThemes, hasTheme, getOpenCodeTheme, parseTheme, resolveTheme } from "../src/theme"
+import { allThemes, hasTheme, getSleepyCodeTheme, parseTheme, resolveTheme } from "../src/theme"
 import { discoverThemes } from "../src/theme/discovery"
 import { configDirectories } from "../src/util/config-directories"
 import { terminalMode } from "../src/theme/system"
-import opencodeSource from "../src/theme/assets/opencode.json" with { type: "json" }
-import type { ThemeV1Json } from "@opencode/theme/tui/v1"
+import sleepycodeSource from "../src/theme/assets/sleepycode.json" with { type: "json" }
+import type { ThemeV1Json } from "@sleepy-ai/theme/tui/v1"
 import { tmpdir } from "./fixture/fixture"
 
-const opencodeV1 = opencodeSource as ThemeV1Json
+const sleepycodeV1 = sleepycodeSource as ThemeV1Json
 
 test("rejects unrecognized theme structures", () => {
   expect(() => parseTheme({})).toThrow()
   expect(() => parseTheme({ version: 3 })).toThrow("Invalid theme")
 })
 
-test("registers opencode as a native V2 theme", () => {
-  expect(allThemes().opencode).toBe(getOpenCodeTheme())
-  expect(parseTheme(getOpenCodeTheme()).base).toBeDefined()
+test("registers sleepycode as a native V2 theme", () => {
+  expect(allThemes().sleepycode).toBe(getSleepyCodeTheme())
+  expect(parseTheme(getSleepyCodeTheme()).base).toBeDefined()
 })
 
 test("detects V1 themes from their theme field and caches migrations", () => {
-  const unversioned = structuredClone(opencodeV1)
-  const explicit = { ...structuredClone(opencodeV1), version: 1 }
+  const unversioned = structuredClone(sleepycodeV1)
+  const explicit = { ...structuredClone(sleepycodeV1), version: 1 }
   const first = parseTheme(unversioned, "unversioned")
   const second = parseTheme(explicit, "explicit")
 
@@ -36,8 +36,8 @@ test("detects V1 themes from their theme field and caches migrations", () => {
 
 test("decodes native V2 themes lazily once", () => {
   const source = {
-    base: getOpenCodeTheme().base,
-    light: { ...getOpenCodeTheme().light, categorical: ["red"] },
+    base: getSleepyCodeTheme().base,
+    light: { ...getSleepyCodeTheme().light, categorical: ["red"] },
   } as const
 
   const document = parseTheme(source)
@@ -52,7 +52,7 @@ test("rejects invalid V2 themes when parsing", () => {
 })
 
 test("rejects invalid V1 themes when parsing", () => {
-  const source = structuredClone(opencodeV1)
+  const source = structuredClone(sleepycodeV1)
   source.defs = { ...source.defs, one: "two", two: "one" }
   source.theme.primary = "one"
 
@@ -60,8 +60,8 @@ test("rejects invalid V1 themes when parsing", () => {
 })
 
 test("replacement sources receive independent parse caches", () => {
-  const first = structuredClone(opencodeV1)
-  const second = structuredClone(opencodeV1)
+  const first = structuredClone(sleepycodeV1)
+  const second = structuredClone(sleepycodeV1)
   second.theme.primary = "#123456"
 
   const previous = parseTheme(first)
@@ -72,18 +72,18 @@ test("replacement sources receive independent parse caches", () => {
 
 test("hasTheme checks theme presence", () => {
   expect(hasTheme("missing-theme")).toBe(false)
-  expect(hasTheme("opencode")).toBe(true)
+  expect(hasTheme("sleepycode")).toBe(true)
 })
 
 test("resolveTheme rejects circular color refs", () => {
-  const item = structuredClone(opencodeV1)
+  const item = structuredClone(sleepycodeV1)
   item.defs = { ...item.defs, one: "two", two: "one" }
   item.theme.primary = "one"
   expect(() => resolveTheme(item, "dark")).toThrow("Circular color reference")
 })
 
 test("resolveTheme preserves full theme numeric color and marker semantics", () => {
-  const item = structuredClone(opencodeV1)
+  const item = structuredClone(sleepycodeV1)
   item.theme.primary = 6
   delete item.theme.selectedListItemText
 
@@ -134,9 +134,9 @@ test("theme directories include global config before project directories", async
   const global = path.join(tmp.path, "global")
   const project = path.join(tmp.path, "repo", "package")
   await mkdir(path.join(global, "themes"), { recursive: true })
-  await mkdir(path.join(project, ".opencode", "themes"), { recursive: true })
+  await mkdir(path.join(project, ".sleepycode", "themes"), { recursive: true })
   await writeFile(path.join(global, "themes", "global.json"), JSON.stringify({ source: "global" }))
-  await writeFile(path.join(project, ".opencode", "themes", "project.json"), JSON.stringify({ source: "project" }))
+  await writeFile(path.join(project, ".sleepycode", "themes", "project.json"), JSON.stringify({ source: "project" }))
 
   await expect(discoverThemes(configDirectories(global, project))).resolves.toEqual({
     global: { source: "global" },

@@ -6464,7 +6464,7 @@ export type PtyRemoveOutput = void
 export type PtyConnectTokenInput = {
   readonly ptyID: { readonly ptyID: string }["ptyID"]
   readonly location?: { readonly location?: { readonly directory?: string | undefined } | undefined }["location"]
-  readonly "x-opencode-ticket"?: { readonly "x-opencode-ticket"?: string | undefined }["x-opencode-ticket"]
+  readonly "x-sleepycode-ticket"?: { readonly "x-sleepycode-ticket"?: string | undefined }["x-sleepycode-ticket"]
 }
 
 export type PtyConnectTokenOutput = { location: LocationPublicRef; data: PtyTicketConnectToken }
@@ -6566,7 +6566,7 @@ export type ExperimentalPersistentPtyRemoveOutput = void
 
 export type ExperimentalPersistentPtyConnectTokenInput = {
   readonly ptyID: { readonly ptyID: string }["ptyID"]
-  readonly "x-opencode-ticket"?: { readonly "x-opencode-ticket"?: string | undefined }["x-opencode-ticket"]
+  readonly "x-sleepycode-ticket"?: { readonly "x-sleepycode-ticket"?: string | undefined }["x-sleepycode-ticket"]
 }
 
 export type ExperimentalPersistentPtyConnectTokenOutput = { data: PtyTicketConnectToken }["data"]

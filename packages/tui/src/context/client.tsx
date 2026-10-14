@@ -1,20 +1,20 @@
-import type { OpenCodeClient, OpenCodeEvent } from "@opencode/client"
-import { createClientConnection, createPersistentPtyClient } from "@opencode/client/solid"
+import type { SleepyCodeClient, SleepyCodeEvent } from "@sleepy-ai/client"
+import { createClientConnection, createPersistentPtyClient } from "@sleepy-ai/client/solid"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { onCleanup } from "solid-js"
 import { createSimpleContext } from "./helper"
 import { useLog } from "./log"
 
 type ManagedService = {
-  reconnect: (signal: AbortSignal) => Promise<{ api: OpenCodeClient; url?: string }>
+  reconnect: (signal: AbortSignal) => Promise<{ api: SleepyCodeClient; url?: string }>
   restart: () => Promise<void>
 }
 
-type ClientEventMap = { [Type in OpenCodeEvent["type"]]: Extract<OpenCodeEvent, { type: Type }> }
+type ClientEventMap = { [Type in SleepyCodeEvent["type"]]: Extract<SleepyCodeEvent, { type: Type }> }
 
 export const { use: useClient, provider: ClientProvider } = createSimpleContext({
   name: "Client",
-  init: (props: { api: OpenCodeClient; url?: string; service?: ManagedService }) => {
+  init: (props: { api: SleepyCodeClient; url?: string; service?: ManagedService }) => {
     const log = useLog({ component: "client" })
     const service = props.service
     const events = createGlobalEmitter<ClientEventMap>()

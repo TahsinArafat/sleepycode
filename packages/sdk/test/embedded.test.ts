@@ -1,20 +1,20 @@
 import fs from "fs/promises"
 import path from "path"
 import { expect } from "bun:test"
-import { LanguageModel, LLMClient } from "@opencode/ai"
-import { OpenAIChat } from "@opencode/ai/protocols"
-import { TestLLM } from "@opencode/ai/testing"
-import { llmClient } from "@opencode/core/effect/app-node-platform"
-import { makeMemoryDriver } from "@opencode/core/environment/index"
-import { SessionRunnerModel } from "@opencode/core/session/runner/model"
-import { WorkspaceDriver } from "@opencode/core/workspace/driver"
-import { Plugin } from "@opencode/plugin/effect"
+import { LanguageModel, LLMClient } from "@sleepy-ai/ai"
+import { OpenAIChat } from "@sleepy-ai/ai/protocols"
+import { TestLLM } from "@sleepy-ai/ai/testing"
+import { llmClient } from "@sleepy-ai/core/effect/app-node-platform"
+import { makeMemoryDriver } from "@sleepy-ai/core/environment/index"
+import { SessionRunnerModel } from "@sleepy-ai/core/session/runner/model"
+import { WorkspaceDriver } from "@sleepy-ai/core/workspace/driver"
+import { Plugin } from "@sleepy-ai/plugin/effect"
 import { makeDurableObjectStorage } from "../../core/test/fixture/durable-object-storage"
-import { OpenCodeWorkerd } from "../src/effect/workerd"
+import { SleepyCodeWorkerd } from "../src/effect/workerd"
 import { Deferred, Effect, Fiber, Latch, Layer, Option, Stream } from "effect"
 import { testEffect } from "../../core/test/lib/effect"
 import { tmpdir } from "../../core/test/fixture/tmpdir"
-import type { OpenCodeEvent } from "../src/effect"
+import type { SleepyCodeEvent } from "../src/effect"
 
 const it = testEffect(Layer.empty)
 type Sdk = typeof import("../src/effect")
@@ -39,12 +39,12 @@ const location = (fixture: Fixture) =>
 
 for (const selection of ["explicit", "default"] as const) {
   it.live(`generate.text uses configured providers with ${selection} model selection`, () =>
-    withEmbedded("opencode-embedded-generate-", (fixture) =>
+    withEmbedded("sleepycode-embedded-generate-", (fixture) =>
       Effect.gen(function* () {
         const llm = yield* TestLLM.Test.pipe(
           Effect.provide(TestLLM.testLayer({ fallback: TestLLM.text("ready", "answer") })),
         )
-        const opencode = yield* fixture.sdk.OpenCode.create(
+        const sleepycode = yield* fixture.sdk.SleepyCode.create(
           {
             config: {
               directory: fixture.directory,
@@ -68,7 +68,7 @@ for (const selection of ["explicit", "default"] as const) {
           },
         )
 
-        const result = yield* opencode.generate.text({
+        const result = yield* sleepycode.generate.text({
           prompt: "Say ready",
           ...(selection === "explicit"
             ? {
@@ -90,7 +90,7 @@ for (const selection of ["explicit", "default"] as const) {
 }
 
 it.live("seeds host plugins from CreateOptions and waits for delayed model plugins without self-deadlock", () =>
-  withEmbedded("opencode-embedded-seeded-plugin-", (fixture) =>
+  withEmbedded("sleepycode-embedded-seeded-plugin-", (fixture) =>
     Effect.gen(function* () {
       const llm = yield* TestLLM.Test.pipe(
         Effect.provide(TestLLM.testLayer({ fallback: TestLLM.text("ready", "answer") })),
@@ -107,7 +107,7 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
               providers.update(fixture.sdk.Provider.ID.make("seeded"), (provider) => {
                 provider.name = "Seeded Provider"
                 provider.activation = "enabled"
-                provider.package = "@opencode/ai/providers/openai-compatible"
+                provider.package = "@sleepy-ai/ai/providers/openai-compatible"
                 provider.settings = { baseURL: "https://provider.example/v1", apiKey: "secret" }
               })
               providers.models.update(
@@ -120,7 +120,7 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
             })
           }).pipe(Effect.orDie),
       })
-      const opencode = yield* fixture.sdk.OpenCode.create(
+      const sleepycode = yield* fixture.sdk.SleepyCode.create(
         {
           config: {
             directory: fixture.directory,
@@ -137,7 +137,7 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
       )
 
       const [defaultModel, generated] = yield* Effect.all(
-        [opencode.model.default({ location: location(fixture) }), opencode.generate.text({ prompt: "Say ready" })],
+        [sleepycode.model.default({ location: location(fixture) }), sleepycode.generate.text({ prompt: "Say ready" })],
         { concurrency: "unbounded" },
       )
 
@@ -152,10 +152,10 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
   ),
 )
 
-it.live("OpenCodeWorkerd seeds plugins before cold model resolution", () =>
-  withEmbedded("opencode-workerd-seeded-plugin-", (fixture) =>
+it.live("SleepyCodeWorkerd seeds plugins before cold model resolution", () =>
+  withEmbedded("sleepycode-workerd-seeded-plugin-", (fixture) =>
     Effect.gen(function* () {
-      const opencode = yield* OpenCodeWorkerd.create({
+      const sleepycode = yield* SleepyCodeWorkerd.create({
         storage: makeDurableObjectStorage(),
         models: { fetch: false },
         config: { model: "workerd-seeded/fictional-chat" },
@@ -170,7 +170,7 @@ it.live("OpenCodeWorkerd seeds plugins before cold model resolution", () =>
                   providers.update(fixture.sdk.Provider.ID.make("workerd-seeded"), (provider) => {
                     provider.name = "Workerd Seeded"
                     provider.activation = "enabled"
-                    provider.package = "@opencode/ai/providers/openai-compatible"
+                    provider.package = "@sleepy-ai/ai/providers/openai-compatible"
                     provider.settings = { baseURL: "https://provider.example/v1", apiKey: "secret" }
                   })
                   providers.models.update(
@@ -184,7 +184,7 @@ it.live("OpenCodeWorkerd seeds plugins before cold model resolution", () =>
         ],
       })
 
-      const selected = yield* opencode.model.default({
+      const selected = yield* sleepycode.model.default({
         location: fixture.sdk.Location.Ref.make({ directory: fixture.sdk.AbsolutePath.make("/workspace") }),
       })
       expect(selected.data).toMatchObject({
@@ -198,49 +198,49 @@ it.live("OpenCodeWorkerd seeds plugins before cold model resolution", () =>
 it.live(
   "embedded client uses the real router and handlers",
   () =>
-    withEmbedded("opencode-embedded-", (fixture) =>
+    withEmbedded("sleepycode-embedded-", (fixture) =>
       Effect.gen(function* () {
-        const opencode = yield* fixture.sdk.OpenCode.create({ events: { persist: true } })
+        const sleepycode = yield* fixture.sdk.SleepyCode.create({ events: { persist: true } })
         const id = sessionID(fixture)
         const model = fixture.sdk.Model.Ref.make({
           id: fixture.sdk.Model.ID.make("embedded"),
           providerID: fixture.sdk.Provider.ID.make("test"),
         })
 
-        const created = yield* opencode.sessions.create({
+        const created = yield* sleepycode.sessions.create({
           id,
           agent: fixture.sdk.Agent.ID.make("build"),
           location: location(fixture),
         })
-        yield* opencode.sessions.switchModel({ sessionID: id, model })
-        const selected = yield* opencode.sessions.get({ sessionID: id })
-        const page = yield* opencode.sessions.list({ directory: fixture.sdk.AbsolutePath.make(fixture.directory) })
-        const active = yield* opencode.sessions.active()
-        const admitted = yield* opencode.sessions.prompt({
+        yield* sleepycode.sessions.switchModel({ sessionID: id, model })
+        const selected = yield* sleepycode.sessions.get({ sessionID: id })
+        const page = yield* sleepycode.sessions.list({ directory: fixture.sdk.AbsolutePath.make(fixture.directory) })
+        const active = yield* sleepycode.sessions.active()
+        const admitted = yield* sleepycode.sessions.prompt({
           sessionID: id,
           text: "Do not run",
           resume: false,
         })
-        const context = yield* opencode.sessions.context({ sessionID: id })
-        const pendingAfterAdmit = yield* opencode.sessions.inbox.list({ sessionID: id })
-        yield* opencode.sessions.instructions.entry.put({ sessionID: id, key: "deploy-target", value: "production" })
-        yield* opencode.sessions.instructions.entry.put({ sessionID: id, key: "flags", value: { beta: true } })
-        const contextEntries = yield* opencode.sessions.instructions.entry.list({ sessionID: id })
-        yield* opencode.sessions.instructions.entry.remove({ sessionID: id, key: "flags" })
-        const remainingContextEntries = yield* opencode.sessions.instructions.entry.list({ sessionID: id })
-        const wake = yield* opencode.sessions.prompt({
+        const context = yield* sleepycode.sessions.context({ sessionID: id })
+        const pendingAfterAdmit = yield* sleepycode.sessions.inbox.list({ sessionID: id })
+        yield* sleepycode.sessions.instructions.entry.put({ sessionID: id, key: "deploy-target", value: "production" })
+        yield* sleepycode.sessions.instructions.entry.put({ sessionID: id, key: "flags", value: { beta: true } })
+        const contextEntries = yield* sleepycode.sessions.instructions.entry.list({ sessionID: id })
+        yield* sleepycode.sessions.instructions.entry.remove({ sessionID: id, key: "flags" })
+        const remainingContextEntries = yield* sleepycode.sessions.instructions.entry.list({ sessionID: id })
+        const wake = yield* sleepycode.sessions.prompt({
           sessionID: id,
           text: "Promote this input",
         })
-        const prompted = yield* opencode.sessions.log({ sessionID: id, follow: true }).pipe(
+        const prompted = yield* sleepycode.sessions.log({ sessionID: id, follow: true }).pipe(
           Stream.filter((event) => event.type === "session.inbox.delivered" && event.data.inboxID === wake.id),
           Stream.runHead,
           Effect.timeout("10 seconds"),
           Effect.map(Option.getOrThrow),
         )
-        const wakeContext = yield* opencode.sessions.context({ sessionID: id })
-        const pendingAfterPromote = yield* opencode.sessions.inbox.list({ sessionID: id })
-        const event = yield* opencode.sessions.log({ sessionID: id }).pipe(
+        const wakeContext = yield* sleepycode.sessions.context({ sessionID: id })
+        const pendingAfterPromote = yield* sleepycode.sessions.inbox.list({ sessionID: id })
+        const event = yield* sleepycode.sessions.log({ sessionID: id }).pipe(
           Stream.filter((item) => item.type === "session.model.selected"),
           Stream.take(1),
           Stream.runHead,
@@ -249,22 +249,22 @@ it.live(
         const modelMessage = Option.fromNullishOr(context.find((message) => message.type === "model-switched")).pipe(
           Option.getOrThrow,
         )
-        const message = yield* opencode.sessions.message.get({ sessionID: id, messageID: modelMessage.id })
-        yield* opencode.sessions.interrupt({ sessionID: id })
-        const other = yield* opencode.sessions.create({ location: location(fixture) })
+        const message = yield* sleepycode.sessions.message.get({ sessionID: id, messageID: modelMessage.id })
+        yield* sleepycode.sessions.interrupt({ sessionID: id })
+        const other = yield* sleepycode.sessions.create({ location: location(fixture) })
         const missingSessionID = fixture.sdk.Session.ID.create()
         const missing = yield* Effect.all(
           [
-            opencode.sessions.log({ sessionID: missingSessionID }).pipe(Stream.runHead, Effect.flip),
-            opencode.sessions.interrupt({ sessionID: missingSessionID }).pipe(Effect.flip),
-            opencode.sessions.message.get({ sessionID: missingSessionID, messageID: modelMessage.id }).pipe(Effect.flip),
-            opencode.sessions.instructions.entry.list({ sessionID: missingSessionID }).pipe(Effect.flip),
-            opencode.sessions.inbox.list({ sessionID: missingSessionID }).pipe(Effect.flip),
+            sleepycode.sessions.log({ sessionID: missingSessionID }).pipe(Stream.runHead, Effect.flip),
+            sleepycode.sessions.interrupt({ sessionID: missingSessionID }).pipe(Effect.flip),
+            sleepycode.sessions.message.get({ sessionID: missingSessionID, messageID: modelMessage.id }).pipe(Effect.flip),
+            sleepycode.sessions.instructions.entry.list({ sessionID: missingSessionID }).pipe(Effect.flip),
+            sleepycode.sessions.inbox.list({ sessionID: missingSessionID }).pipe(Effect.flip),
           ],
           { concurrency: "unbounded" },
         )
         const missingMessage = yield* Effect.flip(
-          opencode.sessions.message.get({
+          sleepycode.sessions.message.get({
             sessionID: other.id,
             messageID: modelMessage.id,
           }),
@@ -304,11 +304,11 @@ it.live(
 )
 
 it.live("embedded client exposes plugin-backed web search", () =>
-  withEmbedded("opencode-embedded-websearch-", (fixture) =>
+  withEmbedded("sleepycode-embedded-websearch-", (fixture) =>
     Effect.gen(function* () {
-      const opencode = yield* fixture.sdk.OpenCode.create()
+      const sleepycode = yield* fixture.sdk.SleepyCode.create()
       const providerID = fixture.sdk.WebSearch.ID.make("embedded-websearch")
-      yield* opencode.plugin({
+      yield* sleepycode.plugin({
         id: `embedded-websearch-${crypto.randomUUID()}`,
         effect: (ctx) =>
           ctx.websearch.transform((editor) => {
@@ -321,15 +321,15 @@ it.live("embedded client exposes plugin-backed web search", () =>
           }),
       })
 
-      const result = yield* opencode.websearch.query({
-        query: "opencode",
+      const result = yield* sleepycode.websearch.query({
+        query: "sleepycode",
         providerID,
         location: location(fixture),
       })
 
       expect(result.data).toEqual({
         providerID,
-        results: [{ url: "https://example.com", content: "Found opencode", time: {} }],
+        results: [{ url: "https://example.com", content: "Found sleepycode", time: {} }],
       })
     }),
   ),
@@ -338,14 +338,14 @@ it.live("embedded client exposes plugin-backed web search", () =>
 it.live(
   "Location-owned runner events reach the ready global client",
   () =>
-    withEmbedded("opencode-embedded-events-", (fixture) =>
+    withEmbedded("sleepycode-embedded-events-", (fixture) =>
       Effect.gen(function* () {
-        const opencode = yield* fixture.sdk.OpenCode.create()
+        const sleepycode = yield* fixture.sdk.SleepyCode.create()
         const id = sessionID(fixture)
         const connected = yield* Latch.make(false)
-        const prompted = yield* Deferred.make<Extract<OpenCodeEvent, { type: "session.inbox.delivered" }>>()
+        const prompted = yield* Deferred.make<Extract<SleepyCodeEvent, { type: "session.inbox.delivered" }>>()
 
-        yield* opencode.events.subscribe().pipe(
+        yield* sleepycode.events.subscribe().pipe(
           Stream.runForEach((event) =>
             event.type === "server.connected"
               ? connected.open
@@ -356,8 +356,8 @@ it.live(
           Effect.forkScoped,
         )
         yield* connected.await
-        yield* opencode.sessions.create({ id, location: location(fixture) })
-        yield* opencode.sessions.prompt({
+        yield* sleepycode.sessions.create({ id, location: location(fixture) })
+        yield* sleepycode.sessions.prompt({
           sessionID: id,
           text: "Observe this input",
         })
@@ -372,17 +372,17 @@ it.live(
 it.live(
   "independent embedded hosts do not share live notifications",
   () =>
-    withEmbedded("opencode-embedded-hosts-", (fixture) =>
+    withEmbedded("sleepycode-embedded-hosts-", (fixture) =>
       Effect.gen(function* () {
-        const first = yield* fixture.sdk.OpenCode.create()
-        const second = yield* fixture.sdk.OpenCode.create()
+        const first = yield* fixture.sdk.SleepyCode.create()
+        const second = yield* fixture.sdk.SleepyCode.create()
         const id = sessionID(fixture)
         const firstReady = yield* Latch.make(false)
         const secondReady = yield* Latch.make(false)
         const firstEvent = yield* Latch.make(false)
         const secondEvent = yield* Latch.make(false)
         const observe = (ready: Latch.Latch, event: Latch.Latch) =>
-          Stream.runForEach((notification: OpenCodeEvent) =>
+          Stream.runForEach((notification: SleepyCodeEvent) =>
             notification.type === "server.connected"
               ? ready.open
               : notification.type === "session.agent.selected" && notification.data.sessionID === id
@@ -404,18 +404,18 @@ it.live(
 )
 
 it.live("embedded client is available as a Layer service", () =>
-  withEmbedded("opencode-embedded-layer-", (fixture) => {
+  withEmbedded("sleepycode-embedded-layer-", (fixture) => {
     const id = sessionID(fixture)
     return Effect.gen(function* () {
-      const opencode = yield* fixture.sdk.OpenCode.Service
-      const created = yield* opencode.sessions.create({ id, location: location(fixture) })
+      const sleepycode = yield* fixture.sdk.SleepyCode.Service
+      const created = yield* sleepycode.sessions.create({ id, location: location(fixture) })
       expect(created.id).toBe(id)
-    }).pipe(Effect.provide(fixture.sdk.OpenCode.layer()))
+    }).pipe(Effect.provide(fixture.sdk.SleepyCode.layer()))
   }),
 )
 
 it.live("configures workspace providers through the SDK facade", () =>
-  withEmbedded("opencode-embedded-workspace-", (fixture) =>
+  withEmbedded("sleepycode-embedded-workspace-", (fixture) =>
     Effect.gen(function* () {
       const calls: Array<{ readonly operation: string; readonly workspaceID: string }> = []
       const driver = WorkspaceDriver.make({
@@ -433,15 +433,15 @@ it.live("configures workspace providers through the SDK facade", () =>
           return Effect.void
         },
       })
-      const opencode = yield* fixture.sdk.OpenCode.create({ workspaceProviders: { fake: driver } })
+      const sleepycode = yield* fixture.sdk.SleepyCode.create({ workspaceProviders: { fake: driver } })
       const requestedID = fixture.sdk.Workspace.ID.create()
-      const workspaceID = yield* opencode.workspace.create({ id: requestedID, provider: "fake" })
+      const workspaceID = yield* sleepycode.workspace.create({ id: requestedID, provider: "fake" })
 
       expect(workspaceID).toBe(requestedID)
-      expect(yield* opencode.workspace.create({ id: requestedID, provider: "fake" })).toBe(requestedID)
+      expect(yield* sleepycode.workspace.create({ id: requestedID, provider: "fake" })).toBe(requestedID)
       expect(calls).toEqual([])
 
-      const workspace = yield* opencode.workspace.provision({ workspaceID })
+      const workspace = yield* sleepycode.workspace.provision({ workspaceID })
 
       expect(workspace.provider).toBe("fake")
       expect(workspace.binding).toEqual({ externalID: workspace.id })
@@ -451,12 +451,12 @@ it.live("configures workspace providers through the SDK facade", () =>
         directory: fixture.sdk.AbsolutePath.make("/"),
         workspaceID: workspace.id,
       })
-      const session = yield* opencode.sessions.create({ location: workspaceLocation })
+      const session = yield* sleepycode.sessions.create({ location: workspaceLocation })
       expect(session.location.workspaceID).toBe(workspace.id)
 
-      expect(yield* opencode.workspace.destroy({ workspaceID: workspace.id })).toEqual({ destroyed: true })
+      expect(yield* sleepycode.workspace.destroy({ workspaceID: workspace.id })).toEqual({ destroyed: true })
       expect(calls.map((call) => call.operation)).toEqual(["create", "destroy"])
-      expect(yield* opencode.workspace.destroy({ workspaceID: workspace.id })).toEqual({ destroyed: false })
+      expect(yield* sleepycode.workspace.destroy({ workspaceID: workspace.id })).toEqual({ destroyed: false })
       expect(calls.map((call) => call.operation)).toEqual(["create", "destroy"])
     }),
   ),
@@ -504,7 +504,7 @@ const workspaceModelScenario = (fixture: Fixture, policy: "eager" | "lazy") =>
     })
     const configDirectory = path.join(fixture.directory, "config")
     yield* Effect.promise(() => fs.mkdir(configDirectory))
-    const opencode = yield* fixture.sdk.OpenCode.create(
+    const sleepycode = yield* fixture.sdk.SleepyCode.create(
       {
         config: { directory: configDirectory, project: false, content: "{}" },
         workspaceProviders: { fake: driver },
@@ -513,10 +513,10 @@ const workspaceModelScenario = (fixture: Fixture, policy: "eager" | "lazy") =>
         overrides: [llmClient.replace(client), SessionRunnerModel.node.replace(models)],
       },
     )
-    const workspaceID = yield* opencode.workspace.create({ provider: "fake" })
+    const workspaceID = yield* sleepycode.workspace.create({ provider: "fake" })
     const provisioning =
       policy === "eager"
-        ? yield* opencode.workspace.provision({ workspaceID }).pipe(Effect.forkScoped({ startImmediately: true }))
+        ? yield* sleepycode.workspace.provision({ workspaceID }).pipe(Effect.forkScoped({ startImmediately: true }))
         : undefined
     if (provisioning) {
       yield* Deferred.await(createStarted).pipe(
@@ -524,13 +524,13 @@ const workspaceModelScenario = (fixture: Fixture, policy: "eager" | "lazy") =>
       )
     }
 
-    const session = yield* opencode.sessions.create({
+    const session = yield* sleepycode.sessions.create({
       location: fixture.sdk.Location.Ref.make({
         directory: fixture.sdk.AbsolutePath.make(fixture.directory),
         workspaceID,
       }),
     })
-    yield* opencode.sessions.prompt({ sessionID: session.id, text: "Answer without using tools" })
+    yield* sleepycode.sessions.prompt({ sessionID: session.id, text: "Answer without using tools" })
     yield* Deferred.await(modelStarted).pipe(
       Effect.timeoutOrElse({ duration: "8 seconds", orElse: () => Effect.die("model stream did not start") }),
     )
@@ -548,20 +548,20 @@ const workspaceModelScenario = (fixture: Fixture, policy: "eager" | "lazy") =>
 
 it.live(
   "starts model execution while eager workspace provisioning is blocked",
-  () => withEmbedded("opencode-embedded-workspace-eager-", (fixture) => workspaceModelScenario(fixture, "eager")),
+  () => withEmbedded("sleepycode-embedded-workspace-eager-", (fixture) => workspaceModelScenario(fixture, "eager")),
   15_000,
 )
 
 it.live(
   "starts model execution without provisioning a lazy workspace",
-  () => withEmbedded("opencode-embedded-workspace-lazy-", (fixture) => workspaceModelScenario(fixture, "lazy")),
+  () => withEmbedded("sleepycode-embedded-workspace-lazy-", (fixture) => workspaceModelScenario(fixture, "lazy")),
   15_000,
 )
 
 it.live(
   "blocks the model-selected first tool on lazy provisioning",
   () =>
-    withEmbedded("opencode-embedded-workspace-tool-", (fixture) =>
+    withEmbedded("sleepycode-embedded-workspace-tool-", (fixture) =>
       Effect.gen(function* () {
         const calls: string[] = []
         const createStarted = yield* Deferred.make<void>()
@@ -605,7 +605,7 @@ it.live(
         })
         const configDirectory = path.join(fixture.directory, "config")
         yield* Effect.promise(() => fs.mkdir(configDirectory))
-        const opencode = yield* fixture.sdk.OpenCode.create(
+        const sleepycode = yield* fixture.sdk.SleepyCode.create(
           {
             config: { directory: configDirectory, project: false, content: "{}" },
             workspaceProviders: { fake: driver },
@@ -617,8 +617,8 @@ it.live(
             ],
           },
         )
-        const workspaceID = yield* opencode.workspace.create({ provider: "fake" })
-        const session = yield* opencode.sessions.create({
+        const workspaceID = yield* sleepycode.workspace.create({ provider: "fake" })
+        const session = yield* sleepycode.sessions.create({
           location: fixture.sdk.Location.Ref.make({
             directory: fixture.sdk.AbsolutePath.make(fixture.directory),
             workspaceID,
@@ -626,7 +626,7 @@ it.live(
         })
         expect(calls).toEqual([])
 
-        yield* opencode.sessions.prompt({ sessionID: session.id, text: "Run echo" })
+        yield* sleepycode.sessions.prompt({ sessionID: session.id, text: "Run echo" })
         // The model-selected shell tool is the first execution-plane demand: it alone
         // starts provisioning and blocks inside the tool call until the provider is ready.
         yield* Deferred.await(createStarted).pipe(
@@ -635,7 +635,7 @@ it.live(
         expect(calls).toEqual(["create"])
 
         yield* Deferred.succeed(createRelease, undefined)
-        yield* opencode.sessions.wait({ sessionID: session.id })
+        yield* sleepycode.sessions.wait({ sessionID: session.id })
         // Provisioning settled, the workspace connected, and the turn completed. The
         // memory driver rejects the actual spawn, which surfaces to the model as an
         // ordinary tool error before the final text response.
@@ -647,10 +647,10 @@ it.live(
 )
 
 it.live("preserves unknown workspace provider errors", () =>
-  withEmbedded("opencode-embedded-workspace-provider-", (fixture) =>
+  withEmbedded("sleepycode-embedded-workspace-provider-", (fixture) =>
     Effect.gen(function* () {
-      const opencode = yield* fixture.sdk.OpenCode.create()
-      const error = yield* opencode.workspace.create({ provider: "missing" }).pipe(Effect.flip)
+      const sleepycode = yield* fixture.sdk.SleepyCode.create()
+      const error = yield* sleepycode.workspace.create({ provider: "missing" }).pipe(Effect.flip)
       expect(error).toEqual(new WorkspaceDriver.ProviderNotFound({ provider: "missing" }))
     }),
   ),

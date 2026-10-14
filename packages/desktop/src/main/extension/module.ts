@@ -1,5 +1,5 @@
 import { createRequire, isBuiltin } from "node:module"
-import type { MainSetup } from "@opencode/gui-extensions/sdk/main"
+import type { MainSetup } from "@sleepy-ai/gui-extensions/sdk/main"
 import { Option, Predicate, Schema } from "effect"
 import { ExtensionError } from "./error"
 
@@ -9,10 +9,10 @@ const native = createRequire(import.meta.url)
 // same objects the host checks against.
 const shared = new Map<string, () => Promise<object>>([
   ["effect", () => import("effect")],
-  ["@opencode/gui-extensions/sdk/main", () => import("@opencode/gui-extensions/sdk/main")],
-  ["@opencode/schema/rpc", () => import("@opencode/schema/rpc")],
-  ["@opencode/client", () => import("@opencode/client")],
-  ["@opencode/client/effect", () => import("@opencode/client/effect")],
+  ["@sleepy-ai/gui-extensions/sdk/main", () => import("@sleepy-ai/gui-extensions/sdk/main")],
+  ["@sleepy-ai/schema/rpc", () => import("@sleepy-ai/schema/rpc")],
+  ["@sleepy-ai/client", () => import("@sleepy-ai/client")],
+  ["@sleepy-ai/client/effect", () => import("@sleepy-ai/client/effect")],
 ])
 
 // Installed catalogs ship every locale inline; only built-ins load locales lazily.

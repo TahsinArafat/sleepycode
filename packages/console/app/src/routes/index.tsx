@@ -1,8 +1,8 @@
 import "./index.css"
 import { Title, Meta } from "@solidjs/meta"
 //import { HttpHeader } from "@solidjs/start"
-import video from "../asset/lander/opencode-min.mp4"
-import videoPoster from "../asset/lander/opencode-poster.png"
+import video from "../asset/lander/sleepycode-min.mp4"
+import videoPoster from "../asset/lander/sleepycode-poster.png"
 import { IconCopy, IconCheck } from "../component/icon"
 import { A, createAsync } from "@solidjs/router"
 import { EmailSignup } from "~/component/email-signup"
@@ -43,7 +43,7 @@ export default function Home() {
   }
 
   return (
-    <main data-page="opencode">
+    <main data-page="sleepycode">
       {/*<HttpHeader name="Cache-Control" value="public, max-age=1, s-maxage=3600, stale-while-revalidate=86400" />*/}
       <Title>{i18n.t("home.title")}</Title>
       <LocaleLinks path="/" />
@@ -112,7 +112,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">npm install -g </span>
-                        <span data-slot="highlight">@opencode/cli</span>
+                        <span data-slot="highlight">@sleepy-ai/cli</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -121,7 +121,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">bun install -g --trust </span>
-                        <span data-slot="highlight">@opencode/cli</span>
+                        <span data-slot="highlight">@sleepy-ai/cli</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -130,7 +130,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">brew install </span>
-                        <span data-slot="highlight">anomalyco/tap/opencode-v2</span>
+                        <span data-slot="highlight">anomalyco/tap/sleepycode-v2</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -139,7 +139,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">paru -S </span>
-                        <span data-slot="highlight">opencode-beta</span>
+                        <span data-slot="highlight">sleepycode-beta</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -148,7 +148,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">yay -S </span>
-                        <span data-slot="highlight">opencode-beta</span>
+                        <span data-slot="highlight">sleepycode-beta</span>
                       </span>
                       <CopyStatus />
                     </button>

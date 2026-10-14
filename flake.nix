@@ -1,5 +1,5 @@
 {
-  description = "OpenCode development flake";
+  description = "SleepyCode development flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -38,11 +38,11 @@
             };
           in
           rec {
-            opencode = final.callPackage ./nix/opencode.nix {
+            sleepycode = final.callPackage ./nix/sleepycode.nix {
               inherit node_modules;
             };
-            opencode-desktop = final.callPackage ./nix/desktop.nix {
-              inherit opencode;
+            sleepycode-desktop = final.callPackage ./nix/desktop.nix {
+              inherit sleepycode;
             };
           };
       };
@@ -55,12 +55,12 @@
           };
         in
         rec {
-          default = opencode;
-          opencode = pkgs.callPackage ./nix/opencode.nix {
+          default = sleepycode;
+          sleepycode = pkgs.callPackage ./nix/sleepycode.nix {
             inherit node_modules;
           };
-          opencode-desktop = pkgs.callPackage ./nix/desktop.nix {
-            inherit opencode;
+          sleepycode-desktop = pkgs.callPackage ./nix/desktop.nix {
+            inherit sleepycode;
           };
           # Updater derivation with fakeHash - build fails and reveals correct hash
           node_modules_updater = node_modules.override {

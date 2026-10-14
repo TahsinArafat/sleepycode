@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { IntegrationInfo } from "@opencode/client"
+import type { IntegrationInfo } from "@sleepy-ai/client"
 import {
   connectionSummary,
   connectMethods,
@@ -21,10 +21,10 @@ describe("integrationOptions", () => {
         integration({ id: "openai", name: "OpenAI" }),
         integration({ id: "custom-z", name: "Zebra" }),
         integration({ id: "anthropic", name: "Anthropic" }),
-        integration({ id: "opencode", name: "OpenCode Zen" }),
-        integration({ id: "opencode-go", name: "OpenCode Go" }),
+        integration({ id: "sleepycode", name: "SleepyCode Zen" }),
+        integration({ id: "sleepycode-go", name: "SleepyCode Go" }),
       ]).map((item) => item.id),
-    ).toEqual(["opencode-go", "opencode", "openai", "anthropic", "mistral", "custom-z"])
+    ).toEqual(["sleepycode-go", "sleepycode", "openai", "anthropic", "mistral", "custom-z"])
   })
 
   test("keeps MCP integrations above popular integrations without relying on their IDs", () => {
@@ -33,10 +33,10 @@ describe("integrationOptions", () => {
         integration({ id: "openai", name: "OpenAI" }),
         integration({ id: "linear", name: "Linear", metadata: { source: "mcp" } }),
         integration({ id: "github", name: "GitHub", metadata: { source: "mcp" } }),
-        integration({ id: "opencode", name: "OpenCode Zen" }),
-        integration({ id: "opencode-go", name: "OpenCode Go" }),
+        integration({ id: "sleepycode", name: "SleepyCode Zen" }),
+        integration({ id: "sleepycode-go", name: "SleepyCode Go" }),
       ]).map((item) => item.id),
-    ).toEqual(["github", "linear", "opencode-go", "opencode", "openai"])
+    ).toEqual(["github", "linear", "sleepycode-go", "sleepycode", "openai"])
   })
 })
 

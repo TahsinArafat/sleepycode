@@ -1,5 +1,5 @@
-import type { McpApi } from "@opencode/client/promise/api"
-import type { Mcp } from "@opencode/schema/mcp"
+import type { McpApi } from "@sleepy-ai/client/promise/api"
+import type { Mcp } from "@sleepy-ai/schema/mcp"
 import type { Transform } from "./registration.js"
 import type { DeepMutable } from "./types.js"
 

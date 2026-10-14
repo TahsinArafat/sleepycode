@@ -1,3 +1,3 @@
-import type { EventApi } from "@opencode/client/promise/api"
+import type { EventApi } from "@sleepy-ai/client/promise/api"
 
 export interface EventDomain extends Pick<EventApi, "subscribe"> {}

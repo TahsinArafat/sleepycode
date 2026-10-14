@@ -1,7 +1,7 @@
-import { ClientError, OpenCode, type SessionStatsInfo } from "@opencode/client"
-import { Service } from "@opencode/client/effect/service"
-import { TokenUsage } from "@opencode/schema/token-usage"
-import { activityCalendar } from "@opencode/util/activity-calendar"
+import { ClientError, SleepyCode, type SessionStatsInfo } from "@sleepy-ai/client"
+import { Service } from "@sleepy-ai/client/effect/service"
+import { TokenUsage } from "@sleepy-ai/schema/token-usage"
+import { activityCalendar } from "@sleepy-ai/util/activity-calendar"
 import { Effect, Option } from "effect"
 import { EOL } from "node:os"
 import { Commands } from "../commands"
@@ -20,7 +20,7 @@ const handler = Effect.fn("cli.stats")(function* (input: Runtime.Input<typeof Co
     server: Option.getOrUndefined(input.server),
     standalone: input.standalone,
   })
-  const client = OpenCode.make({ baseUrl: server.endpoint.url, headers: Service.headers(server.endpoint) })
+  const client = SleepyCode.make({ baseUrl: server.endpoint.url, headers: Service.headers(server.endpoint) })
   const range = statsRange({ days, year, all: input.all })
   const projectID =
     project === "."
@@ -111,7 +111,7 @@ export function renderStats(stats: SessionStatsInfo, options: RenderOptions) {
       : `${style(formatPercent(toolRate), primary, options.color)} tool success`
   const details = options.models || options.tools || options.cost
   const empty = stats.sessions === 0 && stats.prompts === 0 && stats.steps === 0
-  const heading = `${style("opencode stats", primary, options.color)} ${style(`· ${options.label} · ${options.scope}`, "2", options.color)}`
+  const heading = `${style("sleepycode stats", primary, options.color)} ${style(`· ${options.label} · ${options.scope}`, "2", options.color)}`
   const lines = details
     ? [style(`${options.label} · ${options.scope}`, "2", options.color)]
     : empty

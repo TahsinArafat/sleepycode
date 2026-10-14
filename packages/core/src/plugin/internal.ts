@@ -1,10 +1,10 @@
 export * as PluginInternal from "./internal.js"
 
-import { LLMClient } from "@opencode/ai"
-import type { Plugin } from "@opencode/plugin/effect/plugin"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { httpClient } from "@opencode/util/effect/app-node-platform"
-import { AppProcess } from "@opencode/util/process"
+import { LLMClient } from "@sleepy-ai/ai"
+import type { Plugin } from "@sleepy-ai/plugin/effect/plugin"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { httpClient } from "@sleepy-ai/util/effect/app-node-platform"
+import { AppProcess } from "@sleepy-ai/util/process"
 import { Context, Effect, Scope } from "effect"
 import { HttpClient } from "effect/http"
 import { Agent } from "../agent.js"
@@ -42,8 +42,8 @@ import { Formatter } from "../formatter.js"
 import { Form } from "../form.js"
 import { FileSystem } from "../filesystem.js"
 import { LocationWatcherPolicy } from "../filesystem/location-watcher-policy.js"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Global } from "@opencode/util/global"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
+import { Global } from "@sleepy-ai/util/global"
 import { Image } from "../image.js"
 import { InstructionDiscovery } from "../instruction-discovery.js"
 import { Integration } from "../integration.js"
@@ -53,7 +53,7 @@ import { Location } from "../location.js"
 import { ManagedPolicy } from "../managed-policy.js"
 import { ModelsDev } from "../models-dev.js"
 import { Mcp } from "../mcp/index.js"
-import { Npm } from "@opencode/util/npm"
+import { Npm } from "@sleepy-ai/util/npm"
 import { Permission } from "../permission.js"
 import { Reference } from "../reference.js"
 import { WebSearch } from "../websearch.js"
@@ -73,7 +73,7 @@ import { EditTool } from "../tool/plugin/edit.js"
 import { GlobTool } from "../tool/plugin/glob.js"
 import { GrepTool } from "../tool/plugin/grep.js"
 import { McpResourceTools } from "../tool/plugin/mcp-resource.js"
-import { OpenCodeTools } from "../tool/plugin/opencode.js"
+import { SleepyCodeTools } from "../tool/plugin/sleepycode.js"
 import { QuestionTool } from "../tool/plugin/question.js"
 import { ReadToolFileSystem } from "../tool/read-filesystem.js"
 import { ReadTool } from "../tool/plugin/read.js"
@@ -87,14 +87,14 @@ import { WebSearchTool } from "../tool/plugin/websearch.js"
 import { WellKnown } from "../wellknown.js"
 import { WriteTool } from "../tool/plugin/write.js"
 import { AgentPlugin } from "./agent.js"
-import BrowserPlugin from "@opencode/plugin-browser"
+import BrowserPlugin from "@sleepy-ai/plugin-browser"
 import { CommandPlugin } from "./command.js"
 import { IdentityPlugin } from "./identity.js"
 import { PlanPlugin } from "./plan.js"
 import { ModelsDevPlugin } from "./models-dev.js"
 import { McpCodeModeDefaultsPlugin } from "./mcp-codemode-defaults.js"
 import { ProviderPlugins } from "./provider.js"
-import { OpencodePlugin } from "./provider/opencode.js"
+import { SleepycodePlugin } from "./provider/sleepycode.js"
 import { WebSearchPlugins } from "./websearch/index.js"
 import { SkillPlugin } from "./skill.js"
 import { VcsHgPlugin } from "./vcs/hg.js"
@@ -236,7 +236,7 @@ const pre = [
   EditTool.Plugin,
   GlobTool.Plugin,
   GrepTool.Plugin,
-  OpenCodeTools.Plugin,
+  SleepyCodeTools.Plugin,
   McpResourceTools.Plugin,
   QuestionTool.Plugin,
   ReadTool.Plugin,
@@ -271,7 +271,7 @@ const post = [
 
 // Repository config must not switch off policy enforcement or the Console connection that delivers
 // organization statements, so plugin remove operations skip these IDs.
-export const guarded: ReadonlySet<string> = new Set([OpencodePlugin.id, ConfigPolicyPlugin.Plugin.id])
+export const guarded: ReadonlySet<string> = new Set([SleepycodePlugin.id, ConfigPolicyPlugin.Plugin.id])
 
 export const list = Effect.fn("PluginInternal.list")(function* () {
   // Capture only services; activation supplies the child Scope and batching context.

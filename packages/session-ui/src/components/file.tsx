@@ -1,4 +1,4 @@
-import { sampledChecksum } from "@opencode/util/encode"
+import { sampledChecksum } from "@sleepy-ai/util/encode"
 import {
   areFilesEqual,
   areOptionsEqual,

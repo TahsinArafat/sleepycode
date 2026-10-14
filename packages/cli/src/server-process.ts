@@ -1,14 +1,14 @@
 export * as ServerProcess from "./server-process"
 
 import { NodeServices } from "@effect/platform-node"
-import { Service } from "@opencode/client/effect/service"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Global } from "@opencode/util/global"
-import { OPENCODE_ARTIFACT, OPENCODE_CHANNEL, OPENCODE_VERSION } from "./version"
-import { AppProcess } from "@opencode/util/process"
+import { Service } from "@sleepy-ai/client/effect/service"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Global } from "@sleepy-ai/util/global"
+import { SLEEPYCODE_ARTIFACT, SLEEPYCODE_CHANNEL, SLEEPYCODE_VERSION } from "./version"
+import { AppProcess } from "@sleepy-ai/util/process"
 import { randomBytes, randomUUID } from "node:crypto"
 import { Effect, Option, Redacted, Schema } from "effect"
-import { PersistentPty } from "@opencode/schema/persistent-pty"
+import { PersistentPty } from "@sleepy-ai/schema/persistent-pty"
 import { HttpServer } from "effect/http"
 import { NetAddress } from "effect/net"
 import { Env } from "./env"
@@ -35,7 +35,7 @@ export const run = Effect.fnUntraced(function* (options: Options) {
       LayerNode.compile(LayerNode.group([Global.node, AppProcess.node]), {
         replacements: [
           Global.node.replace(
-            Global.layerWith(process.env.OPENCODE_CONFIG_DIR ? { config: process.env.OPENCODE_CONFIG_DIR } : {}),
+            Global.layerWith(process.env.SLEEPYCODE_CONFIG_DIR ? { config: process.env.SLEEPYCODE_CONFIG_DIR } : {}),
           ),
         ],
       }),
@@ -45,8 +45,8 @@ export const run = Effect.fnUntraced(function* (options: Options) {
 })
 
 const processEffect = Effect.fnUntraced(function* (options: Options) {
-  const inherited = process.env.OPENCODE_PTY_HANDOFF
-  delete process.env.OPENCODE_PTY_HANDOFF
+  const inherited = process.env.SLEEPYCODE_PTY_HANDOFF
+  delete process.env.SLEEPYCODE_PTY_HANDOFF
   const handoff =
     inherited === undefined
       ? undefined
@@ -74,12 +74,12 @@ const processEffect = Effect.fnUntraced(function* (options: Options) {
       // Keep a package-manager or curl install replaceable while the service runs; Desktop updates its own copy.
       if (options.mode === "service" && process.platform === "win32" && RetainedImage.installed(global.home))
         yield* RetainedImage.retain(global.cache, "service")
-      const { start } = yield* Effect.promise(() => import("@opencode/server/process"))
+      const { start } = yield* Effect.promise(() => import("@sleepy-ai/server/process"))
       const environmentPassword = yield* Env.password
       // Keep the lease credential out of the environment inherited by tools.
       if (options.mode === "stdio") {
-        delete process.env.OPENCODE_PASSWORD
-        delete process.env.OPENCODE_SERVER_PASSWORD
+        delete process.env.SLEEPYCODE_PASSWORD
+        delete process.env.SLEEPYCODE_SERVER_PASSWORD
       }
       const password =
         options.mode === "service"
@@ -94,41 +94,41 @@ const processEffect = Effect.fnUntraced(function* (options: Options) {
       const launch = start(
         {
           app: {
-            name: process.env.OPENCODE_CLIENT ?? OPENCODE_ARTIFACT,
-            version: OPENCODE_VERSION,
-            channel: OPENCODE_CHANNEL,
+            name: process.env.SLEEPYCODE_CLIENT ?? SLEEPYCODE_ARTIFACT,
+            version: SLEEPYCODE_VERSION,
+            channel: SLEEPYCODE_CHANNEL,
           },
           hostname,
           port,
           cors: options.cors ?? config.cors,
           password,
           pty: { handoff },
-          simulation: truthy(process.env.OPENCODE_SIMULATE),
+          simulation: truthy(process.env.SLEEPYCODE_SIMULATE),
           database: {
             path: databasePath(global.data),
           },
           models: {
-            url: process.env.OPENCODE_MODELS_URL,
-            file: process.env.OPENCODE_MODELS_PATH,
-            fetch: !truthy(process.env.OPENCODE_DISABLE_MODELS_FETCH),
+            url: process.env.SLEEPYCODE_MODELS_URL,
+            file: process.env.SLEEPYCODE_MODELS_PATH,
+            fetch: !truthy(process.env.SLEEPYCODE_DISABLE_MODELS_FETCH),
           },
           config: {
-            directory: process.env.OPENCODE_CONFIG_DIR,
+            directory: process.env.SLEEPYCODE_CONFIG_DIR,
             project: !truthy(
-              process.env.OPENCODE_CONFIG_PROJECT_DISABLE ?? process.env.OPENCODE_DISABLE_PROJECT_CONFIG,
+              process.env.SLEEPYCODE_CONFIG_PROJECT_DISABLE ?? process.env.SLEEPYCODE_DISABLE_PROJECT_CONFIG,
             ),
-            file: process.env.OPENCODE_CONFIG,
-            content: process.env.OPENCODE_CONFIG_CONTENT,
+            file: process.env.SLEEPYCODE_CONFIG,
+            content: process.env.SLEEPYCODE_CONFIG_CONTENT,
           },
           windows: {
-            gitbash: process.env.OPENCODE_GIT_BASH_PATH,
+            gitbash: process.env.SLEEPYCODE_GIT_BASH_PATH,
           },
           fs: {
-            filewatcher: !truthy(process.env.OPENCODE_FILEWATCHER_DISABLE ?? process.env.OPENCODE_DISABLE_FILEWATCHER),
+            filewatcher: !truthy(process.env.SLEEPYCODE_FILEWATCHER_DISABLE ?? process.env.SLEEPYCODE_DISABLE_FILEWATCHER),
             fff:
-              process.env.OPENCODE_DISABLE_FFF === undefined
+              process.env.SLEEPYCODE_DISABLE_FFF === undefined
                 ? process.platform !== "win32"
-                : !truthy(process.env.OPENCODE_DISABLE_FFF),
+                : !truthy(process.env.SLEEPYCODE_DISABLE_FFF),
           },
         },
         serviceOptions === undefined
@@ -166,7 +166,7 @@ const processEffect = Effect.fnUntraced(function* (options: Options) {
             return yield* Effect.fail(
               new Error(
                 `Managed service port ${port} on ${hostname} is already in use by another process. ` +
-                  "Configure another port with `opencode service set port <port>` and start the service again.",
+                  "Configure another port with `sleepycode service set port <port>` and start the service again.",
                 { cause: error },
               ),
             )

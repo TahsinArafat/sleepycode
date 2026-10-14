@@ -1,7 +1,7 @@
-import { Button } from "@opencode/ui/button"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { Dialog, DialogTitle } from "@opencode/ui/dialog"
-import { ProviderIcon } from "@opencode/ui/provider-icon"
+import { Button } from "@sleepy-ai/ui/button"
+import { useDialog } from "@sleepy-ai/ui/context/dialog"
+import { Dialog, DialogTitle } from "@sleepy-ai/ui/dialog"
+import { ProviderIcon } from "@sleepy-ai/ui/provider-icon"
 import { useLanguage } from "@/runtime/i18n/language"
 import { ExternalLink } from "@/runtime/platform/external-link"
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/httpapi-codegen",
+  "name": "@sleepy-ai/httpapi-codegen",
   "version": "2.0.29",
   "private": true,
   "type": "module",

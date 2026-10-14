@@ -11,9 +11,9 @@
     "env": [],
     "models": {}
   },
-  "opencode": {
-    "id": "opencode",
-    "name": "OpenCode",
+  "sleepycode": {
+    "id": "sleepycode",
+    "name": "SleepyCode",
     "env": [],
     "npm": "@ai-sdk/openai-compatible",
     "models": {

@@ -1,6 +1,6 @@
 import { Effect } from "effect"
-import { Npm } from "@opencode/util/npm"
-import { importModule, resolveModule } from "@opencode/util/runtime-import"
+import { Npm } from "@sleepy-ai/util/npm"
+import { importModule, resolveModule } from "@sleepy-ai/util/runtime-import"
 
 export const loadSDKFactory = Effect.fnUntraced(function* (npm: Npm.Interface, packageName: string) {
   const installedPath = packageName.startsWith("file://")

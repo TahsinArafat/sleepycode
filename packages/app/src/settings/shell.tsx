@@ -1,5 +1,5 @@
-import { Tabs } from "@opencode/ui/tabs"
-import { useDialog } from "@opencode/ui/context/dialog"
+import { Tabs } from "@sleepy-ai/ui/tabs"
+import { useDialog } from "@sleepy-ai/ui/context/dialog"
 import {
   createEffect,
   createMemo,

@@ -1,18 +1,18 @@
 ---
 title: "Models"
-description: "Curated coding models, pay-as-you-go pricing, and API access through OpenCode Console."
+description: "Curated coding models, pay-as-you-go pricing, and API access through SleepyCode Console."
 ---
 
-OpenCode Console provides a list of models tested and verified by the OpenCode team. Sign in, add credits, and get an
-API key to use them with OpenCode or another coding agent.
+SleepyCode Console provides a list of models tested and verified by the SleepyCode team. Sign in, add credits, and get an
+API key to use them with SleepyCode or another coding agent.
 
-Console works like any other provider in OpenCode. It's **completely optional**, and you can use any other provider
-instead. For a subscription with included usage, see [OpenCode Go](/console/go).
+Console works like any other provider in SleepyCode. It's **completely optional**, and you can use any other provider
+instead. For a subscription with included usage, see [SleepyCode Go](/console/go).
 
 ## How it works
 
 1. Sign in to the [console](https://opencode.ai/console), add your billing details and credits, and copy your API key.
-2. Run `/connect` in the TUI, choose the OpenCode pay-as-you-go provider, and paste your API key.
+2. Run `/connect` in the TUI, choose the SleepyCode pay-as-you-go provider, and paste your API key.
 
    ```text
    /connect
@@ -123,13 +123,13 @@ You can also access the models directly through the following API endpoints.
 
 </div>
 
-These AI SDK packages are for applications calling the endpoints directly. To select a [model](/models) in OpenCode,
-use the format `opencode/<model-id>`:
+These AI SDK packages are for applications calling the endpoints directly. To select a [model](/models) in SleepyCode,
+use the format `sleepycode/<model-id>`:
 
-```jsonc title="opencode.jsonc"
+```jsonc title="sleepycode.jsonc"
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "opencode/gpt-5.5",
+  "model": "sleepycode/gpt-5.5",
 }
 ```
 
@@ -145,11 +145,11 @@ curl https://opencode.ai/inference/v1/models
 
 Jev is a System One model from TypeSafe AI for fast, structured decisions. Instead of generating text, it evaluates a `state` against typed questions and returns values and probabilities that your code can use directly. It supports yes/no (`noul`), multiple-choice (`choice`), and rubric-based (`score`) questions.
 
-Use your OpenCode Console API key with the `https://opencode.ai/inference/v1/systemone` endpoint. This example checks whether a support request is urgent:
+Use your SleepyCode Console API key with the `https://opencode.ai/inference/v1/systemone` endpoint. This example checks whether a support request is urgent:
 
 ```bash
 curl https://opencode.ai/inference/v1/systemone \
-  -H "Authorization: Bearer $OPENCODE_API_KEY" \
+  -H "Authorization: Bearer $SLEEPYCODE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "jev-1.13",
@@ -167,7 +167,7 @@ You can ask multiple questions in one request. Jev evaluates them in parallel an
 
 ```bash
 curl https://opencode.ai/inference/v1/systemone \
-  -H "Authorization: Bearer $OPENCODE_API_KEY" \
+  -H "Authorization: Bearer $SLEEPYCODE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "jev-1.13",
@@ -307,7 +307,7 @@ Console uses pay-as-you-go pricing. Below are the prices **per 1M tokens**.
 
 **Gemini 4 Argon:** The 50% discount applies through November 30, 2026.
 
-You may notice [low-cost models](/models), such as Haiku, Nano, or Flash, in your usage history. OpenCode uses these
+You may notice [low-cost models](/models), such as Haiku, Nano, or Flash, in your usage history. SleepyCode uses these
 models to generate session titles.
 
 <Callout>
@@ -316,18 +316,18 @@ models to generate session titles.
 
 ### Free models
 
-- Exo Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- MiMo-V2.6-Flash Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- MiMo-V2.5 Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- Nemotron 3 Ultra Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- Nemotron 3.5 Lightning Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- Big Pickle is a stealth model that's free on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- Space Bunny Free is a stealth model that's free on OpenCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
-- Cat Jam Free is a stealth model that's free on OpenCode for a limited time. Its provider does not use your data for model training and retains it for 30 days for safety reasons. It's not available in Angola, Belarus, Cambodia, China (including Hong Kong and Macau), Cuba, the Democratic Republic of the Congo, Equatorial Guinea, Iran, Iraq, Laos, Libya, Nigeria, North Korea, Russia, Syria, Turkmenistan, Uzbekistan, Venezuela, or the Crimea, Donetsk, and Luhansk regions of Ukraine.
-- LongCat 2.5 Preview Free is free on OpenCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
-- Step 5 Preview Free is free on OpenCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
-- Muse Spark 1.3 Contributor Free is available on OpenCode for a limited time. The team is using this time to collect feedback and improve the model.
-- Jev 1.13 Free is available on OpenCode for a limited time.
+- Exo Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- MiMo-V2.6-Flash Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- MiMo-V2.5 Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Nemotron 3 Ultra Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Nemotron 3.5 Lightning Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Big Pickle is a stealth model that's free on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Space Bunny Free is a stealth model that's free on SleepyCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
+- Cat Jam Free is a stealth model that's free on SleepyCode for a limited time. Its provider does not use your data for model training and retains it for 30 days for safety reasons. It's not available in Angola, Belarus, Cambodia, China (including Hong Kong and Macau), Cuba, the Democratic Republic of the Congo, Equatorial Guinea, Iran, Iraq, Laos, Libya, Nigeria, North Korea, Russia, Syria, Turkmenistan, Uzbekistan, Venezuela, or the Crimea, Donetsk, and Luhansk regions of Ukraine.
+- LongCat 2.5 Preview Free is free on SleepyCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
+- Step 5 Preview Free is free on SleepyCode for a limited time. Its provider follows a zero-retention policy and does not use your data for model training.
+- Muse Spark 1.3 Contributor Free is available on SleepyCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Jev 1.13 Free is available on SleepyCode for a limited time.
 
 [Contact us](mailto:help@anoma.ly) if you have any questions.
 
@@ -395,7 +395,7 @@ Share Console models with your team from a [workspace](/console/workspaces). Own
 There are many models available, but only a few work well as coding agents. Providers also vary in configuration,
 performance, and quality, so a model accessed through a gateway such as OpenRouter may perform differently.
 
-<Callout type="tip">We tested a select group of models and providers that work well with OpenCode.</Callout>
+<Callout type="tip">We tested a select group of models and providers that work well with SleepyCode.</Callout>
 
 To build this catalog, we:
 
@@ -412,4 +412,4 @@ We built Console to:
 1. **Benchmark** the best models and providers for coding agents.
 2. Provide the **highest quality** options without downgrading performance or routing to cheaper providers.
 3. Pass along **price drops** by selling at cost, with markup only to cover processing fees.
-4. Have **no lock-in**: use Console with any coding agent, or use another provider with OpenCode.
+4. Have **no lock-in**: use Console with any coding agent, or use another provider with SleepyCode.

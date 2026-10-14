@@ -1,13 +1,13 @@
 import path from "path"
 import { describe, expect, test } from "bun:test"
-import type { ConfigDiscovery } from "@opencode/core/config/discovery"
-import { ConfigWatch } from "@opencode/core/config/watch"
-import { AbsolutePath } from "@opencode/core/schema"
+import type { ConfigDiscovery } from "@sleepy-ai/core/config/discovery"
+import { ConfigWatch } from "@sleepy-ai/core/config/watch"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
 
 const project = path.resolve("watch-plan-project")
-const root = AbsolutePath.make(path.join(project, ".opencode"))
+const root = AbsolutePath.make(path.join(project, ".sleepycode"))
 const sources: ConfigDiscovery.Sources = {
-  direct: ["opencode.json", "opencode.jsonc"].map((name) => AbsolutePath.make(path.join(project, name))),
+  direct: ["sleepycode.json", "sleepycode.jsonc"].map((name) => AbsolutePath.make(path.join(project, name))),
   project: [{ path: root, present: false }],
   claude: [AbsolutePath.make(path.join(project, ".claude"))],
   agents: [AbsolutePath.make(path.join(project, ".agents"))],
@@ -17,9 +17,9 @@ describe("ConfigWatch.plan", () => {
   test("groups missing candidates and keeps parent watches when roots appear", () => {
     const missing = ConfigWatch.plan(sources)
     expect(Array.from(missing.values())).toEqual([
-      { path: project, type: "entries", names: [".agents", ".claude", ".opencode", "opencode.json", "opencode.jsonc"] },
+      { path: project, type: "entries", names: [".agents", ".claude", ".sleepycode", "sleepycode.json", "sleepycode.jsonc"] },
     ])
-    const system = AbsolutePath.make(path.join(project, "system-opencode"))
+    const system = AbsolutePath.make(path.join(project, "system-sleepycode"))
     const present = ConfigWatch.plan({
       ...sources,
       system: { path: system, present: true },
@@ -31,7 +31,7 @@ describe("ConfigWatch.plan", () => {
       {
         path: project,
         type: "entries",
-        names: [".agents", ".claude", ".opencode", "opencode.json", "opencode.jsonc", "system-opencode"],
+        names: [".agents", ".claude", ".sleepycode", "sleepycode.json", "sleepycode.jsonc", "system-sleepycode"],
       },
     ])
   })

@@ -31,7 +31,7 @@
         },
         "mdnsDomain": {
           "type": "string",
-          "description": "Custom domain name for mDNS service (default: opencode.local)"
+          "description": "Custom domain name for mDNS service (default: sleepycode.local)"
         },
         "cors": {
           "type": "array",
@@ -801,7 +801,7 @@
         },
         "server": {
           "$ref": "#/$defs/ServerConfig",
-          "description": "Server configuration for opencode serve and web commands"
+          "description": "Server configuration for sleepycode serve and web commands"
         },
         "command": {
           "type": "object",

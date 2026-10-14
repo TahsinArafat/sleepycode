@@ -1,9 +1,9 @@
-import type { FileSystem } from "@opencode/core/filesystem"
+import type { FileSystem } from "@sleepy-ai/core/filesystem"
 import fs from "fs/promises"
 import path from "path"
 import { describe, expect } from "bun:test"
-import { Config } from "@opencode/schema/config"
-import { Money } from "@opencode/schema/money"
+import { Config } from "@sleepy-ai/schema/config"
+import { Money } from "@sleepy-ai/schema/money"
 import {
   Cause,
   DateTime,
@@ -23,23 +23,23 @@ import {
   Stream,
 } from "effect"
 import { TestClock } from "effect/testing"
-import { Agent } from "@opencode/core/agent"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Global } from "@opencode/util/global"
-import { LocationServiceMap, type LocationServices } from "@opencode/core/location-services"
-import { LocationActivity } from "@opencode/core/location-activity"
-import { Location } from "@opencode/core/location"
-import { LocationWatcher } from "@opencode/core/filesystem/location-watcher"
-import { Plugin } from "@opencode/core/plugin"
-import { Model } from "@opencode/core/model"
-import { Project } from "@opencode/core/project"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { Workspace } from "@opencode/core/workspace"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionRunnerModel } from "@opencode/core/session/runner/model"
+import { Agent } from "@sleepy-ai/core/agent"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Global } from "@sleepy-ai/util/global"
+import { LocationServiceMap, type LocationServices } from "@sleepy-ai/core/location-services"
+import { LocationActivity } from "@sleepy-ai/core/location-activity"
+import { Location } from "@sleepy-ai/core/location"
+import { LocationWatcher } from "@sleepy-ai/core/filesystem/location-watcher"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { Model } from "@sleepy-ai/core/model"
+import { Project } from "@sleepy-ai/core/project"
+import { Provider } from "@sleepy-ai/core/provider"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { Session } from "@sleepy-ai/core/session"
+import { Workspace } from "@sleepy-ai/core/workspace"
+import { SessionEvent } from "@sleepy-ai/core/session/event"
+import { SessionRunnerModel } from "@sleepy-ai/core/session/runner/model"
 import { tmpdir, tmpdirScoped } from "./fixture/tmpdir"
 import { tempGlobalLayer } from "./fixture/global"
 import { offlineModels } from "./fixture/models"
@@ -105,7 +105,7 @@ describe("LocationServiceMap", () => {
           if (failure === "config reference") {
             yield* Effect.promise(() => fs.mkdir(path.join(directory, "username.txt"), { recursive: true }))
             yield* Effect.promise(() =>
-              fs.writeFile(path.join(directory, "opencode.json"), JSON.stringify({ username: "{file:username.txt}" })),
+              fs.writeFile(path.join(directory, "sleepycode.json"), JSON.stringify({ username: "{file:username.txt}" })),
             )
           }
           const first = yield* Effect.exit(load)
@@ -150,7 +150,7 @@ describe("LocationServiceMap", () => {
         if (failure === "config reference") {
           yield* Effect.promise(() => fs.mkdir(path.join(directory, "username.txt"), { recursive: true }))
           yield* Effect.promise(() =>
-            fs.writeFile(path.join(directory, "opencode.json"), JSON.stringify({ username: "{file:username.txt}" })),
+            fs.writeFile(path.join(directory, "sleepycode.json"), JSON.stringify({ username: "{file:username.txt}" })),
           )
         }
 
@@ -529,7 +529,7 @@ describe("LocationServiceMap", () => {
         Effect.gen(function* () {
           yield* Effect.promise(() =>
             fs.writeFile(
-              path.join(dir.path, "opencode.json"),
+              path.join(dir.path, "sleepycode.json"),
               JSON.stringify({ agents: { plan: { disabled: true } } }),
             ),
           )
@@ -558,7 +558,7 @@ describe("LocationServiceMap", () => {
           const location = Location.Ref.make({ directory: AbsolutePath.make(dir.path) })
           yield* Effect.promise(() =>
             fs.writeFile(
-              path.join(dir.path, "opencode.json"),
+              path.join(dir.path, "sleepycode.json"),
               JSON.stringify({
                 providers: {
                   unavailable: {
@@ -661,7 +661,7 @@ describe("LocationServiceMap", () => {
             const modelState = yield* Model.Service
             yield* providers.transform((editor) => {
               editor.update(Provider.ID.make("aliased"), (provider) => {
-                provider.package = "@opencode/ai/providers/openai"
+                provider.package = "@sleepy-ai/ai/providers/openai"
               })
               editor.models.update(Provider.ID.make("aliased"), Model.ID.make("fast"), (model) => {
                 // Catalog id and package model id intentionally differ, like gpt-5.5-fast -> gpt-5.5.

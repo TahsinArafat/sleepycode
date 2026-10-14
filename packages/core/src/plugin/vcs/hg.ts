@@ -3,11 +3,11 @@ export * as VcsHgPlugin from "./hg.js"
 import path from "path"
 import { Effect } from "effect"
 import { ChildProcess } from "effect/process"
-import { define } from "@opencode/plugin/effect/plugin"
-import { FileDiff } from "@opencode/schema/file-diff"
-import { FileStatus, Info, Mode } from "@opencode/schema/vcs"
-import { FSUtil } from "@opencode/util/fs-util"
-import { AppProcess } from "@opencode/util/process"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { FileDiff } from "@sleepy-ai/schema/file-diff"
+import { FileStatus, Info, Mode } from "@sleepy-ai/schema/vcs"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
+import { AppProcess } from "@sleepy-ai/util/process"
 import { Location } from "../../location.js"
 import type { Adapter, DiffOptions } from "../../vcs.js"
 import { DiffError } from "../../vcs.js"
@@ -23,7 +23,7 @@ import {
 } from "../../vcs/patch.js"
 
 export const Plugin = define({
-  id: "opencode.vcs.hg",
+  id: "sleepycode.vcs.hg",
   effect: Effect.fn("VcsHgPlugin")(function* (ctx) {
     const location = yield* Location.Service
     // Markerless locations need this definition to initialize their first repository.

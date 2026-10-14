@@ -1,20 +1,20 @@
-import { Pty } from "@opencode/core/pty"
-import { PtyProtocol } from "@opencode/core/pty/protocol"
-import { PtyTicket } from "@opencode/core/pty/ticket"
-import { Location } from "@opencode/core/location"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
+import { Pty } from "@sleepy-ai/core/pty"
+import { PtyProtocol } from "@sleepy-ai/core/pty/protocol"
+import { PtyTicket } from "@sleepy-ai/core/pty/ticket"
+import { Location } from "@sleepy-ai/core/location"
+import { LocationServiceMap } from "@sleepy-ai/core/location-service-map"
 import { Effect, Queue } from "effect"
 import { HttpServerRequest, HttpServerResponse } from "effect/http"
 import { HttpApiBuilder, HttpApiSchema } from "effect/http-api"
 import { Socket } from "effect/socket"
 import { Api } from "../api"
 import { CorsConfig, isAllowedRequestOrigin } from "../cors"
-import { ForbiddenError, PtyNotFoundError } from "@opencode/protocol/errors"
+import { ForbiddenError, PtyNotFoundError } from "@sleepy-ai/protocol/errors"
 import {
   PTY_CONNECT_TICKET_QUERY,
   PTY_CONNECT_TOKEN_HEADER,
   PTY_CONNECT_TOKEN_HEADER_VALUE,
-} from "@opencode/protocol/groups/pty"
+} from "@sleepy-ai/protocol/groups/pty"
 import { locationErrors, requestRef, response } from "../location"
 import { PtyEnvironment } from "../pty-environment"
 import { type Outbound, runPtySocket } from "./pty-socket"

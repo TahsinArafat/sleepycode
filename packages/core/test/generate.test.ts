@@ -1,15 +1,15 @@
 import { expect } from "bun:test"
-import { LanguageModel, LLMClient } from "@opencode/ai"
-import { RequestExecutor } from "@opencode/ai/route"
-import { OpenAIChat } from "@opencode/ai/protocols"
-import { TestLLM } from "@opencode/ai/testing"
-import { AISDK } from "@opencode/core/aisdk"
-import { Generate } from "@opencode/core/generate"
-import { Integration } from "@opencode/core/integration"
-import { ModelResolver } from "@opencode/core/model-resolver"
-import { ID, Info, Model, Ref } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
-import { Npm } from "@opencode/util/npm"
+import { LanguageModel, LLMClient } from "@sleepy-ai/ai"
+import { RequestExecutor } from "@sleepy-ai/ai/route"
+import { OpenAIChat } from "@sleepy-ai/ai/protocols"
+import { TestLLM } from "@sleepy-ai/ai/testing"
+import { AISDK } from "@sleepy-ai/core/aisdk"
+import { Generate } from "@sleepy-ai/core/generate"
+import { Integration } from "@sleepy-ai/core/integration"
+import { ModelResolver } from "@sleepy-ai/core/model-resolver"
+import { ID, Info, Model, Ref } from "@sleepy-ai/core/model"
+import { Provider } from "@sleepy-ai/core/provider"
+import { Npm } from "@sleepy-ai/util/npm"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientResponse } from "effect/http"
 import { testEffect } from "./lib/effect"
@@ -101,7 +101,7 @@ testEffect(Layer.empty).effect("attributes each stateless completion without cre
       HttpClient.HttpClient,
       HttpClient.make((request) =>
         Effect.sync(() => {
-          const session = request.headers["x-opencode-session"]
+          const session = request.headers["x-sleepycode-session"]
           if (!session)
             return HttpClientResponse.fromWeb(
               request,

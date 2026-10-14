@@ -1,25 +1,25 @@
 import { describe, expect } from "bun:test"
 import { and, asc, eq } from "drizzle-orm"
 import { Effect, Schema } from "effect"
-import { Database } from "@opencode/core/database/database"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { Event } from "@opencode/schema/event"
-import { EventTable } from "@opencode/core/event/sql"
-import { Instructions } from "@opencode/core/instructions/index"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { AbsolutePath } from "@opencode/core/schema"
-import { InstructionState } from "@opencode/core/session/instruction-state"
-import { SessionProjector } from "@opencode/core/session/projector"
-import { SessionSchema } from "@opencode/core/session/schema"
+import { Database } from "@sleepy-ai/core/database/database"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Bus } from "@sleepy-ai/core/bus"
+import { Event } from "@sleepy-ai/schema/event"
+import { EventTable } from "@sleepy-ai/core/event/sql"
+import { Instructions } from "@sleepy-ai/core/instructions/index"
+import { Project } from "@sleepy-ai/core/project"
+import { ProjectTable } from "@sleepy-ai/core/project/sql"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { InstructionState } from "@sleepy-ai/core/session/instruction-state"
+import { SessionProjector } from "@sleepy-ai/core/session/projector"
+import { SessionSchema } from "@sleepy-ai/core/session/schema"
 import {
   InstructionBlobTable,
   InstructionStateTable,
   SessionMessageTable,
   SessionTable,
-} from "@opencode/core/session/sql"
+} from "@sleepy-ai/core/session/sql"
 import { testEffect } from "./lib/effect"
 
 const it = testEffect(

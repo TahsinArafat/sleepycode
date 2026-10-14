@@ -2,8 +2,8 @@ import { MetaProvider, Title, Meta } from "@solidjs/meta"
 import { Router } from "@solidjs/router"
 import { FileRoutes } from "@solidjs/start/router"
 import { Suspense } from "solid-js"
-import { Favicon } from "@opencode/ui/favicon"
-import { Font } from "@opencode/ui/font"
+import { Favicon } from "@sleepy-ai/ui/favicon"
+import { Font } from "@sleepy-ai/ui/font"
 import "@ibm/plex/css/ibm-plex.css"
 import "./app.css"
 import { LanguageProvider } from "~/context/language"
@@ -14,7 +14,7 @@ function AppMeta() {
   const i18n = useI18n()
   return (
     <>
-      <Title>opencode</Title>
+      <Title>sleepycode</Title>
       <Meta name="description" content={i18n.t("app.meta.description")} />
       <Favicon />
       <Font />

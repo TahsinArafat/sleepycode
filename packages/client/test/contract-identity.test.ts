@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test"
 import { Schema } from "effect"
-import { Agent } from "@opencode/schema/agent"
-import { Config } from "@opencode/schema/config"
-import { Model } from "@opencode/schema/model"
-import { Prompt } from "@opencode/schema/prompt"
-import { Session } from "@opencode/schema/session"
-import { SessionMessage } from "@opencode/schema/session-message"
-import { Vcs } from "@opencode/schema/vcs"
+import { Agent } from "@sleepy-ai/schema/agent"
+import { Config } from "@sleepy-ai/schema/config"
+import { Model } from "@sleepy-ai/schema/model"
+import { Prompt } from "@sleepy-ai/schema/prompt"
+import { Session } from "@sleepy-ai/schema/session"
+import { SessionMessage } from "@sleepy-ai/schema/session-message"
+import { Vcs } from "@sleepy-ai/schema/vcs"
 
 const Client = await import("../src/effect")
 
@@ -22,7 +22,7 @@ test("generated Effect API names canonical and composed outputs", async () => {
   const source = await Bun.file(new URL("../src/effect/api/api.ts", import.meta.url)).text()
 
   expect(source).toContain("export type SessionGetOutput = Session.Info")
-  expect(source).toContain("export type EventSubscribeOutput = OpenCodeEvent")
+  expect(source).toContain("export type EventSubscribeOutput = SleepyCodeEvent")
   expect(source).not.toContain("HttpApiClient.ForApi")
 })
 

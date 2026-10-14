@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { Arbitrary, Duration, Effect, Schema } from "effect"
-import { ConfigNormalize } from "@opencode/core/config/normalize"
-import { Info } from "@opencode/schema/config"
+import { ConfigNormalize } from "@sleepy-ai/core/config/normalize"
+import { Info } from "@sleepy-ai/schema/config"
 
 const options = { errors: "all", onExcessProperty: "ignore" } as const
 

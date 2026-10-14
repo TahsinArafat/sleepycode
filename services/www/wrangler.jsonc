@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "opencode-www",
+  "name": "sleepycode-www",
   "compatibility_date": "2026-07-25",
   "workers_dev": false,
   "preview_urls": false,
@@ -15,7 +15,7 @@
   },
   "env": {
     "dev": {
-      "name": "opencode-www-dev",
+      "name": "sleepycode-www-dev",
       "routes": [
         {
           "pattern": "dev.opencode.ai/v2*",
@@ -24,7 +24,7 @@
       ],
     },
     "production": {
-      "name": "opencode-www-production",
+      "name": "sleepycode-www-production",
       "routes": [
         {
           "pattern": "opencode.ai/v2*",

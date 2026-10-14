@@ -4,8 +4,8 @@ import { For } from "solid-js"
 //import { HttpHeader } from "@solidjs/start"
 import zenLogoLight from "../../asset/zen-ornate-light.svg"
 import zenLogoDark from "../../asset/zen-ornate-dark.svg"
-import compareVideo from "../../asset/lander/opencode-comparison-min.mp4"
-import compareVideoPoster from "../../asset/lander/opencode-comparison-poster.png"
+import compareVideo from "../../asset/lander/sleepycode-comparison-min.mp4"
+import compareVideoPoster from "../../asset/lander/sleepycode-comparison-poster.png"
 import avatarDax from "../../asset/lander/avatar-dax.png"
 import avatarJay from "../../asset/lander/avatar-jay.png"
 import avatarFrank from "../../asset/lander/avatar-frank.png"
@@ -213,7 +213,7 @@ export default function Home() {
                   <span>ex-CEO, Terminal Products</span>
                 </div>
                 <div data-slot="quote">
-                  <span>@OpenCode</span>
+                  <span>@SleepyCode</span>
                   {" Zen has been life changing, it's truly a no-brainer."}
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function Home() {
                 </div>
                 <div data-slot="quote">
                   {"4 out of 5 people on our team love using "}
-                  <span>@OpenCode</span>
+                  <span>@SleepyCode</span>
                   {" Zen."}
                 </div>
               </div>
@@ -243,7 +243,7 @@ export default function Home() {
                 </div>
                 <div data-slot="quote">
                   {"I can't recommend "}
-                  <span>@OpenCode</span>
+                  <span>@SleepyCode</span>
                   {" Zen enough. Seriously, it's really good."}
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function Home() {
                 </div>
                 <div data-slot="quote">
                   {"With "}
-                  <span>@OpenCode</span>
+                  <span>@SleepyCode</span>
                   {" Zen I know all the models are tested and perfect for coding agents."}
                 </div>
               </div>

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/update",
+  "name": "@sleepy-ai/update",
   "version": "2.0.29",
   "private": true,
   "type": "module",

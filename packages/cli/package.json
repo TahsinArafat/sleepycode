@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/cli",
+  "name": "@sleepy-ai/cli",
   "version": "2.0.29",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "opencode": "./bin/opencode.cjs",
-    "opencode2": "./bin/opencode2.cjs"
+    "sleepycode": "./bin/sleepycode.cjs",
+    "sleepycode2": "./bin/sleepycode2.cjs"
   },
   "files": [
     "bin"
@@ -28,13 +28,13 @@
     "@clack/core": "1.0.0-alpha.1",
     "@clack/prompts": "1.0.0-alpha.1",
     "@effect/platform-node": "catalog:",
-    "@opencode/client": "workspace:*",
-    "@opencode/plugin": "workspace:*",
+    "@sleepy-ai/client": "workspace:*",
+    "@sleepy-ai/plugin": "workspace:*",
     "@opencode-ai/pty": "0.2.0",
-    "@opencode/schema": "workspace:*",
-    "@opencode/server": "workspace:*",
-    "@opencode/tui": "workspace:*",
-    "@opencode/util": "workspace:*",
+    "@sleepy-ai/schema": "workspace:*",
+    "@sleepy-ai/server": "workspace:*",
+    "@sleepy-ai/tui": "workspace:*",
+    "@sleepy-ai/util": "workspace:*",
     "@opentui/core": "catalog:",
     "@opentui/solid": "catalog:",
     "@opentunnel/client": "0.4.0",
@@ -53,8 +53,8 @@
     "ws": "8.21.0"
   },
   "devDependencies": {
-    "@opencode/script": "workspace:*",
-    "@opencode/protocol": "workspace:*",
+    "@sleepy-ai/script": "workspace:*",
+    "@sleepy-ai/protocol": "workspace:*",
     "@tsconfig/bun": "catalog:",
     "@types/bun": "catalog:",
     "@typescript/native-preview": "catalog:",

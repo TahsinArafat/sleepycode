@@ -1,6 +1,6 @@
-import { define } from "@opencode/plugin/effect/plugin"
-import { Integration } from "@opencode/schema/integration"
-import { Provider } from "@opencode/schema/provider"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { Integration } from "@sleepy-ai/schema/integration"
+import { Provider } from "@sleepy-ai/schema/provider"
 import { Effect, Stream } from "effect"
 import { Bus } from "../bus.js"
 import { Model } from "../model.js"
@@ -25,7 +25,7 @@ const BEDROCK_PROFILE_ONLY_IDS = [
 ]
 
 export const ModelsDevPlugin = define({
-  id: "opencode.models.dev",
+  id: "sleepycode.models.dev",
   effect: Effect.fn(function* (ctx) {
     const modelsDev = yield* ModelsDev.Service
     const bus = yield* Bus.Service

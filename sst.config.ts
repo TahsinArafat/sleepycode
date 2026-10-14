@@ -3,7 +3,7 @@
 export default $config({
   app(input) {
     return {
-      name: "opencode",
+      name: "sleepycode",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "cloudflare",
@@ -17,8 +17,8 @@ export default $config({
                 profile: process.env.GITHUB_ACTIONS
                   ? undefined
                   : input.stage === "production"
-                    ? "opencode-production"
-                    : "opencode-dev",
+                    ? "sleepycode-production"
+                    : "sleepycode-dev",
               },
               stripe: {
                 version: "0.0.28",

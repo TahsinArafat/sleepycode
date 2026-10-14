@@ -1,32 +1,32 @@
 import { expect, test } from "bun:test"
 import { Schema } from "effect"
-import { Agent } from "@opencode/core/agent"
-import { Session } from "@opencode/core/session"
-import { SessionStore } from "@opencode/core/session/store"
-import { Location } from "@opencode/schema/location"
-import { Model } from "@opencode/schema/model"
-import { Provider } from "@opencode/schema/provider"
-import { Project } from "@opencode/schema/project"
-import { Worktree } from "@opencode/schema/worktree"
-import { Prompt } from "@opencode/schema/prompt"
-import { SessionInbox } from "@opencode/schema/session-inbox"
-import { SessionMessage } from "@opencode/schema/session-message"
-import { Workspace } from "@opencode/schema/workspace"
-import { Command } from "@opencode/schema/command"
-import { Connection } from "@opencode/schema/connection"
-import { Credential } from "@opencode/schema/credential"
-import { FileSystem } from "@opencode/schema/filesystem"
-import { Integration } from "@opencode/schema/integration"
-import { LLM } from "@opencode/schema/llm"
-import { Permission } from "@opencode/schema/permission"
-import { Pty } from "@opencode/schema/pty"
-import { Reference } from "@opencode/schema/reference"
-import { Skill } from "@opencode/schema/skill"
-import { AbsolutePath, optional, statics } from "@opencode/schema/schema"
+import { Agent } from "@sleepy-ai/core/agent"
+import { Session } from "@sleepy-ai/core/session"
+import { SessionStore } from "@sleepy-ai/core/session/store"
+import { Location } from "@sleepy-ai/schema/location"
+import { Model } from "@sleepy-ai/schema/model"
+import { Provider } from "@sleepy-ai/schema/provider"
+import { Project } from "@sleepy-ai/schema/project"
+import { Worktree } from "@sleepy-ai/schema/worktree"
+import { Prompt } from "@sleepy-ai/schema/prompt"
+import { SessionInbox } from "@sleepy-ai/schema/session-inbox"
+import { SessionMessage } from "@sleepy-ai/schema/session-message"
+import { Workspace } from "@sleepy-ai/schema/workspace"
+import { Command } from "@sleepy-ai/schema/command"
+import { Connection } from "@sleepy-ai/schema/connection"
+import { Credential } from "@sleepy-ai/schema/credential"
+import { FileSystem } from "@sleepy-ai/schema/filesystem"
+import { Integration } from "@sleepy-ai/schema/integration"
+import { LLM } from "@sleepy-ai/schema/llm"
+import { Permission } from "@sleepy-ai/schema/permission"
+import { Pty } from "@sleepy-ai/schema/pty"
+import { Reference } from "@sleepy-ai/schema/reference"
+import { Skill } from "@sleepy-ai/schema/skill"
+import { AbsolutePath, optional, statics } from "@sleepy-ai/schema/schema"
 
 test("Core reuses the canonical shared schemas", async () => {
-  const schemaAgent = await import("@opencode/schema/agent")
-  const schemaSession = await import("@opencode/schema/session")
+  const schemaAgent = await import("@sleepy-ai/schema/agent")
+  const schemaSession = await import("@sleepy-ai/schema/session")
   const [
     coreCommand,
     coreConnection,
@@ -48,25 +48,25 @@ test("Core reuses the canonical shared schemas", async () => {
     coreSchema,
     coreWorkspace,
   ] = await Promise.all([
-    import("@opencode/core/command"),
-    import("@opencode/core/integration/connection"),
-    import("@opencode/core/credential"),
-    import("@opencode/core/filesystem"),
-    import("@opencode/core/integration"),
-    import("@opencode/core/location"),
-    import("@opencode/ai"),
-    import("@opencode/core/model"),
-    import("@opencode/core/permission"),
-    import("@opencode/core/worktree"),
-    import("@opencode/core/pty"),
-    import("@opencode/core/project/schema"),
-    import("@opencode/core/provider"),
-    import("@opencode/core/reference"),
-    import("@opencode/core/session/inbox"),
-    import("@opencode/core/session/message"),
-    import("@opencode/core/skill"),
-    import("@opencode/core/schema"),
-    import("@opencode/core/workspace"),
+    import("@sleepy-ai/core/command"),
+    import("@sleepy-ai/core/integration/connection"),
+    import("@sleepy-ai/core/credential"),
+    import("@sleepy-ai/core/filesystem"),
+    import("@sleepy-ai/core/integration"),
+    import("@sleepy-ai/core/location"),
+    import("@sleepy-ai/ai"),
+    import("@sleepy-ai/core/model"),
+    import("@sleepy-ai/core/permission"),
+    import("@sleepy-ai/core/worktree"),
+    import("@sleepy-ai/core/pty"),
+    import("@sleepy-ai/core/project/schema"),
+    import("@sleepy-ai/core/provider"),
+    import("@sleepy-ai/core/reference"),
+    import("@sleepy-ai/core/session/inbox"),
+    import("@sleepy-ai/core/session/message"),
+    import("@sleepy-ai/core/skill"),
+    import("@sleepy-ai/core/schema"),
+    import("@sleepy-ai/core/workspace"),
   ])
 
   const schemas = [

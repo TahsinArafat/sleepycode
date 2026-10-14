@@ -1,8 +1,8 @@
 export * as SessionCommand from "./command.js"
 
-import type { PromptInput } from "@opencode/schema/prompt-input"
-import type { Session } from "@opencode/schema/session"
-import type { SessionInbox } from "@opencode/schema/session-inbox"
+import type { PromptInput } from "@sleepy-ai/schema/prompt-input"
+import type { Session } from "@sleepy-ai/schema/session"
+import type { SessionInbox } from "@sleepy-ai/schema/session-inbox"
 import { Effect } from "effect"
 import { Command } from "../command.js"
 import { Instance } from "../instance/service.js"

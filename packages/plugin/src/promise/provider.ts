@@ -1,7 +1,7 @@
-import type { ProviderApi } from "@opencode/client/promise/api"
-import type { Model } from "@opencode/schema/model"
-import type { Provider } from "@opencode/schema/provider"
-import type { ConnectionInfo } from "@opencode/client"
+import type { ProviderApi } from "@sleepy-ai/client/promise/api"
+import type { Model } from "@sleepy-ai/schema/model"
+import type { Provider } from "@sleepy-ai/schema/provider"
+import type { ConnectionInfo } from "@sleepy-ai/client"
 import type { Transform } from "./registration.js"
 import type { DeepMutable } from "./types.js"
 

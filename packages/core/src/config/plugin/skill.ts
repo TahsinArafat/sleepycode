@@ -1,9 +1,9 @@
 export * as ConfigSkillPlugin from "./skill.js"
 
-import { define } from "@opencode/plugin/effect/plugin"
-import type { Entry } from "@opencode/schema/config"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Global } from "@opencode/util/global"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import type { Entry } from "@sleepy-ai/schema/config"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
+import { Global } from "@sleepy-ai/util/global"
 import path from "path"
 import { Effect, FiberMap, PubSub, Semaphore, Stream } from "effect"
 import { Config } from "../../config.js"
@@ -17,7 +17,7 @@ import { SkillFile } from "./skill-file.js"
 type Source = Skill.DirectorySource | Skill.UrlSource
 
 export const Plugin = define({
-  id: "opencode.config.skill",
+  id: "sleepycode.config.skill",
   effect: Effect.fn(function* (ctx) {
     const config = yield* Config.Service
     const discovery = yield* SkillDiscovery.Service

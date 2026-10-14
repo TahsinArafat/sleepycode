@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/client",
+  "name": "@sleepy-ai/client",
   "version": "2.0.29",
   "type": "module",
   "license": "MIT",
@@ -33,8 +33,8 @@
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
-    "@opencode/schema": "workspace:*",
-    "@opencode/protocol": "workspace:*"
+    "@sleepy-ai/schema": "workspace:*",
+    "@sleepy-ai/protocol": "workspace:*"
   },
   "peerDependencies": {
     "effect": "catalog:",
@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@effect/platform-node": "catalog:",
-    "@opencode/httpapi-codegen": "workspace:*",
+    "@sleepy-ai/httpapi-codegen": "workspace:*",
     "@tsconfig/bun": "catalog:",
     "@types/bun": "catalog:",
     "@typescript/native-preview": "catalog:",

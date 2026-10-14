@@ -1,7 +1,7 @@
 import { createSignal, Index, Show } from "solid-js"
 import { Effect, Option, Predicate, Schema } from "effect"
-import { Button } from "@opencode/ui/button"
-import { Dialog } from "@opencode/ui/dialog"
+import { Button } from "@sleepy-ai/ui/button"
+import { Dialog } from "@sleepy-ai/ui/dialog"
 import { useExtension, type DialogHandle, type SetupContext } from "../sdk"
 import type definition from "./index"
 

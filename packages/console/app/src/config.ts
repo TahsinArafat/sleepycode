@@ -18,8 +18,8 @@ export const config = {
 
   // Social links
   social: {
-    twitter: "https://x.com/opencode",
-    discord: "https://discord.gg/opencode",
+    twitter: "https://x.com/sleepycode",
+    discord: "https://discord.gg/sleepycode",
   },
 
   // Static stats (used on landing page)

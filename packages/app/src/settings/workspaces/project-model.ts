@@ -1,5 +1,5 @@
-import { getFilename } from "@opencode/util/path"
-import type { ProjectUpdateInput } from "@opencode/client/promise"
+import { getFilename } from "@sleepy-ai/util/path"
+import type { ProjectUpdateInput } from "@sleepy-ai/client/promise"
 import { createMemo } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useGlobal } from "@/runtime/server/runtime"

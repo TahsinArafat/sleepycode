@@ -1,5 +1,5 @@
-import { Provider } from "@opencode/core/provider"
-import { ProviderNotFoundError } from "@opencode/protocol/errors"
+import { Provider } from "@sleepy-ai/core/provider"
+import { ProviderNotFoundError } from "@sleepy-ai/protocol/errors"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/http-api"
 import { Api } from "../api"

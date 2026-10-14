@@ -22,26 +22,26 @@ describe("acp session lifecycle over the wire", () => {
         mcpCapabilities: { http: true, sse: false },
         promptCapabilities: { embeddedContext: true, image: true },
         sessionCapabilities: { additionalDirectories: {}, close: {}, delete: {}, fork: {}, list: {}, resume: {} },
-        _meta: { "opencode/child-session-updates": true },
+        _meta: { "sleepycode/child-session-updates": true },
       },
-      agentInfo: { name: "OpenCode" },
+      agentInfo: { name: "SleepyCode" },
     })
     expect(plain.authMethods).toEqual([
-      { id: "opencode-login", name: "Login with opencode", description: "Run `opencode auth login` in the terminal" },
+      { id: "sleepycode-login", name: "Login with sleepycode", description: "Run `sleepycode auth login` in the terminal" },
     ])
     expect(terminal.authMethods?.[0]?._meta).toEqual({
-      "terminal-auth": { command: "opencode", args: ["auth", "login"], label: "OpenCode Login" },
+      "terminal-auth": { command: "sleepycode", args: ["auth", "login"], label: "SleepyCode Login" },
     })
     expect(standard.authMethods).toEqual([
       {
-        id: "opencode-login",
-        name: "Login with opencode",
-        description: "Run `opencode auth login` in the terminal",
+        id: "sleepycode-login",
+        name: "Login with sleepycode",
+        description: "Run `sleepycode auth login` in the terminal",
         type: "terminal",
         args: ["--login"],
       },
     ])
-    expect(await acp.request("authenticate", { methodId: "opencode-login" })).toEqual({})
+    expect(await acp.request("authenticate", { methodId: "sleepycode-login" })).toEqual({})
     expect(await rpcError(acp.request("authenticate", { methodId: "missing" }))).toMatchObject({
       code: -32602,
       data: { methodId: "missing" },

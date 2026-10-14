@@ -1,8 +1,8 @@
-import type { LocationGetOutput, OpenCodeClient } from "@opencode/client/promise"
-import type { Data } from "@opencode/client/solid"
+import type { LocationGetOutput, SleepyCodeClient } from "@sleepy-ai/client/promise"
+import type { Data } from "@sleepy-ai/client/solid"
 
 export async function createWorktree(input: {
-  api: Pick<OpenCodeClient, "location" | "worktree">
+  api: Pick<SleepyCodeClient, "location" | "worktree">
   data: Pick<Data, "location">
   directory: string
   project?: LocationGetOutput["project"]

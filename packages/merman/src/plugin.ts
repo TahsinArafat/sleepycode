@@ -1,14 +1,14 @@
-import { Plugin } from "@opencode/plugin/tui"
+import { Plugin } from "@sleepy-ai/plugin/tui"
 import { createMermaidCodeBlockRenderer } from "./markdown.js"
-import { resolveOpenCodeDiagramPalette } from "./palette.js"
+import { resolveSleepyCodeDiagramPalette } from "./palette.js"
 
 export default Plugin.define({
-  id: "opencode.merman",
+  id: "sleepycode.merman",
   setup(context) {
     context.markdown.registerCodeBlockRenderer(
       "mermaid",
       createMermaidCodeBlockRenderer(context.renderer, () => ({
-        colors: resolveOpenCodeDiagramPalette(context.theme, context.themeMode),
+        colors: resolveSleepyCodeDiagramPalette(context.theme, context.themeMode),
       })),
     )
   },

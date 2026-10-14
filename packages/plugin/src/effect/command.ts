@@ -1,7 +1,7 @@
-import type { CommandApi } from "@opencode/client/effect/api"
-import type { PromptInput } from "@opencode/schema/prompt-input"
-import type { Session } from "@opencode/schema/session"
-import type { SessionInbox } from "@opencode/schema/session-inbox"
+import type { CommandApi } from "@sleepy-ai/client/effect/api"
+import type { PromptInput } from "@sleepy-ai/schema/prompt-input"
+import type { Session } from "@sleepy-ai/schema/session"
+import type { SessionInbox } from "@sleepy-ai/schema/session-inbox"
 import type { Effect } from "effect"
 import type { Transform } from "./registration.js"
 

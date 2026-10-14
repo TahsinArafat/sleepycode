@@ -1,5 +1,5 @@
-import { useFilteredList } from "@opencode/ui/hooks"
-import { Switch } from "@opencode/ui/switch"
+import { useFilteredList } from "@sleepy-ai/ui/hooks"
+import { Switch } from "@sleepy-ai/ui/switch"
 import { type Component, createEffect, createMemo, For, Show } from "solid-js"
 
 import { Schema } from "effect"

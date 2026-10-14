@@ -1,35 +1,35 @@
-import { SessionTimeline } from "@opencode/session-ui/timeline"
-import type { SessionDocument } from "@opencode/session-ui/document"
-import type { SessionMessageInfo } from "@opencode/client/promise"
-import { SessionReview } from "@opencode/session-ui/session-review"
-import { DataProvider } from "@opencode/session-ui/context"
-import { FileComponentProvider } from "@opencode/ui/context/file"
-import { WorkerPoolProvider } from "@opencode/ui/context/worker-pool"
-import { withTimestampedFallback } from "@opencode/util/session-title-fallback"
+import { SessionTimeline } from "@sleepy-ai/session-ui/timeline"
+import type { SessionDocument } from "@sleepy-ai/session-ui/document"
+import type { SessionMessageInfo } from "@sleepy-ai/client/promise"
+import { SessionReview } from "@sleepy-ai/session-ui/session-review"
+import { DataProvider } from "@sleepy-ai/session-ui/context"
+import { FileComponentProvider } from "@sleepy-ai/ui/context/file"
+import { WorkerPoolProvider } from "@sleepy-ai/ui/context/worker-pool"
+import { withTimestampedFallback } from "@sleepy-ai/util/session-title-fallback"
 import { createAsync, query, useParams } from "@solidjs/router"
 import { createMemo, createSignal, ErrorBoundary, Match, Show, Switch, type JSX } from "solid-js"
 import { Share } from "~/core/share"
 import { readShareDocument } from "~/core/share-document"
-import { Logo, Mark } from "@opencode/ui/logo"
-import { IconButton } from "@opencode/ui/icon-button"
-import { Icon } from "@opencode/ui/icon"
-import { ProviderIcon } from "@opencode/ui/provider-icon"
-import { iife } from "@opencode/core/util/iife"
-import { Binary } from "@opencode/util/binary"
-import { NamedError } from "@opencode/core/util/error"
+import { Logo, Mark } from "@sleepy-ai/ui/logo"
+import { IconButton } from "@sleepy-ai/ui/icon-button"
+import { Icon } from "@sleepy-ai/ui/icon"
+import { ProviderIcon } from "@sleepy-ai/ui/provider-icon"
+import { iife } from "@sleepy-ai/core/util/iife"
+import { Binary } from "@sleepy-ai/util/binary"
+import { NamedError } from "@sleepy-ai/core/util/error"
 import { DateTime } from "luxon"
 import { createStore } from "solid-js/store"
 import NotFound from "../[...404]"
-import { Tabs } from "@opencode/ui/tabs"
-import { MessageNav } from "@opencode/session-ui/message-nav"
-import { FileSSR } from "@opencode/session-ui/file-ssr"
+import { Tabs } from "@sleepy-ai/ui/tabs"
+import { MessageNav } from "@sleepy-ai/session-ui/message-nav"
+import { FileSSR } from "@sleepy-ai/session-ui/file-ssr"
 import { clientOnly } from "@solidjs/start"
 import { Meta, Title } from "@solidjs/meta"
 import { Base64 } from "js-base64"
 import { getRequestEvent } from "solid-js/web"
 
 const ClientOnlyWorkerPoolProvider = clientOnly(() =>
-  import("@opencode/session-ui/pierre/worker").then((m) => ({
+  import("@sleepy-ai/session-ui/pierre/worker").then((m) => ({
     default: (props: { children: JSX.Element }) => (
       <WorkerPoolProvider pools={m.getWorkerPools()}>{props.children}</WorkerPoolProvider>
     ),
@@ -134,13 +134,13 @@ export default function () {
             } else {
               modelParam = "unknown"
             }
-            return `https://social-cards.sst.dev/opencode-share/${encodedTitle}.png?model=${modelParam}&version=v${data().version}&id=${data().shareID}`
+            return `https://social-cards.sst.dev/sleepycode-share/${encodedTitle}.png?model=${modelParam}&version=v${data().version}&id=${data().shareID}`
           })
 
           return (
             <>
-              <Title>{title()} | OpenCode</Title>
-              <Meta name="description" content="opencode - The AI coding agent built for the terminal." />
+              <Title>{title()} | SleepyCode</Title>
+              <Meta name="description" content="sleepycode - The AI coding agent built for the terminal." />
               <Meta property="og:image" content={ogImage()} />
               <Meta name="twitter:image" content={ogImage()} />
               <ClientOnlyWorkerPoolProvider>

@@ -1,13 +1,13 @@
-import { Bus } from "@opencode/core/bus"
-import { Config } from "@opencode/core/config"
-import { Integration } from "@opencode/core/integration"
-import { Model } from "@opencode/core/model"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { ProviderPlugins } from "@opencode/core/plugin/provider"
-import { make, VLLMPlugin } from "@opencode/core/plugin/provider/vllm"
-import { Provider } from "@opencode/core/provider"
-import { Document, Event, Info } from "@opencode/schema/config"
+import { Bus } from "@sleepy-ai/core/bus"
+import { Config } from "@sleepy-ai/core/config"
+import { Integration } from "@sleepy-ai/core/integration"
+import { Model } from "@sleepy-ai/core/model"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { PluginHost } from "@sleepy-ai/core/plugin/host"
+import { ProviderPlugins } from "@sleepy-ai/core/plugin/provider"
+import { make, VLLMPlugin } from "@sleepy-ai/core/plugin/provider/vllm"
+import { Provider } from "@sleepy-ai/core/provider"
+import { Document, Event, Info } from "@sleepy-ai/schema/config"
 import { describe, expect } from "bun:test"
 import { Duration, Effect, Layer, Schema } from "effect"
 import { testEffect } from "../lib/effect"
@@ -77,8 +77,8 @@ describe("VLLMPlugin", () => {
           const providers = yield* Provider.Service
           const modelState = yield* Model.Service
           const providerID = Provider.ID.make("vllm")
-          expect(VLLMPlugin.id).toBe("opencode.provider.vllm")
-          expect(ProviderPlugins.map((item) => item.id)).toContain("opencode.provider.vllm")
+          expect(VLLMPlugin.id).toBe("sleepycode.provider.vllm")
+          expect(ProviderPlugins.map((item) => item.id)).toContain("sleepycode.provider.vllm")
           yield* addPlugin(server.url.origin, "5 millis")
           yield* Effect.promise(() => Bun.sleep(20))
           expect(yield* providers.get(providerID)).toBeUndefined()
@@ -92,7 +92,7 @@ describe("VLLMPlugin", () => {
           expect(yield* providers.get(providerID)).toEqual({
             id: providerID,
             name: "vLLM",
-            package: "@opencode/ai/providers/openai-compatible",
+            package: "@sleepy-ai/ai/providers/openai-compatible",
             settings: { baseURL: `${server.url.origin}/v1`, provider: "vllm", apiKey: "" },
             activation: "enabled",
           })
@@ -185,7 +185,7 @@ describe("VLLMPlugin", () => {
           yield* providers.transform((editor) => {
             editor.update(providerID, (provider) => {
               provider.name = "vLLM"
-              provider.package = "@opencode/ai/providers/openai-compatible"
+              provider.package = "@sleepy-ai/ai/providers/openai-compatible"
               provider.integrationID = Integration.ID.make("vllm")
               provider.activation = "auto"
             })

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/simulation",
+  "name": "@sleepy-ai/simulation",
   "version": "2.0.29",
   "type": "module",
   "license": "MIT",
@@ -29,11 +29,11 @@
     "typecheck": "tsgo -b"
   },
   "dependencies": {
-    "@opencode/core": "workspace:*",
-    "@opencode/ai": "workspace:*",
-    "@opencode/plugin": "workspace:*",
-    "@opencode/protocol": "workspace:*",
-    "@opencode/util": "workspace:*",
+    "@sleepy-ai/core": "workspace:*",
+    "@sleepy-ai/ai": "workspace:*",
+    "@sleepy-ai/plugin": "workspace:*",
+    "@sleepy-ai/protocol": "workspace:*",
+    "@sleepy-ai/util": "workspace:*",
     "@opentui/core": "catalog:",
     "effect": "catalog:",
     "ws": "8.21.0"

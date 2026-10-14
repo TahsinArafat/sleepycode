@@ -1,11 +1,11 @@
-import type { KeymapCommand } from "@opencode/plugin/tui/context"
-import type { OpenCodeClient } from "@opencode/client"
+import type { KeymapCommand } from "@sleepy-ai/plugin/tui/context"
+import type { SleepyCodeClient } from "@sleepy-ai/client"
 import path from "path"
 import { displaySlice, promptOffsetWidth } from "./display"
 import { parseSlashHead } from "./parse"
 
 export async function directoryAutocomplete(
-  file: Pick<OpenCodeClient["file"], "list">,
+  file: Pick<SleepyCodeClient["file"], "list">,
   location: { directory: string },
   query: string,
   home: string,

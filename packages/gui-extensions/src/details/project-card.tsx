@@ -1,10 +1,10 @@
-import { Icon } from "@opencode/ui/icon"
+import { Icon } from "@sleepy-ai/ui/icon"
 import {
   displayName,
   getProjectAvatarSource,
   getProjectAvatarVariant,
   ProjectAvatar,
-} from "@opencode/ui/project-avatar"
+} from "@sleepy-ai/ui/project-avatar"
 import { createUniqueId, Show, type ParentProps } from "solid-js"
 import type { Project } from "../sdk"
 

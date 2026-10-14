@@ -1,18 +1,18 @@
 import { describe, expect } from "bun:test"
 import { Deferred, Duration, Effect, Layer, LayerMap, Stream } from "effect"
 import { TestClock } from "effect/testing"
-import { define } from "@opencode/plugin/effect/plugin"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Global } from "@opencode/util/global"
-import { Command } from "@opencode/core/command"
-import { ConfigPluginSource } from "@opencode/core/config/plugin/source"
-import { Instance } from "@opencode/core/instance"
-import { LocationServiceMap } from "@opencode/core/location-services"
-import { Location } from "@opencode/core/location"
-import { Plugin } from "@opencode/core/plugin"
-import { SdkPlugins } from "@opencode/core/plugin/sdk"
-import { AbsolutePath } from "@opencode/core/schema"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Global } from "@sleepy-ai/util/global"
+import { Command } from "@sleepy-ai/core/command"
+import { ConfigPluginSource } from "@sleepy-ai/core/config/plugin/source"
+import { Instance } from "@sleepy-ai/core/instance"
+import { LocationServiceMap } from "@sleepy-ai/core/location-services"
+import { Location } from "@sleepy-ai/core/location"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { SdkPlugins } from "@sleepy-ai/core/plugin/sdk"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
 import { Database } from "../../src/database/database"
 import { Bus } from "../../src/bus"
 import { tempGlobalLayer } from "../fixture/global"
@@ -111,7 +111,7 @@ describe("PluginSupervisor", () => {
       expect(state.instance).toBeUndefined()
       // Builtins stay active: the duplicate is a plugin failure, not a generation defect.
       expect(
-        state.inventory.some((plugin) => plugin.id?.startsWith("opencode.") && plugin.state.status === "active"),
+        state.inventory.some((plugin) => plugin.id?.startsWith("sleepycode.") && plugin.state.status === "active"),
       ).toBe(true)
     }),
   )
@@ -202,7 +202,7 @@ describe("PluginSupervisor", () => {
     }),
   )
 
-  for (const targets of [["opencode.config.policy", "opencode.provider.opencode", "opencode.config.agent"], ["*"]]) {
+  for (const targets of [["sleepycode.config.policy", "sleepycode.provider.sleepycode", "sleepycode.config.agent"], ["*"]]) {
     it.effect(`keeps policy enforcement and the Console connection through plugin removals: ${targets}`, () =>
       Effect.gen(function* () {
         source.operations = targets.map((target) => ({ type: "remove", target }))
@@ -217,10 +217,10 @@ describe("PluginSupervisor", () => {
           Effect.provide(locations.get(Location.Ref.make({ directory: AbsolutePath.make(directory.path) }))),
         )
         const status = (id: string) => inventory.find((plugin) => plugin.id === id)?.state.status
-        expect(status("opencode.config.policy")).toBe("active")
-        expect(status("opencode.provider.opencode")).toBe("active")
+        expect(status("sleepycode.config.policy")).toBe("active")
+        expect(status("sleepycode.provider.sleepycode")).toBe("active")
         // Removals still apply to everything else, including instance and builtin plugins.
-        expect(status("opencode.config.agent")).toBeUndefined()
+        expect(status("sleepycode.config.agent")).toBeUndefined()
         expect(inventory.some((plugin) => plugin.id === id)).toBe(targets[0] !== "*")
       }).pipe(
         Effect.ensuring(

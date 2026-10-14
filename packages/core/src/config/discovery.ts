@@ -3,18 +3,18 @@ export * as ConfigDiscovery from "./discovery.js"
 import os from "os"
 import path from "path"
 import { Effect } from "effect"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Global } from "@opencode/util/global"
+import { FSUtil } from "@sleepy-ai/util/fs-util"
+import { Global } from "@sleepy-ai/util/global"
 import { Location } from "../location.js"
 import { AbsolutePath } from "../schema.js"
 import type { Options } from "../config.js"
 
-export const names = ["opencode.json", "opencode.jsonc"]
+export const names = ["sleepycode.json", "sleepycode.jsonc"]
 
 /** Eligible sources in priority order, including paths that may appear later. */
 export interface Sources {
   readonly system?: { readonly path: AbsolutePath; readonly present: boolean }
-  /** macOS MDM managed preferences plist (`ai.opencode.managed`), when one is deployed. */
+  /** macOS MDM managed preferences plist (`ai.sleepycode.managed`), when one is deployed. */
   readonly preferences?: AbsolutePath
   readonly global?: AbsolutePath
   readonly explicit?: AbsolutePath
@@ -24,22 +24,22 @@ export interface Sources {
   readonly agents: readonly AbsolutePath[]
 }
 
-/** Platform system configuration directory (`/Library/Application Support/opencode`, `/etc/opencode`, `%ProgramData%\opencode`). */
+/** Platform system configuration directory (`/Library/Application Support/sleepycode`, `/etc/sleepycode`, `%ProgramData%\sleepycode`). */
 export function systemDirectory(platform: NodeJS.Platform = process.platform, env: NodeJS.ProcessEnv = process.env) {
-  if (platform === "darwin") return AbsolutePath.make("/Library/Application Support/opencode")
-  if (platform === "win32") return AbsolutePath.make(path.join(env.ProgramData || "C:\\ProgramData", "opencode"))
-  return AbsolutePath.make("/etc/opencode")
+  if (platform === "darwin") return AbsolutePath.make("/Library/Application Support/sleepycode")
+  if (platform === "win32") return AbsolutePath.make(path.join(env.ProgramData || "C:\\ProgramData", "sleepycode"))
+  return AbsolutePath.make("/etc/sleepycode")
 }
 
 /** macOS MDM managed preferences plists, most specific first; the first one present wins. */
 export function preferencePaths(user: string) {
   return [
-    AbsolutePath.make(path.join("/Library/Managed Preferences", user, "ai.opencode.managed.plist")),
-    AbsolutePath.make("/Library/Managed Preferences/ai.opencode.managed.plist"),
+    AbsolutePath.make(path.join("/Library/Managed Preferences", user, "ai.sleepycode.managed.plist")),
+    AbsolutePath.make("/Library/Managed Preferences/ai.sleepycode.managed.plist"),
   ]
 }
 
-// Keys macOS and MDM profiles inject into managed preferences that are not OpenCode config.
+// Keys macOS and MDM profiles inject into managed preferences that are not SleepyCode config.
 const preferenceMetadata = new Set([
   "PayloadDisplayName",
   "PayloadIdentifier",
@@ -82,7 +82,7 @@ export const discover = Effect.fn("ConfigDiscovery.discover")(function* (options
     Effect.gen(function* () {
       // Resolve the parent too: missing children must honor symlinked global roots.
       const parent = yield* fs.resolve(directory)
-      return yield* Effect.forEach([".claude", ".agents", ".opencode", ...names.toReversed()], (name) =>
+      return yield* Effect.forEach([".claude", ".agents", ".sleepycode", ...names.toReversed()], (name) =>
         fs
           .resolve(path.join(parent, name))
           .pipe(Effect.map((resolved) => ({ item: AbsolutePath.make(path.join(directory, name)), resolved }))),
@@ -121,9 +121,9 @@ export const discover = Effect.fn("ConfigDiscovery.discover")(function* (options
     preferences,
     global: globalEnabled ? globalDirectory : undefined,
     explicit: options?.file ? AbsolutePath.make(path.resolve(options.file)) : undefined,
-    direct: visible.filter((item) => ![".agents", ".claude", ".opencode"].includes(path.basename(item))).toReversed(),
+    direct: visible.filter((item) => ![".agents", ".claude", ".sleepycode"].includes(path.basename(item))).toReversed(),
     project: yield* Effect.forEach(
-      visible.filter((item) => path.basename(item) === ".opencode").toReversed(),
+      visible.filter((item) => path.basename(item) === ".sleepycode").toReversed(),
       (directory) => fs.isDir(directory).pipe(Effect.map((present) => ({ path: directory, present }))),
     ),
     claude: [

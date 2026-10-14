@@ -3,19 +3,19 @@
 import { $ } from "bun"
 import { mkdir, rm } from "fs/promises"
 import path from "path"
-import { Script } from "@opencode/script"
-import { embed } from "@opencode/script/highlights"
+import { Script } from "@sleepy-ai/script"
+import { embed } from "@sleepy-ai/script/highlights"
 import { createSolidTransformPlugin } from "@opentui/solid/bun-plugin"
 import type { BunPlugin } from "bun"
 import pkg from "../package.json"
-import { discoverPluginRuntimeSpecifiers, pluginRuntimeLoaderCode } from "@opencode/plugin/runtime-modules"
+import { discoverPluginRuntimeSpecifiers, pluginRuntimeLoaderCode } from "@sleepy-ai/plugin/runtime-modules"
 import { buildAppArchive } from "./app-assets"
 import { verifyArtifact, verifySimulationGraph } from "./verify-artifact"
-import { resolveOpencodePty } from "./opencode-pty"
+import { resolveSleepycodePty } from "./sleepycode-pty"
 import { NativeArch } from "../../../script/native-arch"
 
 const dir = path.resolve(import.meta.dirname, "..")
-const binary = "opencode"
+const binary = "sleepycode"
 const outdir = path.resolve(
   dir,
   process.argv.find((arg) => arg.startsWith("--outdir="))?.slice("--outdir=".length) ?? "dist",
@@ -31,7 +31,7 @@ const requestedTarget = process.argv.find((arg) => arg.startsWith("--target="))?
 const skipInstall = process.argv.includes("--skip-install")
 const skipWebUi = process.argv.includes("--skip-web-ui")
 const solidPlugin = createSolidTransformPlugin()
-const highlights = Script.preview ? undefined : embed(process.env.OPENCODE_RELEASE_NOTES)
+const highlights = Script.preview ? undefined : embed(process.env.SLEEPYCODE_RELEASE_NOTES)
 const releaseAssets = new Map<string, Promise<Map<string, string>>>()
 
 const allTargets: {
@@ -71,13 +71,13 @@ if (!skipInstall)
 const appArchive = path.join(dir, ".cache", "bun-app-archive.bin")
 await Bun.write(appArchive, await buildAppArchive(Script.channel, { skipBuild: skipWebUi }))
 const appAssetsPlugin: BunPlugin = {
-  name: "opencode-app-assets",
+  name: "sleepycode-app-assets",
   setup(build) {
-    build.onResolve({ filter: /^virtual:opencode-app-assets$/ }, () => ({
-      path: "opencode-app-assets",
-      namespace: "opencode",
+    build.onResolve({ filter: /^virtual:sleepycode-app-assets$/ }, () => ({
+      path: "sleepycode-app-assets",
+      namespace: "sleepycode",
     }))
-    build.onLoad({ filter: /^opencode-app-assets$/, namespace: "opencode" }, () => ({
+    build.onLoad({ filter: /^sleepycode-app-assets$/, namespace: "sleepycode" }, () => ({
       loader: "js",
       // Embedded as a file, not a string: its bytes go into the executable once and unencoded.
       contents: `import { readFileSync } from "node:fs"
@@ -97,7 +97,7 @@ const pluginRuntimeModulesSource = [
   "export const loadRuntimeModules = () => modules",
 ].join("\n")
 const pluginRuntimePlugin: BunPlugin = {
-  name: "opencode-plugin-runtime",
+  name: "sleepycode-plugin-runtime",
   setup(build) {
     build.onLoad({ filter: /plugin[/\\]src[/\\]runtime-modules\.ts$/ }, () => ({
       contents: pluginRuntimeModulesSource,
@@ -105,33 +105,33 @@ const pluginRuntimePlugin: BunPlugin = {
     }))
     build.onLoad({ filter: /[/\\]internal[/\\]httpApi(?:Scalar|Swagger)\.js$/ }, () => ({
       contents:
-        'export const css = ""; export const javascript = \'document.body.textContent = "Scalar/Swagger UI assets are not bundled in OpenCode"\'',
+        'export const css = ""; export const javascript = \'document.body.textContent = "Scalar/Swagger UI assets are not bundled in SleepyCode"\'',
       loader: "js",
     }))
   },
 }
 
 for (const item of targets) {
-  const opencodePty = await resolveOpencodePty({
+  const sleepycodePty = await resolveSleepycodePty({
     platform: item.os,
     arch: item.arch,
     ...(item.os === "linux" ? { libc: item.abi ?? "glibc" } : {}),
   })
-  const opencodePtyPlugin: BunPlugin = {
-    name: "opencode-pty-binary",
+  const sleepycodePtyPlugin: BunPlugin = {
+    name: "sleepycode-pty-binary",
     setup(build) {
       build.onLoad({ filter: /persistent-pty[/\\]pty-binding\.ts$/ }, () => ({
         loader: "js",
-        contents: opencodePty
-          ? `import file from ${JSON.stringify(opencodePty.source)} with { type: "file" }
-export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sha256: ${JSON.stringify(opencodePty.sha256)} }`
+        contents: sleepycodePty
+          ? `import file from ${JSON.stringify(sleepycodePty.source)} with { type: "file" }
+export default { path: file, version: ${JSON.stringify(sleepycodePty.version)}, sha256: ${JSON.stringify(sleepycodePty.sha256)} }`
           : "export default undefined",
       }))
     },
   }
   const simulationInputs = new Set<string>()
   const simulationGraphPlugin: BunPlugin = {
-    name: "opencode-simulation-graph",
+    name: "sleepycode-simulation-graph",
     setup(build) {
       build.onLoad(
         { filter: /packages[/\\]simulation[/\\]src[/\\](frontend[/\\](simulation|server)|control-server)\.ts$/ },
@@ -160,7 +160,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
       appAssetsPlugin,
       solidPlugin,
       parcelWatcherPlugin,
-      opencodePtyPlugin,
+      sleepycodePtyPlugin,
       pluginRuntimePlugin,
       simulationGraphPlugin,
     ],
@@ -180,7 +180,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
       outfile: path.join(outdir, name, "bin", binary),
       execArgv: [
         "--smol",
-        `--user-agent=opencode/${Script.channel}/${Script.version}/cli`,
+        `--user-agent=sleepycode/${Script.channel}/${Script.version}/cli`,
         "--use-system-ca",
         "--no-warnings",
         "--",
@@ -188,12 +188,12 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
       windows: {},
     },
     define: {
-      OPENCODE_VERSION: `'${Script.version}'`,
-      OPENCODE_CLI_NAME: "'opencode'",
-      OPENCODE_CHANNEL: `'${Script.channel}'`,
-      OPENCODE_ARTIFACT: `'cli'`,
-      ...(highlights ? { OPENCODE_RELEASE_HIGHLIGHTS: JSON.stringify(highlights) } : {}),
-      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "undefined",
+      SLEEPYCODE_VERSION: `'${Script.version}'`,
+      SLEEPYCODE_CLI_NAME: "'sleepycode'",
+      SLEEPYCODE_CHANNEL: `'${Script.channel}'`,
+      SLEEPYCODE_ARTIFACT: `'cli'`,
+      ...(highlights ? { SLEEPYCODE_RELEASE_HIGHLIGHTS: JSON.stringify(highlights) } : {}),
+      SLEEPYCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "undefined",
       // FFF_LIBC selects the fff native lib variant: "musl" or "gnu".
       FFF_LIBC: item.os === "linux" ? `'${item.abi ?? "gnu"}'` : "undefined",
       ...(item.os === "linux" ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") } : {}),
@@ -211,7 +211,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
     path.join(outdir, name, "package.json"),
     JSON.stringify(
       {
-        name: `@opencode/${name}`,
+        name: `@sleepy-ai/${name}`,
         version: Script.version,
         license: "MIT",
         repository: { type: "git", url: "git+https://github.com/anomalyco/opencode.git" },

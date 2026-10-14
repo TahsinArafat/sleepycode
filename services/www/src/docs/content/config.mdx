@@ -2,22 +2,22 @@
 title: "Config"
 ---
 
-Create `opencode.jsonc` in your project to configure OpenCode. Add the schema for editor validation, then set only the options you need.
+Create `sleepycode.jsonc` in your project to configure SleepyCode. Add the schema for editor validation, then set only the options you need.
 
-```jsonc title="opencode.jsonc"
+```jsonc title="sleepycode.jsonc"
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "anthropic/claude-sonnet-4-5",
 }
 ```
 
-You can also ask OpenCode to update this file for you.
+You can also ask SleepyCode to update this file for you.
 
 ## Format
 
-OpenCode supports JSON and JSONC. Use JSONC when you want comments or trailing commas.
+SleepyCode supports JSON and JSONC. Use JSONC when you want comments or trailing commas.
 
-```jsonc title="opencode.jsonc"
+```jsonc title="sleepycode.jsonc"
 {
   "$schema": "https://opencode.ai/config.json",
   // Use this model by default.
@@ -31,29 +31,29 @@ Put managed, machine-wide settings in the system configuration directory:
 
 | Platform | Directory                               |
 | -------- | --------------------------------------- |
-| macOS    | `/Library/Application Support/opencode` |
-| Linux    | `/etc/opencode`                         |
-| Windows  | `%ProgramData%\opencode`                |
+| macOS    | `/Library/Application Support/sleepycode` |
+| Linux    | `/etc/sleepycode`                         |
+| Windows  | `%ProgramData%\sleepycode`                |
 
 The system directory works like the global directory. Besides
-`opencode.json(c)`, it loads `agents/`, `commands/`, `skills/`, and `plugins/`
+`sleepycode.json(c)`, it loads `agents/`, `commands/`, `skills/`, and `plugins/`
 for every user on the machine:
 
 ```text
-/etc/opencode/
-├── opencode.json
+/etc/sleepycode/
+├── sleepycode.json
 ├── agents/review.md
 ├── commands/release.md
 └── skills/deploy/SKILL.md
 ```
 
-On macOS, OpenCode also reads managed preferences that MDM tools deploy for the
-`ai.opencode.managed` domain. A user-specific profile replaces the
+On macOS, SleepyCode also reads managed preferences that MDM tools deploy for the
+`ai.sleepycode.managed` domain. A user-specific profile replaces the
 machine-wide one:
 
 ```text
-/Library/Managed Preferences/<user>/ai.opencode.managed.plist
-/Library/Managed Preferences/ai.opencode.managed.plist
+/Library/Managed Preferences/<user>/ai.sleepycode.managed.plist
+/Library/Managed Preferences/ai.sleepycode.managed.plist
 ```
 
 Managed settings have the highest precedence, so users and projects cannot
@@ -65,42 +65,42 @@ configuration to enforce restrictions.
 Put user settings for every project in the global configuration:
 
 ```text
-~/.config/opencode/opencode.json(c)
+~/.config/sleepycode/sleepycode.json(c)
 ```
 
 Put project settings in either of these files:
 
 ```text
-/home/user/projects/my-app/opencode.json(c)
-/home/user/projects/my-app/.opencode/opencode.json(c)
+/home/user/projects/my-app/sleepycode.json(c)
+/home/user/projects/my-app/.sleepycode/sleepycode.json(c)
 ```
 
-OpenCode searches from the current directory to the filesystem root. It first
-merges direct `opencode.json(c)` files from the farthest directory to the
-closest, then merges files inside `.opencode` directories in the same order.
-This means every discovered `.opencode` config overrides every direct config.
+SleepyCode searches from the current directory to the filesystem root. It first
+merges direct `sleepycode.json(c)` files from the farthest directory to the
+closest, then merges files inside `.sleepycode` directories in the same order.
+This means every discovered `.sleepycode` config overrides every direct config.
 Use one form throughout a directory tree unless you need that behavior.
 
-For example, start OpenCode from `/home/user/projects/acme/packages/web`:
+For example, start SleepyCode from `/home/user/projects/acme/packages/web`:
 
 ```text
-/etc/opencode/opencode.json
-~/.config/opencode/opencode.json
+/etc/sleepycode/sleepycode.json
+~/.config/sleepycode/sleepycode.json
 
 /home/user/projects/acme/
-├── opencode.json
+├── sleepycode.json
 └── packages/
     └── web/
-        ├── opencode.json
+        ├── sleepycode.json
         └── src/
 ```
 
-OpenCode applies these files from lowest to highest precedence:
+SleepyCode applies these files from lowest to highest precedence:
 
-1. `~/.config/opencode/opencode.json`
-2. `/home/user/projects/acme/opencode.json`
-3. `/home/user/projects/acme/packages/web/opencode.json`
-4. `/etc/opencode/opencode.json`
+1. `~/.config/sleepycode/sleepycode.json`
+2. `/home/user/projects/acme/sleepycode.json`
+3. `/home/user/projects/acme/packages/web/sleepycode.json`
+4. `/etc/sleepycode/sleepycode.json`
 
 The package config overrides matching settings from the repository config,
 which overrides the global config. The system config overrides all of them.
@@ -110,13 +110,13 @@ policies outrank all of them.
 
 ## Schema
 
-The complete OpenCode configuration schema is available at
+The complete SleepyCode configuration schema is available at
 [opencode.ai/config.json](https://opencode.ai/config.json).
 
 Add the `$schema` field to your configuration file to enable validation and
 autocomplete in editors that support JSON Schema:
 
-```json title="opencode.json"
+```json title="sleepycode.json"
 {
   "$schema": "https://opencode.ai/config.json"
 }
@@ -178,7 +178,7 @@ Project-level values are ignored.
 
 ### Sharing
 
-Set the session sharing policy. OpenCode accepts this field, but session sharing
+Set the session sharing policy. SleepyCode accepts this field, but session sharing
 is not supported yet.
 
 ```jsonc
@@ -191,7 +191,7 @@ See the [sharing guide](/sharing) for more details.
 
 ### Username
 
-Set a username. OpenCode accepts this field but does not display it in
+Set a username. SleepyCode accepts this field but does not display it in
 conversations.
 
 ```jsonc
@@ -330,7 +330,7 @@ Set the maximum number of lines and bytes retained from a tool result.
 
 ### Search
 
-Choose how OpenCode searches the web. Use `"random"` to select an available
+Choose how SleepyCode searches the web. Use `"random"` to select an available
 provider automatically.
 
 ```jsonc
@@ -424,7 +424,7 @@ and cost considerations.
 
 ### Skills
 
-Add directories or URLs that OpenCode should search for agent skills.
+Add directories or URLs that SleepyCode should search for agent skills.
 
 ```jsonc
 {
@@ -432,7 +432,7 @@ Add directories or URLs that OpenCode should search for agent skills.
 }
 ```
 
-See the [skills guide](/skills) for skill structure and automatic discovery under `.opencode/skills/`.
+See the [skills guide](/skills) for skill structure and automatic discovery under `.sleepycode/skills/`.
 
 ### Commands
 
@@ -453,7 +453,7 @@ See the [commands guide](/commands) for arguments, models, agents, and file-base
 
 ### Instructions
 
-Declare additional instruction files, globs, or HTTP(S) URLs. OpenCode loads
+Declare additional instruction files, globs, or HTTP(S) URLs. SleepyCode loads
 them alongside discovered `AGENTS.md` files.
 
 ```jsonc
@@ -488,7 +488,7 @@ See the [references guide](/references) for shorthand, visibility, and path reso
 
 ### Worktrees
 
-Set the parent directory for new local worktrees. OpenCode appends the requested or generated worktree name.
+Set the parent directory for new local worktrees. SleepyCode appends the requested or generated worktree name.
 
 ```jsonc
 {
@@ -528,7 +528,7 @@ accepts options.
 ```jsonc
 {
   "plugins": [
-    "opencode-example-plugin",
+    "sleepycode-example-plugin",
     {
       "package": "./plugins/local",
       "options": {

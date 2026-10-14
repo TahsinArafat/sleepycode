@@ -3,21 +3,21 @@ title: "Go"
 description: "Reliable access to open coding models with two usage tiers."
 ---
 
-OpenCode Go gives you reliable access to popular open coding models, with two monthly plans:
+SleepyCode Go gives you reliable access to popular open coding models, with two monthly plans:
 
 | Plan        | Price         | Included usage                              |
 | ----------- | ------------- | ------------------------------------------- |
 | **Go**      | **$10/month** | Lower-cost access to the models below       |
 | **Go Plus** | **$40/month** | Higher usage limits across the models below |
 
-Go works like any other provider in OpenCode. You subscribe to OpenCode Go and get your API key. It's **completely optional** and you don't need it to use OpenCode.
+Go works like any other provider in SleepyCode. You subscribe to SleepyCode Go and get your API key. It's **completely optional** and you don't need it to use SleepyCode.
 
 The service is designed primarily for international users and provides stable global access.
 
 ## How it works
 
-1. Sign in to the [OpenCode Console](https://opencode.ai/console), subscribe to Go or Go Plus, add your billing details, and copy your API key.
-2. Run `/connect` in the TUI, select **OpenCode Go**, and paste your API key.
+1. Sign in to the [SleepyCode Console](https://opencode.ai/console), subscribe to Go or Go Plus, add your billing details, and copy your API key.
+2. Run `/connect` in the TUI, select **SleepyCode Go**, and paste your API key.
 
    ```text
    /connect
@@ -73,7 +73,7 @@ The list of models may change as we test and add new ones.
 
 ## Where can I use it?
 
-OpenCode Go is designed for [OpenCode](https://opencode.ai) and other coding agents
+SleepyCode Go is designed for [SleepyCode](https://opencode.ai) and other coding agents
 that produce similar types of requests. Traffic is monitored for abuse that
 degrades the experience for other users.
 
@@ -82,23 +82,23 @@ Your client should:
 1. Send typical coding agent traffic
 2. Identify itself with its own user agent, such as `my-coding-agent/1.0`, rather
    than a generic SDK or HTTP-library name.
-3. Send a stable session ID in `x-opencode-session` for each conversation so we can optimize routing and
+3. Send a stable session ID in `x-sleepycode-session` for each conversation so we can optimize routing and
    prompt caching.
 
 ### Validated clients
 
-Besides OpenCode, the following clients have been validated to work properly
-with OpenCode Go. Although we do not guarantee that they will continue to work in the future.
+Besides SleepyCode, the following clients have been validated to work properly
+with SleepyCode Go. Although we do not guarantee that they will continue to work in the future.
 
 | Client            | Session support                                                                                                                                                                                                                             |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Hermes**        | Builds containing [PR #101864](https://github.com/NousResearch/hermes-agent/pull/101864) send the header on main and auxiliary OpenCode requests. The fix was merged after v0.21.0; that release alone does not include it.                 |
+| **Hermes**        | Builds containing [PR #101864](https://github.com/NousResearch/hermes-agent/pull/101864) send the header on main and auxiliary SleepyCode requests. The fix was merged after v0.21.0; that release alone does not include it.                 |
 | **Claude Code**   | Go recognizes its native session header. No custom-header wrapper is needed.                                                                                                                                                                |
 | **Codex**         | Go recognizes its native session header. Some versions and proxy setups still omit it; preserve the session header when forwarding requests.                                                                                                |
-| **ZCode**         | Go recognizes its native session header. Our [request for `x-opencode-session`](https://github.com/zai-org/feedback/issues/492) remains open, but it is no longer necessary to send that specific header.                                   |
-| **Pi**            | Current builds send session information for OpenCode. Update older installations.                                                                                                                                                           |
+| **ZCode**         | Go recognizes its native session header. Our [request for `x-sleepycode-session`](https://github.com/zai-org/feedback/issues/492) remains open, but it is no longer necessary to send that specific header.                                   |
+| **Pi**            | Current builds send session information for SleepyCode. Update older installations.                                                                                                                                                           |
 | **jcode**         | Update to **v0.81.6 or later**, which includes the [session-header fix](https://github.com/1jehuang/jcode/issues/1167).                                                                                                                     |
-| **Kilo Code CLI** | Builds containing [PR #13752](https://github.com/Kilo-Org/kilocode/pull/13752) restore OpenCode session headers. This fix covers the CLI, not the VS Code extension. See [issue #13723](https://github.com/Kilo-Org/kilocode/issues/13723). |
+| **Kilo Code CLI** | Builds containing [PR #13752](https://github.com/Kilo-Org/kilocode/pull/13752) restore SleepyCode session headers. This fix covers the CLI, not the VS Code extension. See [issue #13723](https://github.com/Kilo-Org/kilocode/issues/13723). |
 
 ### Known problematic clients
 
@@ -407,13 +407,13 @@ You can also access Go models through the following API endpoints.
 
 </div>
 
-These AI SDK packages are for applications calling Go directly. To use Go in OpenCode, connect with `/connect` and set
-the [model](/models) using the format `opencode-go/<model-id>`:
+These AI SDK packages are for applications calling Go directly. To use Go in SleepyCode, connect with `/connect` and set
+the [model](/models) using the format `sleepycode-go/<model-id>`:
 
-```jsonc title="opencode.jsonc"
+```jsonc title="sleepycode.jsonc"
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "opencode-go/kimi-k3",
+  "model": "sleepycode-go/kimi-k3",
 }
 ```
 
@@ -476,7 +476,7 @@ Open models have gotten really good. They now reach performance close to proprie
 
 However, getting reliable, low latency access to them can be difficult. Providers vary in quality and availability.
 
-<Callout type="tip">We tested a select group of models and providers that work well with OpenCode.</Callout>
+<Callout type="tip">We tested a select group of models and providers that work well with SleepyCode.</Callout>
 
 To fix this, we did a couple of things:
 
@@ -488,9 +488,9 @@ Both Go and Go Plus provide access to these models; choose the plan that fits ho
 
 ## Goals
 
-We created OpenCode Go to:
+We created SleepyCode Go to:
 
 1. Make AI coding **accessible** to more people with a low cost subscription.
 2. Provide **reliable** access to the best open coding models.
 3. Curate models that are **tested and benchmarked** for coding agent use.
-4. Have **no lock-in** by allowing you to use any other provider with OpenCode as well.
+4. Have **no lock-in** by allowing you to use any other provider with SleepyCode as well.

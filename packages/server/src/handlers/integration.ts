@@ -1,5 +1,5 @@
-import { Integration } from "@opencode/core/integration"
-import { Plugin } from "@opencode/core/plugin"
+import { Integration } from "@sleepy-ai/core/integration"
+import { Plugin } from "@sleepy-ai/core/plugin"
 import { Effect } from "effect"
 import { HttpApiBuilder, HttpApiSchema } from "effect/http-api"
 import { Api } from "../api"
@@ -8,9 +8,9 @@ import {
   IntegrationMethodNotFoundError,
   IntegrationNotFoundError,
   InvalidRequestError,
-} from "@opencode/protocol/errors"
+} from "@sleepy-ai/protocol/errors"
 import { response } from "../location"
-import { WellKnown } from "@opencode/core/wellknown"
+import { WellKnown } from "@sleepy-ai/core/wellknown"
 
 const authorize = <A, R>(effect: Effect.Effect<A, Integration.AuthorizationError, R>) =>
   effect.pipe(

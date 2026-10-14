@@ -1,10 +1,10 @@
-import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@opencode/ui/dialog"
-import { Badge } from "@opencode/ui/badge"
-import { Icon } from "@opencode/ui/icon"
+import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@sleepy-ai/ui/dialog"
+import { Badge } from "@sleepy-ai/ui/badge"
+import { Icon } from "@sleepy-ai/ui/icon"
 import { ProviderModelIcon } from "@/providers/models/provider-group"
-import { Tooltip } from "@opencode/ui/tooltip"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { useTheme } from "@opencode/ui/theme"
+import { Tooltip } from "@sleepy-ai/ui/tooltip"
+import { useDialog } from "@sleepy-ai/ui/context/dialog"
+import { useTheme } from "@sleepy-ai/ui/theme"
 import { createMemo, onCleanup, onMount, type Component, For, Show } from "solid-js"
 import { useLocal, type ModelSelection } from "@/providers/models/selection"
 import { useIntegrations } from "@/providers/catalog/integrations"
@@ -14,7 +14,7 @@ import { ModelTooltip } from "./tooltip"
 
 type ModelState = ModelSelection
 
-const featuredProviders = ["opencode-go", "opencode", "openai", "anthropic", "google", "github-copilot"]
+const featuredProviders = ["sleepycode-go", "sleepycode", "openai", "anthropic", "google", "github-copilot"]
 
 const displayModelName = (name: string) => name.replace(/\s+(?:\(free\)|free)$/i, "")
 
@@ -35,10 +35,10 @@ export const DialogSelectModelUnpaid: Component<{ model?: ModelState }> = (props
   })
 
   const isFree = (item: ReturnType<ModelState["list"]>[number]) =>
-    item.provider.id === "opencode" && (!item.cost || item.cost.input === 0)
+    item.provider.id === "sleepycode" && (!item.cost || item.cost.input === 0)
 
   const providerName = (provider: { id: string; name: string }) =>
-    provider.id === "opencode" ? language.t("provider.connect.opencode.name") : provider.name
+    provider.id === "sleepycode" ? language.t("provider.connect.sleepycode.name") : provider.name
 
   const freeModels = createMemo(() => model.list().filter(isFree))
 
@@ -164,12 +164,12 @@ export const DialogSelectModelUnpaid: Component<{ model?: ModelState }> = (props
                       />
                       <span class="flex min-w-0 flex-col">
                         <span class="truncate">{providerName(provider)}</span>
-                        <Show when={provider.id === "opencode" || provider.id === "opencode-go"}>
+                        <Show when={provider.id === "sleepycode" || provider.id === "sleepycode-go"}>
                           <span class="truncate font-[440] text-v2-text-text-muted">
                             {language.t(
-                              provider.id === "opencode"
-                                ? "dialog.provider.opencode.tagline"
-                                : "dialog.provider.opencodeGo.tagline",
+                              provider.id === "sleepycode"
+                                ? "dialog.provider.sleepycode.tagline"
+                                : "dialog.provider.sleepycodeGo.tagline",
                             )}
                           </span>
                         </Show>

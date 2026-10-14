@@ -1,9 +1,9 @@
 export * as ConfigProviderPlugin from "./provider.js"
 
-import { define } from "@opencode/plugin/effect/plugin"
-import { Document, type Entry } from "@opencode/schema/config"
-import { ConfigProvider } from "@opencode/schema/config/provider"
-import { Money } from "@opencode/schema/money"
+import { define } from "@sleepy-ai/plugin/effect/plugin"
+import { Document, type Entry } from "@sleepy-ai/schema/config"
+import { ConfigProvider } from "@sleepy-ai/schema/config/provider"
+import { Money } from "@sleepy-ai/schema/money"
 import { Effect } from "effect"
 import { Config } from "../../config.js"
 import { Model } from "../../model.js"
@@ -12,7 +12,7 @@ import { Variant } from "../../variant.js"
 import { ConfigEntryObserver } from "./entry-observer.js"
 
 export const Plugin = define({
-  id: "opencode.config.provider",
+  id: "sleepycode.config.provider",
   effect: Effect.fn(function* (ctx) {
     const config = yield* Config.Service
     const loaded = yield* ConfigEntryObserver.observe(

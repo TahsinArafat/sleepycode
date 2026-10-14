@@ -1,4 +1,4 @@
-import { Resource } from "@opencode/console-resource"
+import { Resource } from "@sleepy-ai/console-resource"
 import { z } from "zod"
 
 export const consoleAccountSchema = z.object({

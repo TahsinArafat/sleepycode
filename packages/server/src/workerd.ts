@@ -1,23 +1,23 @@
 export * as ServerWorkerd from "./workerd"
 
 import { Effect, Layer } from "effect"
-import { ConfigPluginSource } from "@opencode/core/config/plugin/source"
-import { Database } from "@opencode/core/database/database"
-import { sqliteLayer } from "@opencode/core/database/sqlite.workerd"
-import type { DurableObjectStorage } from "@opencode/core/database/sqlite.workerd"
-import { EnvironmentUnavailable } from "@opencode/core/environment/unavailable"
-import { FileSystem } from "@opencode/core/filesystem"
-import { FileSystemSearch } from "@opencode/core/filesystem/search"
-import { Pty } from "@opencode/core/pty"
-import { Snapshot } from "@opencode/core/snapshot"
-import { Vcs } from "@opencode/core/vcs"
-import { CrossSpawnSpawner } from "@opencode/util/cross-spawn-spawner"
-import type { LayerNode } from "@opencode/util/effect/layer-node"
+import { ConfigPluginSource } from "@sleepy-ai/core/config/plugin/source"
+import { Database } from "@sleepy-ai/core/database/database"
+import { sqliteLayer } from "@sleepy-ai/core/database/sqlite.workerd"
+import type { DurableObjectStorage } from "@sleepy-ai/core/database/sqlite.workerd"
+import { EnvironmentUnavailable } from "@sleepy-ai/core/environment/unavailable"
+import { FileSystem } from "@sleepy-ai/core/filesystem"
+import { FileSystemSearch } from "@sleepy-ai/core/filesystem/search"
+import { Pty } from "@sleepy-ai/core/pty"
+import { Snapshot } from "@sleepy-ai/core/snapshot"
+import { Vcs } from "@sleepy-ai/core/vcs"
+import { CrossSpawnSpawner } from "@sleepy-ai/util/cross-spawn-spawner"
+import type { LayerNode } from "@sleepy-ai/util/effect/layer-node"
 import { ServerFetch } from "./fetch"
 import type { ServerOptions } from "./options"
 
 /**
- * The workerd runtime profile: boots opencode core and server inside a
+ * The workerd runtime profile: boots sleepycode core and server inside a
  * Cloudflare Durable Object, with every intentionally-local service replaced
  * or disabled.
  *
@@ -36,11 +36,11 @@ import type { ServerOptions } from "./options"
  * (see `script/workerd-probe.ts`).
  */
 export interface Options {
-  /** Durable Object storage whose SQLite database backs the opencode database. */
+  /** Durable Object storage whose SQLite database backs the sleepycode database. */
   readonly storage: DurableObjectStorage
   readonly app?: ServerOptions["app"]
   readonly password?: string
-  /** Inline opencode config content (JSON), same as `ServerOptions.config.content`. */
+  /** Inline sleepycode config content (JSON), same as `ServerOptions.config.content`. */
   readonly config?: { readonly content?: string }
   /** models.dev catalog options; the bundled snapshot is the boot-time floor either way. */
   readonly models?: ServerOptions["models"]

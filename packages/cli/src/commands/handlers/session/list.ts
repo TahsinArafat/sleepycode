@@ -1,5 +1,5 @@
-import { OpenCode, type SessionInfo } from "@opencode/client"
-import { Service } from "@opencode/client/effect/service"
+import { SleepyCode, type SessionInfo } from "@sleepy-ai/client"
+import { Service } from "@sleepy-ai/client/effect/service"
 import { Effect, Option, Stream } from "effect"
 import { EOL } from "node:os"
 import { Commands } from "../../commands"
@@ -14,7 +14,7 @@ const handler = Effect.fn("cli.session.list")(function* (
     server: Option.getOrUndefined(input.server),
     standalone: input.standalone,
   })
-  const client = OpenCode.make({ baseUrl: server.endpoint.url, headers: Service.headers(server.endpoint) })
+  const client = SleepyCode.make({ baseUrl: server.endpoint.url, headers: Service.headers(server.endpoint) })
   const location = yield* Effect.tryPromise({
     try: (signal) => client.location.get({ location: { directory: process.cwd() } }, { signal }),
     catch: (cause) => cause,
@@ -59,8 +59,8 @@ const handler = Effect.fn("cli.session.list")(function* (
     return
   }
 
-  const { AppProcess } = yield* Effect.promise(() => import("@opencode/util/process"))
-  const { LayerNode } = yield* Effect.promise(() => import("@opencode/util/effect/layer-node"))
+  const { AppProcess } = yield* Effect.promise(() => import("@sleepy-ai/util/process"))
+  const { LayerNode } = yield* Effect.promise(() => import("@sleepy-ai/util/effect/layer-node"))
   const { ChildProcess } = yield* Effect.promise(() => import("effect/process"))
   yield* Effect.gen(function* () {
     const processService = yield* AppProcess.Service

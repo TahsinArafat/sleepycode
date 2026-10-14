@@ -1,16 +1,16 @@
 import { describe, expect, test } from "bun:test"
-import { AIError, LLM, Message } from "@opencode/ai"
+import { AIError, LLM, Message } from "@sleepy-ai/ai"
 import {
   LLMClient,
   RequestExecutor,
   WebSocketTransport,
   type ChannelObservation,
   type WebSocketChannelExchange,
-} from "@opencode/ai/route"
-import { configure } from "@opencode/ai/providers/openai"
-import { SessionModelTransport } from "@opencode/core/session/model-transport"
-import { WebSocketConstructor } from "@opencode/core/effect/websocket-constructor"
-import { Session } from "@opencode/schema/session"
+} from "@sleepy-ai/ai/route"
+import { configure } from "@sleepy-ai/ai/providers/openai"
+import { SessionModelTransport } from "@sleepy-ai/core/session/model-transport"
+import { WebSocketConstructor } from "@sleepy-ai/core/effect/websocket-constructor"
+import { Session } from "@sleepy-ai/schema/session"
 import { Effect, Fiber, Layer, Stream } from "effect"
 import { Headers } from "effect/http"
 import { Socket } from "effect/socket"

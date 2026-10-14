@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=SleepyCode
+Exec=/opt/SleepyCode/ai.sleepycode.desktop %U
+Terminal=false
+Type=Application
+Icon=ai.sleepycode.desktop
+StartupWMClass=ai.sleepycode.desktop
+NoDisplay=true
+Comment=Open source AI coding agent
+Categories=Development;

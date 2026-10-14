@@ -1,14 +1,14 @@
-import type { SessionInfo } from "@opencode/client/promise"
-import { Icon } from "@opencode/ui/icon"
-import { IconButton } from "@opencode/ui/icon-button"
-import { Menu } from "@opencode/ui/menu"
+import type { SessionInfo } from "@sleepy-ai/client/promise"
+import { Icon } from "@sleepy-ai/ui/icon"
+import { IconButton } from "@sleepy-ai/ui/icon-button"
+import { Menu } from "@sleepy-ai/ui/menu"
 import {
   displayName,
   getProjectAvatarSource,
   getProjectAvatarVariant,
   ProjectAvatar,
-} from "@opencode/ui/project-avatar"
-import { Tooltip } from "@opencode/ui/tooltip"
+} from "@sleepy-ai/ui/project-avatar"
+import { Tooltip } from "@sleepy-ai/ui/tooltip"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { useNavigate } from "@solidjs/router"
 import { createMemo, For, Show, type ParentProps } from "solid-js"

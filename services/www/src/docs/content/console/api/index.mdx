@@ -1,6 +1,6 @@
 ---
 title: "API Overview"
-description: "Authenticate with the OpenCode Console API using service account keys or user tokens."
+description: "Authenticate with the SleepyCode Console API using service account keys or user tokens."
 ---
 
 The Console API lets integrations read workspace configuration and manage budgets. Paths are relative
@@ -72,7 +72,7 @@ header. A different `x-org-id` returns `403`.
 
 ## Device flow
 
-OpenCode signs in with the OAuth device authorization grant (RFC 8628). Other CLIs can use the same flow.
+SleepyCode signs in with the OAuth device authorization grant (RFC 8628). Other CLIs can use the same flow.
 
 1. Request a device code. Send `supports_org_scope=true` to bind the token to a workspace.
 
@@ -113,8 +113,8 @@ Each refresh token can be used once. Reusing an old refresh token revokes the wh
 
 ## Workspace config
 
-`GET /api/v2/config` returns the providers and models available to the workspace in the OpenCode V2
-[config](/config) format. OpenCode loads it after `/connect`.
+`GET /api/v2/config` returns the providers and models available to the workspace in the SleepyCode V2
+[config](/config) format. SleepyCode loads it after `/connect`.
 
 ```bash
 curl --fail-with-body "${CONSOLE_URL}/api/v2/config" \
@@ -124,15 +124,15 @@ curl --fail-with-body "${CONSOLE_URL}/api/v2/config" \
 ```json
 {
   "providers": {
-    "opencode": {
-      "name": "OpenCode",
-      "env": ["OPENCODE_CONSOLE_TOKEN"],
+    "sleepycode": {
+      "name": "SleepyCode",
+      "env": ["SLEEPYCODE_CONSOLE_TOKEN"],
       "package": "aisdk:@ai-sdk/openai-compatible",
       "settings": {
         "baseURL": "https://opencode.ai/inference/openai/v1",
-        "apiKey": "{env:OPENCODE_CONSOLE_TOKEN}"
+        "apiKey": "{env:SLEEPYCODE_CONSOLE_TOKEN}"
       },
-      "headers": { "x-opencode-org-id": "org_..." },
+      "headers": { "x-sleepycode-org-id": "org_..." },
       "models": {
         "kimi-k2.6": { "name": "Kimi K2.6" }
       }

@@ -3,14 +3,14 @@
     <picture>
       <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
       <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
-      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="OpenCode logo">
+      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="SleepyCode logo">
     </picture>
   </a>
 </p>
 <p align="center">開源的 AI Coding Agent。</p>
 <p align="center">
   <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/@opencode/cli"><img alt="npm" src="https://img.shields.io/npm/v/@opencode/cli?style=flat-square" /></a>
+  <a href="https://www.npmjs.com/package/@sleepy-ai/cli"><img alt="npm" src="https://img.shields.io/npm/v/@sleepy-ai/cli?style=flat-square" /></a>
   <a href="https://github.com/anomalyco/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
@@ -39,7 +39,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![SleepyCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---
 
@@ -50,15 +50,15 @@
 curl -fsSL https://opencode.ai/install | bash
 
 # 套件管理員
-npm i -g @opencode/cli@latest      # 也可使用 bun/pnpm/yarn
-scoop install opencode             # Windows
-choco install opencode             # Windows
-brew install anomalyco/tap/opencode # macOS 與 Linux（推薦，始終保持最新）
-brew install opencode              # macOS 與 Linux（官方 brew formula，更新頻率較低）
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-bin               # Arch Linux (Latest from AUR)
-mise use -g opencode               # 任何作業系統
-nix run nixpkgs#opencode           # 或使用 github:anomalyco/opencode 以取得最新開發分支
+npm i -g @sleepy-ai/cli@latest      # 也可使用 bun/pnpm/yarn
+scoop install sleepycode             # Windows
+choco install sleepycode             # Windows
+brew install anomalyco/tap/sleepycode # macOS 與 Linux（推薦，始終保持最新）
+brew install sleepycode              # macOS 與 Linux（官方 brew formula，更新頻率較低）
+sudo pacman -S sleepycode            # Arch Linux (Stable)
+paru -S sleepycode-bin               # Arch Linux (Latest from AUR)
+mise use -g sleepycode               # 任何作業系統
+nix run nixpkgs#sleepycode           # 或使用 github:anomalyco/opencode 以取得最新開發分支
 ```
 
 > [!TIP]
@@ -66,40 +66,40 @@ nix run nixpkgs#opencode           # 或使用 github:anomalyco/opencode 以取�
 
 ### 桌面應用程式 (BETA)
 
-OpenCode 也提供桌面版應用程式。您可以直接從 [發佈頁面 (releases page)](https://github.com/anomalyco/opencode/releases) 或 [opencode.ai/download](https://opencode.ai/download) 下載。
+SleepyCode 也提供桌面版應用程式。您可以直接從 [發佈頁面 (releases page)](https://github.com/anomalyco/opencode/releases) 或 [opencode.ai/download](https://opencode.ai/download) 下載。
 
 | 平台                  | 下載連結                           |
 | --------------------- | ---------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-mac-arm64.dmg`   |
-| macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
-| Windows               | `opencode-desktop-windows-x64.exe` |
+| macOS (Apple Silicon) | `sleepycode-desktop-mac-arm64.dmg`   |
+| macOS (Intel)         | `sleepycode-desktop-mac-x64.dmg`     |
+| Windows               | `sleepycode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, 或 AppImage        |
 
 ```bash
 # macOS (Homebrew Cask)
-brew install --cask opencode-desktop
+brew install --cask sleepycode-desktop
 # Windows (Scoop)
-scoop bucket add extras; scoop install extras/opencode-desktop
+scoop bucket add extras; scoop install extras/sleepycode-desktop
 ```
 
 #### 安裝目錄
 
 安裝腳本會依據以下優先順序決定安裝路徑：
 
-1. `$OPENCODE_INSTALL_DIR` - 自定義安裝目錄
+1. `$SLEEPYCODE_INSTALL_DIR` - 自定義安裝目錄
 2. `$XDG_BIN_DIR` - 符合 XDG 基礎目錄規範的路徑
 3. `$HOME/bin` - 標準使用者執行檔目錄 (若存在或可建立)
-4. `$HOME/.opencode/bin` - 預設備用路徑
+4. `$HOME/.sleepycode/bin` - 預設備用路徑
 
 ```bash
 # 範例
-OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
+SLEEPYCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
 XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 ```
 
 ### Agents
 
-OpenCode 內建了兩種 Agent，您可以使用 `Tab` 鍵快速切換。
+SleepyCode 內建了兩種 Agent，您可以使用 `Tab` 鍵快速切換。
 
 - **build** - 預設模式，具備完整權限的 Agent，適用於開發工作。
 - **plan** - 唯讀模式，適用於程式碼分析與探索。
@@ -107,22 +107,22 @@ OpenCode 內建了兩種 Agent，您可以使用 `Tab` 鍵快速切換。
   - 執行 bash 指令前會詢問權限。
   - 非常適合用來探索陌生的程式碼庫或規劃變更。
 
-此外，OpenCode 還包含一個 **general** 子 Agent，用於處理複雜搜尋與多步驟任務。此 Agent 供系統內部使用，亦可透過在訊息中輸入 `@general` 來呼叫。
+此外，SleepyCode 還包含一個 **general** 子 Agent，用於處理複雜搜尋與多步驟任務。此 Agent 供系統內部使用，亦可透過在訊息中輸入 `@general` 來呼叫。
 
 了解更多關於 [Agents](https://opencode.ai/docs/agents) 的資訊。
 
 ### 線上文件
 
-關於如何設定 OpenCode 的詳細資訊，請參閱我們的 [**官方文件**](https://opencode.ai/docs)。
+關於如何設定 SleepyCode 的詳細資訊，請參閱我們的 [**官方文件**](https://opencode.ai/docs)。
 
 ### 參與貢獻
 
-如果您有興趣參與 OpenCode 的開發，請在提交 Pull Request 前先閱讀我們的 [貢獻指南 (Contributing Docs)](./CONTRIBUTING.md)。
+如果您有興趣參與 SleepyCode 的開發，請在提交 Pull Request 前先閱讀我們的 [貢獻指南 (Contributing Docs)](./CONTRIBUTING.md)。
 
-### 基於 OpenCode 進行開發
+### 基於 SleepyCode 進行開發
 
-如果您正在開發與 OpenCode 相關的專案，並在名稱中使用了 "opencode"（例如 "opencode-dashboard" 或 "opencode-mobile"），請在您的 README 中加入聲明，說明該專案並非由 OpenCode 團隊開發，且與我們沒有任何隸屬關係。
+如果您正在開發與 SleepyCode 相關的專案，並在名稱中使用了 "sleepycode"（例如 "sleepycode-dashboard" 或 "sleepycode-mobile"），請在您的 README 中加入聲明，說明該專案並非由 SleepyCode 團隊開發，且與我們沒有任何隸屬關係。
 
 ---
 
-**加入我們的社群** [飞书](https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=52ao9352-5623-4fa0-b7dd-3407c392c1af&qr_code=true) | [X.com](https://x.com/opencode)
+**加入我們的社群** [飞书](https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=52ao9352-5623-4fa0-b7dd-3407c392c1af&qr_code=true) | [X.com](https://x.com/sleepycode)

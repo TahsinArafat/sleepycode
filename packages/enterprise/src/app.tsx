@@ -1,10 +1,10 @@
 import { Router } from "@solidjs/router"
 import { FileRoutes } from "@solidjs/start/router"
-import { Font } from "@opencode/ui/font"
+import { Font } from "@sleepy-ai/ui/font"
 import { MetaProvider } from "@solidjs/meta"
-import { MarkedProvider } from "@opencode/ui/context/marked"
-import { DialogProvider } from "@opencode/ui/context/dialog"
-import { I18nProvider } from "@opencode/ui/context"
+import { MarkedProvider } from "@sleepy-ai/ui/context/marked"
+import { DialogProvider } from "@sleepy-ai/ui/context/dialog"
+import { I18nProvider } from "@sleepy-ai/ui/context"
 import {
   pluralCategory,
   pluralKey,
@@ -12,13 +12,13 @@ import {
   type UiI18nPluralKey,
   type UiPluralCategory,
   type UiTranslate,
-} from "@opencode/ui/context/i18n"
-import { dict as uiEn } from "@opencode/ui/i18n/en"
-import { dict as uiZh } from "@opencode/ui/i18n/zh"
+} from "@sleepy-ai/ui/context/i18n"
+import { dict as uiEn } from "@sleepy-ai/ui/i18n/en"
+import { dict as uiZh } from "@sleepy-ai/ui/i18n/zh"
 import { createEffect, createMemo, Suspense, type ParentProps } from "solid-js"
 import { getRequestEvent } from "solid-js/web"
 import "./app.css"
-import { Favicon } from "@opencode/ui/favicon"
+import { Favicon } from "@sleepy-ai/ui/favicon"
 
 function resolveTemplate(text: string, params?: UiI18nParams) {
   if (!params) return text

@@ -1,13 +1,13 @@
-import { Session } from "@opencode/core/session"
-import { SessionStats } from "@opencode/core/session/stats"
-import { SessionTitle } from "@opencode/core/session/title"
-import { SessionTransfer } from "@opencode/core/session/transfer"
-import { InstructionEntry } from "@opencode/core/session/instruction-entry"
-import { Form } from "@opencode/core/form"
+import { Session } from "@sleepy-ai/core/session"
+import { SessionStats } from "@sleepy-ai/core/session/stats"
+import { SessionTitle } from "@sleepy-ai/core/session/title"
+import { SessionTransfer } from "@sleepy-ai/core/session/transfer"
+import { InstructionEntry } from "@sleepy-ai/core/session/instruction-entry"
+import { Form } from "@sleepy-ai/core/form"
 import { DateTime, Effect, Stream } from "effect"
 import { HttpApiBuilder, HttpApiSchema } from "effect/http-api"
 import { Api } from "../api"
-import { SessionsCursor } from "@opencode/protocol/groups/session"
+import { SessionsCursor } from "@sleepy-ai/protocol/groups/session"
 import {
   ConflictError,
   CommandExecutionError,
@@ -21,8 +21,8 @@ import {
   ServiceUnavailableError,
   SessionBusyError,
   SkillNotFoundError,
-} from "@opencode/protocol/errors"
-import { AbsolutePath } from "@opencode/core/schema"
+} from "@sleepy-ai/protocol/errors"
+import { AbsolutePath } from "@sleepy-ai/core/schema"
 import { locationErrors } from "../location"
 import { failedMessageDecode, failedSnapshot, missingMessage, missingSession } from "./session-error"
 

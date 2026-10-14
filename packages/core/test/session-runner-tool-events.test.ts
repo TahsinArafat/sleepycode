@@ -1,27 +1,27 @@
 import { expect, test } from "bun:test"
 import { Cause, Deferred, Effect, Exit, Fiber, Schema } from "effect"
 import { eq } from "drizzle-orm"
-import { LLMEvent } from "@opencode/ai"
-import { Money } from "@opencode/schema/money"
-import { Bus } from "@opencode/core/bus"
-import { Database } from "@opencode/core/database/database"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { EventTable } from "@opencode/core/event/sql"
-import { Event } from "@opencode/schema/event"
-import { Agent } from "@opencode/core/agent"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionMessage } from "@opencode/core/session/message"
-import { Session } from "@opencode/core/session"
-import { SessionProjector } from "@opencode/core/session/projector"
-import { SessionMessageTable, SessionTable } from "@opencode/core/session/sql"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { Model } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath, RelativePath } from "@opencode/core/schema"
-import { Snapshot } from "@opencode/core/snapshot"
-import { createLLMEventPublisher } from "@opencode/core/session/runner/publish-llm-event"
-import { LayerNode } from "@opencode/util/effect/layer-node"
+import { LLMEvent } from "@sleepy-ai/ai"
+import { Money } from "@sleepy-ai/schema/money"
+import { Bus } from "@sleepy-ai/core/bus"
+import { Database } from "@sleepy-ai/core/database/database"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { EventTable } from "@sleepy-ai/core/event/sql"
+import { Event } from "@sleepy-ai/schema/event"
+import { Agent } from "@sleepy-ai/core/agent"
+import { SessionEvent } from "@sleepy-ai/core/session/event"
+import { SessionMessage } from "@sleepy-ai/core/session/message"
+import { Session } from "@sleepy-ai/core/session"
+import { SessionProjector } from "@sleepy-ai/core/session/projector"
+import { SessionMessageTable, SessionTable } from "@sleepy-ai/core/session/sql"
+import { Project } from "@sleepy-ai/core/project"
+import { ProjectTable } from "@sleepy-ai/core/project/sql"
+import { Model } from "@sleepy-ai/core/model"
+import { Provider } from "@sleepy-ai/core/provider"
+import { AbsolutePath, RelativePath } from "@sleepy-ai/core/schema"
+import { Snapshot } from "@sleepy-ai/core/snapshot"
+import { createLLMEventPublisher } from "@sleepy-ai/core/session/runner/publish-llm-event"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
 import { it, testEffect } from "./lib/effect"
 import { TestClock } from "effect/testing"
 
@@ -61,7 +61,7 @@ const capture = (
       agent: Agent.ID.make("build"),
       model: {
         id: Model.ID.make("model"),
-        providerID: Provider.ID.opencode,
+        providerID: Provider.ID.sleepycode,
       },
       providerMetadataKey,
       pendingSnapshot: options?.pendingSnapshot,
@@ -167,7 +167,7 @@ testEffect(
         sessionID,
         assistantMessageID,
         agent: Agent.defaultID,
-        model: { id: Model.ID.make("test-model"), providerID: Provider.ID.opencode },
+        model: { id: Model.ID.make("test-model"), providerID: Provider.ID.sleepycode },
         providerMetadataKey: "openai",
         started: 0,
       },

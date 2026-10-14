@@ -1,5 +1,5 @@
-import type { OpenCodeEvent } from "@opencode/client/promise"
-import { createClientConnection, createPtyClient, type ClientConnectionStatus } from "@opencode/client/solid"
+import type { SleepyCodeEvent } from "@sleepy-ai/client/promise"
+import { createClientConnection, createPtyClient, type ClientConnectionStatus } from "@sleepy-ai/client/solid"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { type Accessor, createEffect, on, onCleanup } from "solid-js"
 import { createApiForServer, type ServerApi } from "@/runtime/server/api"
@@ -10,21 +10,21 @@ import { createRequestQueue } from "@/runtime/server/request-queue"
 import { ServerScope } from "@/runtime/server/scope"
 import { useServer } from "./current"
 
-type OpenCodeEventMap = { [Type in OpenCodeEvent["type"]]: Extract<OpenCodeEvent, { type: Type }> }
+type SleepyCodeEventMap = { [Type in SleepyCodeEvent["type"]]: Extract<SleepyCodeEvent, { type: Type }> }
 
-export type OpenCodeEventStream = {
-  on<Type extends OpenCodeEvent["type"]>(type: Type, handler: (event: OpenCodeEventMap[Type]) => void): VoidFunction
-  listen(handler: (event: OpenCodeEvent) => void): VoidFunction
+export type SleepyCodeEventStream = {
+  on<Type extends SleepyCodeEvent["type"]>(type: Type, handler: (event: SleepyCodeEventMap[Type]) => void): VoidFunction
+  listen(handler: (event: SleepyCodeEvent) => void): VoidFunction
 }
 
-type OpenCodeEventSource = OpenCodeEventStream & {
-  location(directory: string): OpenCodeEventStream
+type SleepyCodeEventSource = SleepyCodeEventStream & {
+  location(directory: string): SleepyCodeEventStream
 }
 
-export function createOpenCodeEventSource() {
-  const emitter = createGlobalEmitter<OpenCodeEventMap>()
+export function createSleepyCodeEventSource() {
+  const emitter = createGlobalEmitter<SleepyCodeEventMap>()
 
-  function stream(directory?: string): OpenCodeEventStream {
+  function stream(directory?: string): SleepyCodeEventStream {
     return {
       on(type, handler) {
         return emitter.on(type, (event) => {
@@ -41,7 +41,7 @@ export function createOpenCodeEventSource() {
     }
   }
 
-  const event: OpenCodeEventSource = {
+  const event: SleepyCodeEventSource = {
     ...stream(),
     location: (directory) => stream(directory),
   }
@@ -50,7 +50,7 @@ export function createOpenCodeEventSource() {
 
   return {
     event,
-    publish(event: OpenCodeEvent) {
+    publish(event: SleepyCodeEvent) {
       emitter.emit(event.type, event)
     },
   }
@@ -69,7 +69,7 @@ type ServerSDKBase = {
     attempt: Accessor<number>
     error: Accessor<string | undefined>
   }
-  event: OpenCodeEventSource
+  event: SleepyCodeEventSource
 }
 
 function createServerSdkContextBase(server: ServerConnection.Any, scope: ServerScope): ServerSDKBase {
@@ -86,7 +86,7 @@ function createServerSdkContextBase(server: ServerConnection.Any, scope: ServerS
     )
   }
 
-  const events = createOpenCodeEventSource()
+  const events = createSleepyCodeEventSource()
   const reconnect = server.type === "extension" || server.type === "sidecar" ? server.reconnect : undefined
 
   const connection = createClientConnection(transport.api, {
@@ -175,7 +175,7 @@ export const useServerSDK = () => {
 
 export type LocationContext = {
   directory: string
-  event: OpenCodeEventStream
+  event: SleepyCodeEventStream
 }
 
 function createDirSdkContext(directory: string, serverSDK: ServerSDKBase): LocationContext {

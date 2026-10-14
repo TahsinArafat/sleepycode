@@ -4,7 +4,7 @@ import {
   getProjectAvatarVariant,
   ProjectAvatar,
   type ProjectAvatarProps,
-} from "@opencode/ui/project-avatar"
+} from "@sleepy-ai/ui/project-avatar"
 import { splitProps } from "solid-js"
 import type { LocalProject } from "@/shell/state/layout"
 

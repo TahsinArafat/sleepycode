@@ -1,17 +1,17 @@
 import { expect, test } from "@playwright/test"
 import { provider, sessionHref } from "../utils/app"
-import { mockOpenCodeServer } from "../utils/mock-server"
+import { mockSleepyCodeServer } from "../utils/mock-server"
 import { expectAppVisible } from "../utils/waits"
 import { openSession } from "../utils/workspace"
 
-const directory = "C:/OpenCode/NewProject"
+const directory = "C:/SleepyCode/NewProject"
 
 test("creates a session in a new project and selects its model", async ({ page }) => {
   // An empty draft must remain usable when the file viewer is unavailable.
   await page.route(/(?:\/_assets\/file-(?!icon-)[^/]+\.js|\/session-ui\/src\/components\/file\.tsx)(?:\?|$)/, (route) =>
     route.abort(),
   )
-  await mockOpenCodeServer(page, {
+  await mockSleepyCodeServer(page, {
     directory,
     project: {
       id: "proj_model_selection_flow",
@@ -24,8 +24,8 @@ test("creates a session in a new project and selects its model", async ({ page }
     provider: () => ({
       all: [
         {
-          id: "opencode",
-          name: "OpenCode",
+          id: "sleepycode",
+          name: "SleepyCode",
           models: {
             "free-model": {
               id: "free-model",
@@ -36,8 +36,8 @@ test("creates a session in a new project and selects its model", async ({ page }
           },
         },
         {
-          id: "opencode-go",
-          name: "OpenCode Go",
+          id: "sleepycode-go",
+          name: "SleepyCode Go",
           models: {
             "go-model-1": {
               id: "go-model-1",
@@ -48,24 +48,24 @@ test("creates a session in a new project and selects its model", async ({ page }
           },
         },
       ],
-      connected: ["opencode", "opencode-go"],
-      default: { providerID: "opencode", modelID: "free-model" },
+      connected: ["sleepycode", "sleepycode-go"],
+      default: { providerID: "sleepycode", modelID: "free-model" },
     }),
     sessions: [],
     pageMessages: () => ({ items: [] }),
     // Listings are requested by absolute path and returned relative to the stable Location.
-    fileList: (path) => (path === "C:/OpenCode" ? [{ path: "./", type: "directory", ignored: false }] : []),
+    fileList: (path) => (path === "C:/SleepyCode" ? [{ path: "./", type: "directory", ignored: false }] : []),
   })
   await page.addInitScript(() => {
-    localStorage.setItem("opencode.global.dat:server", JSON.stringify({ projects: { local: [] } }))
+    localStorage.setItem("sleepycode.global.dat:server", JSON.stringify({ projects: { local: [] } }))
     localStorage.setItem(
-      "opencode.global.dat:model",
+      "sleepycode.global.dat:model",
       JSON.stringify({
         user: [
-          { providerID: "opencode", modelID: "free-model", visibility: "show" },
-          { providerID: "opencode-go", modelID: "go-model-1", visibility: "show" },
+          { providerID: "sleepycode", modelID: "free-model", visibility: "show" },
+          { providerID: "sleepycode-go", modelID: "go-model-1", visibility: "show" },
         ],
-        recent: [{ providerID: "opencode-go", modelID: "go-model-1" }],
+        recent: [{ providerID: "sleepycode-go", modelID: "go-model-1" }],
         variant: {},
       }),
     )
@@ -76,12 +76,12 @@ test("creates a session in a new project and selects its model", async ({ page }
   await expectAppVisible(addProject)
   await addProject.click()
   const picker = page.getByRole("dialog", { name: "Open project", exact: true })
-  await expect(picker.getByRole("combobox")).toHaveValue("C:\\OpenCode\\NewProject")
+  await expect(picker.getByRole("combobox")).toHaveValue("C:\\SleepyCode\\NewProject")
 
   const listing = page.waitForRequest((request) => {
     const url = new URL(request.url())
 
-    return url.pathname === "/api/fs/list" && url.searchParams.get("path") === "C:/OpenCode"
+    return url.pathname === "/api/fs/list" && url.searchParams.get("path") === "C:/SleepyCode"
   })
 
   await picker.getByRole("button", { name: "Parent", exact: true }).click()
@@ -90,7 +90,7 @@ test("creates a session in a new project and selects its model", async ({ page }
   await expect(directoryItem).toBeVisible()
   await directoryItem.click()
   await expect(directoryItem).toHaveAttribute("aria-selected", "true")
-  await expect(picker.getByText("C:\\OpenCode\\NewProject", { exact: true })).toBeVisible()
+  await expect(picker.getByText("C:\\SleepyCode\\NewProject", { exact: true })).toBeVisible()
   const selectFolder = picker.getByRole("button", { name: "Select folder", exact: true })
   await expect(selectFolder).toBeEnabled()
   await selectFolder.click()
@@ -120,7 +120,7 @@ test("restores each existing session's model and variant when switching tabs", a
   const sessions = ["A", "B"].map((name) => ({
     id: `ses_model_${name}`,
     title: `Model ${name}`,
-    model: { id: `model-${name}`, providerID: "opencode", variant: "balanced" },
+    model: { id: `model-${name}`, providerID: "sleepycode", variant: "balanced" },
   }))
 
   await openSession(page, {

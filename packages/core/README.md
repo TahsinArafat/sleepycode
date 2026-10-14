@@ -1,3 +1,3 @@
-# @opencode/core
+# @sleepy-ai/core
 
-Core runtime services for OpenCode.
+Core runtime services for SleepyCode.

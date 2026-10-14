@@ -1,95 +1,95 @@
 import { NodeFileSystem } from "@effect/platform-node"
-import { compile, emitEffectImported, emitEffectShape, emitPromise, write } from "@opencode/httpapi-codegen"
-import { ClientApi, effectOmitEndpoints, groupNames, promiseOmitEndpoints } from "@opencode/protocol/client"
-import { Agent } from "@opencode/schema/agent"
-import { Command } from "@opencode/schema/command"
-import { Config } from "@opencode/schema/config"
-import { Credential } from "@opencode/schema/credential"
-import { Event } from "@opencode/schema/event"
-import { EventLog } from "@opencode/schema/event-log"
-import { FileDiff } from "@opencode/schema/file-diff"
-import { FileSystem } from "@opencode/schema/filesystem"
-import { Form } from "@opencode/schema/form"
-import { Instruction } from "@opencode/schema/instruction"
-import { InstructionEntry } from "@opencode/schema/instruction-entry"
-import { Integration } from "@opencode/schema/integration"
-import { Location } from "@opencode/schema/location"
-import { Mcp } from "@opencode/schema/mcp"
-import { Model } from "@opencode/schema/model"
-import { Money } from "@opencode/schema/money"
-import { Permission } from "@opencode/schema/permission"
-import { PermissionSaved } from "@opencode/schema/permission-saved"
-import { Plugin } from "@opencode/schema/plugin"
-import { Project } from "@opencode/schema/project"
-import { Worktree } from "@opencode/schema/worktree"
-import { AgentAttachment, FileAttachment, Prompt, PromptMention } from "@opencode/schema/prompt"
-import { PromptInput } from "@opencode/schema/prompt-input"
-import { Provider } from "@opencode/schema/provider"
-import { Pty } from "@opencode/schema/pty"
-import { PtyTicket } from "@opencode/schema/pty-ticket"
-import { Question } from "@opencode/schema/question"
-import { Reference } from "@opencode/schema/reference"
-import { AbsolutePath, RelativePath } from "@opencode/schema/schema"
-import { Session } from "@opencode/schema/session"
-import { SessionMessage } from "@opencode/schema/session-message"
-import { SessionInbox } from "@opencode/schema/session-inbox"
-import { Shell } from "@opencode/schema/shell"
-import { Skill } from "@opencode/schema/skill"
-import { Snapshot } from "@opencode/schema/snapshot"
-import { Vcs } from "@opencode/schema/vcs"
-import { WebSearch } from "@opencode/schema/websearch"
-import { Workspace } from "@opencode/schema/workspace"
-import { SessionsCursor } from "@opencode/protocol/groups/session"
+import { compile, emitEffectImported, emitEffectShape, emitPromise, write } from "@sleepy-ai/httpapi-codegen"
+import { ClientApi, effectOmitEndpoints, groupNames, promiseOmitEndpoints } from "@sleepy-ai/protocol/client"
+import { Agent } from "@sleepy-ai/schema/agent"
+import { Command } from "@sleepy-ai/schema/command"
+import { Config } from "@sleepy-ai/schema/config"
+import { Credential } from "@sleepy-ai/schema/credential"
+import { Event } from "@sleepy-ai/schema/event"
+import { EventLog } from "@sleepy-ai/schema/event-log"
+import { FileDiff } from "@sleepy-ai/schema/file-diff"
+import { FileSystem } from "@sleepy-ai/schema/filesystem"
+import { Form } from "@sleepy-ai/schema/form"
+import { Instruction } from "@sleepy-ai/schema/instruction"
+import { InstructionEntry } from "@sleepy-ai/schema/instruction-entry"
+import { Integration } from "@sleepy-ai/schema/integration"
+import { Location } from "@sleepy-ai/schema/location"
+import { Mcp } from "@sleepy-ai/schema/mcp"
+import { Model } from "@sleepy-ai/schema/model"
+import { Money } from "@sleepy-ai/schema/money"
+import { Permission } from "@sleepy-ai/schema/permission"
+import { PermissionSaved } from "@sleepy-ai/schema/permission-saved"
+import { Plugin } from "@sleepy-ai/schema/plugin"
+import { Project } from "@sleepy-ai/schema/project"
+import { Worktree } from "@sleepy-ai/schema/worktree"
+import { AgentAttachment, FileAttachment, Prompt, PromptMention } from "@sleepy-ai/schema/prompt"
+import { PromptInput } from "@sleepy-ai/schema/prompt-input"
+import { Provider } from "@sleepy-ai/schema/provider"
+import { Pty } from "@sleepy-ai/schema/pty"
+import { PtyTicket } from "@sleepy-ai/schema/pty-ticket"
+import { Question } from "@sleepy-ai/schema/question"
+import { Reference } from "@sleepy-ai/schema/reference"
+import { AbsolutePath, RelativePath } from "@sleepy-ai/schema/schema"
+import { Session } from "@sleepy-ai/schema/session"
+import { SessionMessage } from "@sleepy-ai/schema/session-message"
+import { SessionInbox } from "@sleepy-ai/schema/session-inbox"
+import { Shell } from "@sleepy-ai/schema/shell"
+import { Skill } from "@sleepy-ai/schema/skill"
+import { Snapshot } from "@sleepy-ai/schema/snapshot"
+import { Vcs } from "@sleepy-ai/schema/vcs"
+import { WebSearch } from "@sleepy-ai/schema/websearch"
+import { Workspace } from "@sleepy-ai/schema/workspace"
+import { SessionsCursor } from "@sleepy-ai/protocol/groups/session"
 import { Effect, Schema } from "effect"
 import { fileURLToPath } from "url"
 
 const promiseContract = compile(ClientApi, { groupNames, omitEndpoints: promiseOmitEndpoints })
 const effectContract = compile(ClientApi, { groupNames, omitEndpoints: effectOmitEndpoints })
 const effectTypeReferences = [
-  ...namespaceTypes("Agent", "@opencode/schema/agent", Agent),
-  ...namespaceTypes("Command", "@opencode/schema/command", Command),
-  ...namespaceTypes("Config", "@opencode/schema/config", Config),
-  ...namespaceTypes("Credential", "@opencode/schema/credential", Credential),
-  ...namespaceTypes("Event", "@opencode/schema/event", Event),
-  ...namespaceTypes("EventLog", "@opencode/schema/event-log", EventLog),
-  ...namespaceTypes("FileDiff", "@opencode/schema/file-diff", FileDiff),
-  ...namespaceTypes("FileSystem", "@opencode/schema/filesystem", FileSystem),
-  ...namespaceTypes("Form", "@opencode/schema/form", Form),
-  ...namespaceTypes("Instruction", "@opencode/schema/instruction", Instruction),
-  ...namespaceTypes("InstructionEntry", "@opencode/schema/instruction-entry", InstructionEntry),
-  ...namespaceTypes("Integration", "@opencode/schema/integration", Integration),
-  typeReference("Location.PublicRef", "@opencode/schema/location", Location.PublicRef),
-  typeReference("Location.PublicInfo", "@opencode/schema/location", Location.PublicInfo),
-  ...namespaceTypes("Mcp", "@opencode/schema/mcp", Mcp),
-  ...namespaceTypes("Model", "@opencode/schema/model", Model),
-  ...namespaceTypes("Money", "@opencode/schema/money", Money),
-  ...namespaceTypes("Permission", "@opencode/schema/permission", Permission),
-  ...namespaceTypes("PermissionSaved", "@opencode/schema/permission-saved", PermissionSaved),
-  ...namespaceTypes("Plugin", "@opencode/schema/plugin", Plugin),
-  ...namespaceTypes("Project", "@opencode/schema/project", Project),
-  ...namespaceTypes("Worktree", "@opencode/schema/worktree", Worktree),
-  ...namespaceTypes("PromptInput", "@opencode/schema/prompt-input", PromptInput),
-  ...namespaceTypes("Provider", "@opencode/schema/provider", Provider),
-  ...namespaceTypes("Pty", "@opencode/schema/pty", Pty),
-  ...namespaceTypes("PtyTicket", "@opencode/schema/pty-ticket", PtyTicket),
-  ...namespaceTypes("Question", "@opencode/schema/question", Question),
-  ...namespaceTypes("Reference", "@opencode/schema/reference", Reference),
-  ...namespaceTypes("Session", "@opencode/schema/session", Session),
-  ...namespaceTypes("SessionMessage", "@opencode/schema/session-message", SessionMessage),
-  ...namespaceTypes("SessionInbox", "@opencode/schema/session-inbox", SessionInbox),
-  ...namespaceTypes("Shell", "@opencode/schema/shell", Shell),
-  ...namespaceTypes("Skill", "@opencode/schema/skill", Skill),
-  ...namespaceTypes("Snapshot", "@opencode/schema/snapshot", Snapshot),
-  ...namespaceTypes("Vcs", "@opencode/schema/vcs", Vcs),
-  ...namespaceTypes("WebSearch", "@opencode/schema/websearch", WebSearch),
-  ...namespaceTypes("Workspace", "@opencode/schema/workspace", Workspace),
-  typeReference("Prompt", "@opencode/schema/prompt", Prompt),
-  typeReference("PromptMention", "@opencode/schema/prompt", PromptMention),
-  typeReference("FileAttachment", "@opencode/schema/prompt", FileAttachment),
-  typeReference("AgentAttachment", "@opencode/schema/prompt", AgentAttachment),
-  typeReference("AbsolutePath", "@opencode/schema/schema", AbsolutePath),
-  typeReference("RelativePath", "@opencode/schema/schema", RelativePath),
-  typeReference("SessionsCursor", "@opencode/protocol/groups/session", SessionsCursor),
+  ...namespaceTypes("Agent", "@sleepy-ai/schema/agent", Agent),
+  ...namespaceTypes("Command", "@sleepy-ai/schema/command", Command),
+  ...namespaceTypes("Config", "@sleepy-ai/schema/config", Config),
+  ...namespaceTypes("Credential", "@sleepy-ai/schema/credential", Credential),
+  ...namespaceTypes("Event", "@sleepy-ai/schema/event", Event),
+  ...namespaceTypes("EventLog", "@sleepy-ai/schema/event-log", EventLog),
+  ...namespaceTypes("FileDiff", "@sleepy-ai/schema/file-diff", FileDiff),
+  ...namespaceTypes("FileSystem", "@sleepy-ai/schema/filesystem", FileSystem),
+  ...namespaceTypes("Form", "@sleepy-ai/schema/form", Form),
+  ...namespaceTypes("Instruction", "@sleepy-ai/schema/instruction", Instruction),
+  ...namespaceTypes("InstructionEntry", "@sleepy-ai/schema/instruction-entry", InstructionEntry),
+  ...namespaceTypes("Integration", "@sleepy-ai/schema/integration", Integration),
+  typeReference("Location.PublicRef", "@sleepy-ai/schema/location", Location.PublicRef),
+  typeReference("Location.PublicInfo", "@sleepy-ai/schema/location", Location.PublicInfo),
+  ...namespaceTypes("Mcp", "@sleepy-ai/schema/mcp", Mcp),
+  ...namespaceTypes("Model", "@sleepy-ai/schema/model", Model),
+  ...namespaceTypes("Money", "@sleepy-ai/schema/money", Money),
+  ...namespaceTypes("Permission", "@sleepy-ai/schema/permission", Permission),
+  ...namespaceTypes("PermissionSaved", "@sleepy-ai/schema/permission-saved", PermissionSaved),
+  ...namespaceTypes("Plugin", "@sleepy-ai/schema/plugin", Plugin),
+  ...namespaceTypes("Project", "@sleepy-ai/schema/project", Project),
+  ...namespaceTypes("Worktree", "@sleepy-ai/schema/worktree", Worktree),
+  ...namespaceTypes("PromptInput", "@sleepy-ai/schema/prompt-input", PromptInput),
+  ...namespaceTypes("Provider", "@sleepy-ai/schema/provider", Provider),
+  ...namespaceTypes("Pty", "@sleepy-ai/schema/pty", Pty),
+  ...namespaceTypes("PtyTicket", "@sleepy-ai/schema/pty-ticket", PtyTicket),
+  ...namespaceTypes("Question", "@sleepy-ai/schema/question", Question),
+  ...namespaceTypes("Reference", "@sleepy-ai/schema/reference", Reference),
+  ...namespaceTypes("Session", "@sleepy-ai/schema/session", Session),
+  ...namespaceTypes("SessionMessage", "@sleepy-ai/schema/session-message", SessionMessage),
+  ...namespaceTypes("SessionInbox", "@sleepy-ai/schema/session-inbox", SessionInbox),
+  ...namespaceTypes("Shell", "@sleepy-ai/schema/shell", Shell),
+  ...namespaceTypes("Skill", "@sleepy-ai/schema/skill", Skill),
+  ...namespaceTypes("Snapshot", "@sleepy-ai/schema/snapshot", Snapshot),
+  ...namespaceTypes("Vcs", "@sleepy-ai/schema/vcs", Vcs),
+  ...namespaceTypes("WebSearch", "@sleepy-ai/schema/websearch", WebSearch),
+  ...namespaceTypes("Workspace", "@sleepy-ai/schema/workspace", Workspace),
+  typeReference("Prompt", "@sleepy-ai/schema/prompt", Prompt),
+  typeReference("PromptMention", "@sleepy-ai/schema/prompt", PromptMention),
+  typeReference("FileAttachment", "@sleepy-ai/schema/prompt", FileAttachment),
+  typeReference("AgentAttachment", "@sleepy-ai/schema/prompt", AgentAttachment),
+  typeReference("AbsolutePath", "@sleepy-ai/schema/schema", AbsolutePath),
+  typeReference("RelativePath", "@sleepy-ai/schema/schema", RelativePath),
+  typeReference("SessionsCursor", "@sleepy-ai/protocol/groups/session", SessionsCursor),
 ]
 
 await Effect.runPromise(
@@ -114,8 +114,8 @@ await Effect.runPromise(
           typeReferences: effectTypeReferences,
           outputTypes: {
             "event.subscribe": {
-              name: "OpenCodeEvent",
-              import: 'import type { OpenCodeEvent } from "@opencode/protocol/groups/event"',
+              name: "SleepyCodeEvent",
+              import: 'import type { SleepyCodeEvent } from "@sleepy-ai/protocol/groups/event"',
             },
           },
         }),

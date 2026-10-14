@@ -1,6 +1,6 @@
-export * as SessionSchema from "@opencode/schema/session"
+export * as SessionSchema from "@sleepy-ai/schema/session"
 
-import { Session } from "@opencode/schema/session"
+import { Session } from "@sleepy-ai/schema/session"
 
 export const ID = Session.ID
 export type ID = typeof ID.Type

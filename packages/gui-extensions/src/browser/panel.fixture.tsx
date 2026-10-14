@@ -1,5 +1,5 @@
-import { Browser } from "@opencode/plugin-browser/rpc"
-import { DialogProvider } from "@opencode/ui/context/dialog"
+import { Browser } from "@sleepy-ai/plugin-browser/rpc"
+import { DialogProvider } from "@sleepy-ai/ui/context/dialog"
 import {
   batch,
   createSignal,

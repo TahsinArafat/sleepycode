@@ -1,6 +1,6 @@
-import { OpenCode, type OpenCodeEvent } from "@opencode/client"
+import { SleepyCode, type SleepyCodeEvent } from "@sleepy-ai/client"
 
-export const worktree = "/tmp/opencode"
+export const worktree = "/tmp/sleepycode"
 export const directory = `${worktree}/packages/tui`
 
 export function json(data: unknown, init?: ResponseInit) {
@@ -51,7 +51,7 @@ export function createEventStream() {
   }
 
   return {
-    emit(event: OpenCodeEvent) {
+    emit(event: SleepyCodeEvent) {
       send(v2, pending, event)
     },
     v2() {
@@ -174,5 +174,5 @@ export function createFetch(override?: FetchHandler, events?: ReturnType<typeof 
 }
 
 export function createApi(fetch: typeof globalThis.fetch) {
-  return OpenCode.make({ baseUrl: "http://test", fetch })
+  return SleepyCode.make({ baseUrl: "http://test", fetch })
 }

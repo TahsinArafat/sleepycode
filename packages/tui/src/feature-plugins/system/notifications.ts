@@ -1,5 +1,5 @@
-import { Plugin } from "@opencode/plugin/tui"
-import type { AttentionSoundName } from "@opencode/plugin/tui/context"
+import { Plugin } from "@sleepy-ai/plugin/tui"
+import type { AttentionSoundName } from "@sleepy-ai/plugin/tui/context"
 
 function notify(
   context: Plugin.Context,
@@ -19,7 +19,7 @@ function notify(
 }
 
 export default Plugin.define({
-  id: "opencode.notifications",
+  id: "sleepycode.notifications",
   setup(context) {
     const errored = new Set<string>()
     const terminal = new Set<string>()

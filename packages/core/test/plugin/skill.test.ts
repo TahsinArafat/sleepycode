@@ -1,10 +1,10 @@
 import { describe, expect } from "bun:test"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { Config } from "@opencode/core/config"
-import { Document, Info } from "@opencode/schema/config"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { Config } from "@sleepy-ai/core/config"
+import { Document, Info } from "@sleepy-ai/schema/config"
 import { Effect, Layer, Stream } from "effect"
-import { SkillPlugin } from "@opencode/core/plugin/skill"
-import { Skill } from "@opencode/core/skill"
+import { SkillPlugin } from "@sleepy-ai/core/plugin/skill"
+import { Skill } from "@sleepy-ai/core/skill"
 import { testEffect } from "../lib/effect"
 import { host } from "./host"
 
@@ -37,19 +37,19 @@ describe("SkillPlugin.Plugin", () => {
 
       expect(skills).toContainEqual(
         expect.objectContaining({
-          id: "opencode",
-          name: "OpenCode",
-          description: expect.stringContaining("any question about OpenCode itself"),
+          id: "sleepycode",
+          name: "SleepyCode",
+          description: expect.stringContaining("any question about SleepyCode itself"),
         }),
       )
       expect(skills).toContainEqual(
         expect.objectContaining({
           id: "report",
           name: "Report",
-          description: expect.stringContaining("opencode issue"),
+          description: expect.stringContaining("sleepycode issue"),
         }),
       )
-      expect(report?.content).toContain("- opencode version: 1.2.3")
+      expect(report?.content).toContain("- sleepycode version: 1.2.3")
       expect(report?.content).toContain("- install/channel: beta")
     }),
   )

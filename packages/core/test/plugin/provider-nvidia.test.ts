@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { Effect } from "effect"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { ProviderPlugins } from "@opencode/core/plugin/provider"
-import { NvidiaPlugin } from "@opencode/core/plugin/provider/nvidia"
-import { Provider } from "@opencode/core/provider"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { PluginHost } from "@sleepy-ai/core/plugin/host"
+import { ProviderPlugins } from "@sleepy-ai/core/plugin/provider"
+import { NvidiaPlugin } from "@sleepy-ai/core/plugin/provider/nvidia"
+import { Provider } from "@sleepy-ai/core/provider"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
 
@@ -18,7 +18,7 @@ const addPlugin = Effect.fn(function* () {
 
 describe("NvidiaPlugin", () => {
   test("is registered so legacy referer headers can be applied", () => {
-    expect(ProviderPlugins.map((item) => item.id)).toContain("opencode.provider.nvidia")
+    expect(ProviderPlugins.map((item) => item.id)).toContain("sleepycode.provider.nvidia")
   })
 
   it.effect("applies NVIDIA tracking headers only to nvidia", () =>
@@ -26,7 +26,7 @@ describe("NvidiaPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("nvidia"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@sleepy-ai/ai/providers/openai-compatible"
           provider.settings = { baseURL: "https://integrate.api.nvidia.com/v1" }
           provider.headers = { Existing: "value" }
         })
@@ -36,8 +36,8 @@ describe("NvidiaPlugin", () => {
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
         Existing: "value",
         "HTTP-Referer": "https://opencode.ai/",
-        "X-Title": "opencode",
-        "X-BILLING-INVOKE-ORIGIN": "OpenCode",
+        "X-Title": "sleepycode",
+        "X-BILLING-INVOKE-ORIGIN": "SleepyCode",
       })
       expect((yield* catalog.get(Provider.ID.openrouter))?.headers).toBeUndefined()
     }),
@@ -48,7 +48,7 @@ describe("NvidiaPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("nvidia"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@sleepy-ai/ai/providers/openai-compatible"
           provider.settings = { baseURL: "https://integrate.api.nvidia.com/v1" }
         })
       })
@@ -56,8 +56,8 @@ describe("NvidiaPlugin", () => {
 
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
         "HTTP-Referer": "https://opencode.ai/",
-        "X-Title": "opencode",
-        "X-BILLING-INVOKE-ORIGIN": "OpenCode",
+        "X-Title": "sleepycode",
+        "X-BILLING-INVOKE-ORIGIN": "SleepyCode",
       })
     }),
   )
@@ -67,7 +67,7 @@ describe("NvidiaPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("nvidia"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@sleepy-ai/ai/providers/openai-compatible"
           provider.settings = { baseURL: "https://integrate.api.nvidia.com/v1" }
           provider.headers = { "X-BILLING-INVOKE-ORIGIN": "CustomOrigin" }
         })
@@ -76,7 +76,7 @@ describe("NvidiaPlugin", () => {
 
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
         "HTTP-Referer": "https://opencode.ai/",
-        "X-Title": "opencode",
+        "X-Title": "sleepycode",
         "X-BILLING-INVOKE-ORIGIN": "CustomOrigin",
       })
     }),

@@ -1,13 +1,13 @@
 export * as SdkInstances from "./instances"
 
-import { Instance } from "@opencode/core/instance"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
-import { Plugin } from "@opencode/core/plugin"
-import type { InstancePlugins } from "@opencode/core/plugin/instance"
-import { Location } from "@opencode/schema/location"
-import type { Session } from "@opencode/schema/session"
-import { makeGlobalNode } from "@opencode/util/effect/app-node"
-import type { LayerNode } from "@opencode/util/effect/layer-node"
+import { Instance } from "@sleepy-ai/core/instance"
+import { LocationServiceMap } from "@sleepy-ai/core/location-service-map"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import type { InstancePlugins } from "@sleepy-ai/core/plugin/instance"
+import { Location } from "@sleepy-ai/schema/location"
+import type { Session } from "@sleepy-ai/schema/session"
+import { makeGlobalNode } from "@sleepy-ai/util/effect/app-node"
+import type { LayerNode } from "@sleepy-ai/util/effect/layer-node"
 import { Context, Duration, Effect, Layer, LayerMap, Scope } from "effect"
 
 export interface Configuration {

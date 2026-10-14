@@ -1,11 +1,11 @@
-import { useFilteredList } from "@opencode/ui/hooks"
-import { getDirectory, getFilename } from "@opencode/util/path"
+import { useFilteredList } from "@sleepy-ai/ui/hooks"
+import { getDirectory, getFilename } from "@sleepy-ai/util/path"
 import { createSignal, For, onMount, Show, splitProps, type JSX } from "solid-js"
-import { Button } from "@opencode/ui/button"
-import { FileIcon } from "@opencode/ui/file-icon"
-import { Icon } from "@opencode/ui/icon"
+import { Button } from "@sleepy-ai/ui/button"
+import { FileIcon } from "@sleepy-ai/ui/file-icon"
+import { Icon } from "@sleepy-ai/ui/icon"
 import { installLineCommentStyles } from "./line-comment-styles"
-import { useI18n } from "@opencode/ui/context/i18n"
+import { useI18n } from "@sleepy-ai/ui/context/i18n"
 
 installLineCommentStyles()
 

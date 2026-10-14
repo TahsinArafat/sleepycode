@@ -1,6 +1,6 @@
-import type { RpcApi } from "@opencode/client/effect/api"
-export type { RpcClient } from "@opencode/client/effect/api"
-import type { Rpc } from "@opencode/schema/rpc"
+import type { RpcApi } from "@sleepy-ai/client/effect/api"
+export type { RpcClient } from "@sleepy-ai/client/effect/api"
+import type { Rpc } from "@sleepy-ai/schema/rpc"
 import type { Effect, Scope } from "effect"
 import type { Registration } from "./registration.js"
 

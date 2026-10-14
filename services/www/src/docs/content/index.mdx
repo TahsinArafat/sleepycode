@@ -2,7 +2,7 @@
 title: "Intro"
 ---
 
-OpenCode is an open source AI coding agent. It’s available as a terminal-based interface, desktop app, or web app.
+SleepyCode is an open source AI coding agent. It’s available as a terminal-based interface, desktop app, or web app.
 
 
 ## CLI
@@ -12,51 +12,51 @@ OpenCode is an open source AI coding agent. It’s available as a terminal-based
   label="Install method"
   tabs={[
     { label: "curl", code: "curl -fsSL https://opencode.ai/v2/install | bash" },
-    { label: "homebrew", code: "brew install anomalyco/tap/opencode-v2" },
-    { label: "npm", code: "npm install -g @opencode/cli" },
-    { label: "bun", code: "bun install -g --trust @opencode/cli" },
-    { label: "pnpm", code: "pnpm add -g --allow-build=@opencode/cli @opencode/cli" },
-    { label: "yarn", code: "yarn global add @opencode/cli" },
-    { label: "vite+", code: "vp install -g @opencode/cli" },
-    { label: "aur", code: "paru -S opencode-beta" },
-    { label: "mise", code: "mise use -g opencode" },
+    { label: "homebrew", code: "brew install anomalyco/tap/sleepycode-v2" },
+    { label: "npm", code: "npm install -g @sleepy-ai/cli" },
+    { label: "bun", code: "bun install -g --trust @sleepy-ai/cli" },
+    { label: "pnpm", code: "pnpm add -g --allow-build=@sleepy-ai/cli @sleepy-ai/cli" },
+    { label: "yarn", code: "yarn global add @sleepy-ai/cli" },
+    { label: "vite+", code: "vp install -g @sleepy-ai/cli" },
+    { label: "aur", code: "paru -S sleepycode-beta" },
+    { label: "mise", code: "mise use -g sleepycode" },
   ]}
 />
 
-The npm package uses a postinstall script to select the native `opencode` binary for your platform. The Bun and pnpm commands
+The npm package uses a postinstall script to select the native `sleepycode` binary for your platform. The Bun and pnpm commands
 explicitly allow the required script; Vite+ requires no additional flag. The mise command requires mise 2026.10.9 or later;
-older versions install OpenCode 1.
+older versions install SleepyCode 1.
 
 Windows package managers are not supported.
 
 
 Download a standalone CLI binary for your platform.
 
-- **macOS:** [Apple silicon](https://opencode.ai/update/api/latest/cli/opencode/opencode-darwin-arm64.zip) · [Intel](https://opencode.ai/update/api/latest/cli/opencode/opencode-darwin-x64.zip) · [Intel (baseline)](https://opencode.ai/update/api/latest/cli/opencode/opencode-darwin-x64-baseline.zip)
-- **Windows:** [ARM64](https://opencode.ai/update/api/latest/cli/opencode/opencode-windows-arm64.zip) · [x64](https://opencode.ai/update/api/latest/cli/opencode/opencode-windows-x64.zip) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/opencode/opencode-windows-x64-baseline.zip)
-- **Linux (glibc):** [ARM64](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-arm64.tar.gz) · [x64](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-x64.tar.gz) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-x64-baseline.tar.gz)
-- **Linux (musl):** [ARM64](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-arm64-musl.tar.gz) · [x64](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-x64-musl.tar.gz) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/opencode/opencode-linux-x64-baseline-musl.tar.gz)
+- **macOS:** [Apple silicon](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-darwin-arm64.zip) · [Intel](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-darwin-x64.zip) · [Intel (baseline)](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-darwin-x64-baseline.zip)
+- **Windows:** [ARM64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-windows-arm64.zip) · [x64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-windows-x64.zip) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-windows-x64-baseline.zip)
+- **Linux (glibc):** [ARM64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-arm64.tar.gz) · [x64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-x64.tar.gz) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-x64-baseline.tar.gz)
+- **Linux (musl):** [ARM64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-arm64-musl.tar.gz) · [x64](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-x64-musl.tar.gz) · [x64 (baseline)](https://opencode.ai/update/api/latest/cli/sleepycode/sleepycode-linux-x64-baseline-musl.tar.gz)
 
 ## Desktop
 
-Download the latest OpenCode Desktop build for your platform.
+Download the latest SleepyCode Desktop build for your platform.
 
-- **macOS:** [Apple silicon](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-mac-arm64.dmg) · [Intel](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-mac-x64.dmg)
-- **Windows:** [x64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-win-x64.exe) · [ARM64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-win-arm64.exe)
-- **Linux (.deb):** [x64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-amd64.deb) · [ARM64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-arm64.deb)
-- **Linux (.rpm):** [x64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.rpm) · [ARM64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-aarch64.rpm)
-- **Linux (AppImage):** [x64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-x86_64.AppImage) · [ARM64](https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-linux-arm64.AppImage)
+- **macOS:** [Apple silicon](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-mac-arm64.dmg) · [Intel](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-mac-x64.dmg)
+- **Windows:** [x64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-win-x64.exe) · [ARM64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-win-arm64.exe)
+- **Linux (.deb):** [x64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-amd64.deb) · [ARM64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-arm64.deb)
+- **Linux (.rpm):** [x64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-x86_64.rpm) · [ARM64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-aarch64.rpm)
+- **Linux (AppImage):** [x64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-x86_64.AppImage) · [ARM64](https://opencode.ai/update/api/latest/desktop/sleepycode/sleepycode-desktop-linux-arm64.AppImage)
 
 
 ## Web
 
-Access the OpenCode web interface with the `opencode pair` command.
+Access the SleepyCode web interface with the `sleepycode pair` command.
 
 ```bash
-$ opencode pair
+$ sleepycode pair
 
   URLs      http://127.0.0.1:49374
-  Username  opencode
+  Username  sleepycode
   Password  ********
 ```
 
@@ -68,21 +68,21 @@ Docker images use versioned tags, for example `ghcr.io/anomalyco/opencode:2.0.0`
 
 ## Connect
 
-OpenCode has built in support for many LLM providers - you can connect to them
+SleepyCode has built in support for many LLM providers - you can connect to them
 directly [in the TUI](/cli/providers) with `/connect`.
 
 See [Providers](/providers) to configure custom providers.
 
 If you'd like easy access to all the best coding models you can try out
-[OpenCode Console](/console).
+[SleepyCode Console](/console).
 
-You can also try [OpenCode Go](/console/go) a $10/month subscription
+You can also try [SleepyCode Go](/console/go) a $10/month subscription
 plan that grants you access to the best open source models.
 
 ---
 
 ## Customize
 
-Make OpenCode your own by editing the [OpenCode config](/config), [loading plugins](/plugins), [connecting MCP
+Make SleepyCode your own by editing the [SleepyCode config](/config), [loading plugins](/plugins), [connecting MCP
 servers](/mcp-servers), or [creating commands](/commands). For terminal interface themes and keybindings, see [CLI
 settings](/cli/config).

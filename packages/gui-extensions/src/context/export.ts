@@ -1,8 +1,8 @@
-import type { OpenCodeClient } from "@opencode/client/promise"
+import type { SleepyCodeClient } from "@sleepy-ai/client/promise"
 
 export async function fetchSessionExport(input: {
   sessionID: string
-  api: Pick<OpenCodeClient, "session" | "message">
+  api: Pick<SleepyCodeClient, "session" | "message">
 }) {
   const [info, first] = await Promise.all([
     input.api.session.get({ sessionID: input.sessionID }),

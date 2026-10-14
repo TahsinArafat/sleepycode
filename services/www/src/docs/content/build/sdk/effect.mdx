@@ -2,11 +2,11 @@
 title: "Effect"
 ---
 
-`@opencode/sdk/effect` is the Effect-native embedded SDK. Operations return typed Effects and Streams, and closing
+`@sleepy-ai/sdk/effect` is the Effect-native embedded SDK. Operations return typed Effects and Streams, and closing
 the owning Scope releases the router, Location services, fibers, and plugin registrations.
 
 ```sh
-bun add @opencode/sdk effect
+bun add @sleepy-ai/sdk effect
 ```
 
 ## Create a host
@@ -14,16 +14,16 @@ bun add @opencode/sdk effect
 Create the host inside `Effect.scoped`, then use its generated API groups or the `sessions` alias.
 
 ```ts
-import { AbsolutePath, Location, OpenCode } from "@opencode/sdk/effect"
+import { AbsolutePath, Location, SleepyCode } from "@sleepy-ai/sdk/effect"
 import { Effect } from "effect"
 
 const program = Effect.scoped(
   Effect.gen(function* () {
-    const opencode = yield* OpenCode.create()
-    const session = yield* opencode.sessions.create({
+    const sleepycode = yield* SleepyCode.create()
+    const session = yield* sleepycode.sessions.create({
       location: Location.Ref.make({ directory: AbsolutePath.make("/workspace") }),
     })
-    yield* opencode.sessions.prompt({
+    yield* sleepycode.sessions.prompt({
       sessionID: session.id,
       text: "Review the current changes",
     })
@@ -35,11 +35,11 @@ const session = await Effect.runPromise(program)
 ```
 
 The embedded host uses the same schema values, declared errors, request options, and Streams as
-`@opencode/client/effect`.
+`@sleepy-ai/client/effect`.
 
 ```ts
-const info = yield* opencode.server.info()
-const sessions = yield* opencode.sessions.list()
+const info = yield* sleepycode.server.info()
+const sessions = yield* sleepycode.sessions.list()
 ```
 
 ## Stream events
@@ -50,19 +50,19 @@ background.
 ```ts
 import { Effect, Stream } from "effect"
 
-yield* opencode.events.subscribe().pipe(
-  Stream.runForEach((event) => Effect.logInfo("OpenCode event", { type: event.type })),
+yield* sleepycode.events.subscribe().pipe(
+  Stream.runForEach((event) => Effect.logInfo("SleepyCode event", { type: event.type })),
   Effect.forkScoped,
 )
 ```
 
 ## Customize
 
-Customize your OpenCode instance by registering Effect plugins. Use the embedded
+Customize your SleepyCode instance by registering Effect plugins. Use the embedded
 host to customize agents, models, tools, and other behavior:
 
 ```ts
-import { Plugin } from "@opencode/plugin/effect"
+import { Plugin } from "@sleepy-ai/plugin/effect"
 import { Effect } from "effect"
 
 const plugin = Plugin.define({
@@ -78,7 +78,7 @@ const plugin = Plugin.define({
     }),
 })
 
-yield* opencode.plugin(plugin)
+yield* sleepycode.plugin(plugin)
 ```
 
 See the [full Effect plugins documentation](/build/plugins/effect) for plugin
@@ -86,16 +86,16 @@ hooks, transforms, tools, and the complete plugin context.
 
 ## Layer
 
-Use `OpenCode.layer()` when the embedded host should be an application service.
+Use `SleepyCode.layer()` when the embedded host should be an application service.
 
 ```ts
-import { OpenCode } from "@opencode/sdk/effect"
+import { SleepyCode } from "@sleepy-ai/sdk/effect"
 import { Effect } from "effect"
 
 const program = Effect.gen(function* () {
-  const opencode = yield* OpenCode.Service
-  return yield* opencode.server.info()
+  const sleepycode = yield* SleepyCode.Service
+  return yield* sleepycode.server.info()
 })
 
-const health = await Effect.runPromise(program.pipe(Effect.provide(OpenCode.layer())))
+const health = await Effect.runPromise(program.pipe(Effect.provide(SleepyCode.layer())))
 ```

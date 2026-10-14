@@ -1,16 +1,16 @@
 import { describe, expect } from "bun:test"
-import { Document, Event, Info, type Entry } from "@opencode/schema/config"
-import { ConfigPolicy } from "@opencode/schema/config/policy"
-import { Permission } from "@opencode/schema/permission"
-import { Config } from "@opencode/core/config"
-import { ConfigPolicyPlugin } from "@opencode/core/config/plugin/policy"
-import { Bus } from "@opencode/core/bus"
-import { ManagedPolicy } from "@opencode/core/managed-policy"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { Provider } from "@opencode/core/provider"
-import { Session } from "@opencode/core/session"
+import { Document, Event, Info, type Entry } from "@sleepy-ai/schema/config"
+import { ConfigPolicy } from "@sleepy-ai/schema/config/policy"
+import { Permission } from "@sleepy-ai/schema/permission"
+import { Config } from "@sleepy-ai/core/config"
+import { ConfigPolicyPlugin } from "@sleepy-ai/core/config/plugin/policy"
+import { Bus } from "@sleepy-ai/core/bus"
+import { ManagedPolicy } from "@sleepy-ai/core/managed-policy"
+import { Plugin } from "@sleepy-ai/core/plugin"
+import { PluginHooks } from "@sleepy-ai/core/plugin/hooks"
+import { PluginHost } from "@sleepy-ai/core/plugin/host"
+import { Provider } from "@sleepy-ai/core/provider"
+import { Session } from "@sleepy-ai/core/session"
 import { Effect, Schema } from "effect"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "../plugin/fixture"
@@ -170,14 +170,14 @@ describe("ConfigPolicyPlugin.Plugin", () => {
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.openai, () => {})
         catalog.update(Provider.ID.anthropic, () => {})
-        catalog.update(Provider.ID.opencode, () => {})
+        catalog.update(Provider.ID.sleepycode, () => {})
       })
-      yield* managed.set({ statements: [provider("deny", "*"), provider("allow", "opencode")] })
+      yield* managed.set({ statements: [provider("deny", "*"), provider("allow", "sleepycode")] })
       yield* addPlugin([document(provider("allow", "anthropic"))])
 
       expect(yield* catalog.get(Provider.ID.anthropic)).toBeUndefined()
       expect(yield* catalog.get(Provider.ID.openai)).toBeUndefined()
-      expect(yield* catalog.get(Provider.ID.opencode)).toBeDefined()
+      expect(yield* catalog.get(Provider.ID.sleepycode)).toBeDefined()
     }),
   )
 

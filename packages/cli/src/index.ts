@@ -1,26 +1,26 @@
 #!/usr/bin/env bun
 
-import { ensurePluginRuntime } from "@opencode/plugin/runtime"
+import { ensurePluginRuntime } from "@sleepy-ai/plugin/runtime"
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Cause, Effect } from "effect"
 import { getErrorReported } from "effect/Runtime"
 import { Commands } from "./commands/commands"
 import { Runtime } from "./framework/runtime"
-import { Observability } from "@opencode/util/observability"
+import { Observability } from "@sleepy-ai/util/observability"
 import { Updater } from "./services/updater"
-import { OPENCODE_ARTIFACT, OPENCODE_CHANNEL, OPENCODE_LOCAL, OPENCODE_VERSION } from "./version"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Global } from "@opencode/util/global"
-import { AppProcess } from "@opencode/util/process"
+import { SLEEPYCODE_ARTIFACT, SLEEPYCODE_CHANNEL, SLEEPYCODE_LOCAL, SLEEPYCODE_VERSION } from "./version"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Global } from "@sleepy-ai/util/global"
+import { AppProcess } from "@sleepy-ai/util/process"
 import { Config } from "./config"
-import { Npm } from "@opencode/util/npm"
-import { EffectFlock } from "@opencode/util/effect-flock"
+import { Npm } from "@sleepy-ai/util/npm"
+import { EffectFlock } from "@sleepy-ai/util/effect-flock"
 import { Heap } from "./heap"
 import { CpuProfile } from "./cpu-profile"
 
 ensurePluginRuntime()
 
-if (process.env.OPENCODE_SSH_ASKPASS_PORT) {
+if (process.env.SLEEPYCODE_SSH_ASKPASS_PORT) {
   const { askpass } = await import("./ssh-askpass")
   process.exit(await Effect.runPromise(askpass.pipe(Effect.provide(NodeServices.layer))))
 }
@@ -100,12 +100,12 @@ Effect.gen(function* () {
     }),
   )
   yield* Effect.logInfo("cli starting", {
-    version: OPENCODE_VERSION,
-    channel: OPENCODE_CHANNEL,
-    local: OPENCODE_LOCAL,
+    version: SLEEPYCODE_VERSION,
+    channel: SLEEPYCODE_CHANNEL,
+    local: SLEEPYCODE_LOCAL,
     args: process.argv.slice(2),
   })
-  return yield* Runtime.run(Commands, Handlers, { version: OPENCODE_VERSION })
+  return yield* Runtime.run(Commands, Handlers, { version: SLEEPYCODE_VERSION })
 }).pipe(
   Effect.catchCause((cause) =>
     Effect.logError("cli process failed", {
@@ -120,7 +120,7 @@ Effect.gen(function* () {
     LayerNode.compile(LayerNode.group([Global.node, AppProcess.node, Npm.node, EffectFlock.node]), {
       replacements: [
         Global.node.replace(
-          Global.layerWith(process.env.OPENCODE_CONFIG_DIR ? { config: process.env.OPENCODE_CONFIG_DIR } : {}),
+          Global.layerWith(process.env.SLEEPYCODE_CONFIG_DIR ? { config: process.env.SLEEPYCODE_CONFIG_DIR } : {}),
         ),
       ],
     }),
@@ -129,9 +129,9 @@ Effect.gen(function* () {
     Observability.layer({
       endpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
       headers: process.env.OTEL_EXPORTER_OTLP_HEADERS,
-      client: process.env.OPENCODE_CLIENT ?? OPENCODE_ARTIFACT,
-      version: OPENCODE_VERSION,
-      channel: OPENCODE_CHANNEL,
+      client: process.env.SLEEPYCODE_CLIENT ?? SLEEPYCODE_ARTIFACT,
+      version: SLEEPYCODE_VERSION,
+      channel: SLEEPYCODE_CHANNEL,
     }),
   ),
   Effect.provide(NodeServices.layer),

@@ -1,15 +1,15 @@
 import { describe, expect, test } from "bun:test"
-import { Money } from "@opencode/schema/money"
+import { Money } from "@sleepy-ai/schema/money"
 import { Effect, Fiber, Layer, Ref, Scope, Stream } from "effect"
 import { HttpClient, HttpClientResponse } from "effect/http"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNodePlatform } from "@opencode/util/effect/app-node-platform"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { KV } from "@opencode/core/kv"
-import { Model } from "@opencode/core/model"
-import { bodyDigest, ModelsDev } from "@opencode/core/models-dev"
-import { Provider } from "@opencode/core/provider"
+import { AppNodeBuilder } from "@sleepy-ai/core/effect/app-node-builder"
+import { LayerNodePlatform } from "@sleepy-ai/util/effect/app-node-platform"
+import { LayerNode } from "@sleepy-ai/util/effect/layer-node"
+import { Bus } from "@sleepy-ai/core/bus"
+import { KV } from "@sleepy-ai/core/kv"
+import { Model } from "@sleepy-ai/core/model"
+import { bodyDigest, ModelsDev } from "@sleepy-ai/core/models-dev"
+import { Provider } from "@sleepy-ai/core/provider"
 import { it } from "./lib/effect"
 
 const cacheKey = "models-dev:catalog"
@@ -49,7 +49,7 @@ const fixtureSnapshot = [
       id: Provider.ID.make("acme"),
       name: "Acme",
       activation: "auto",
-      package: "@opencode/ai/providers/openai-compatible",
+      package: "@sleepy-ai/ai/providers/openai-compatible",
     },
     models: [
       {
@@ -112,7 +112,7 @@ const fixture2Snapshot = [
       id: Provider.ID.make("beta"),
       name: "Beta",
       activation: "auto",
-      package: "@opencode/ai/providers/openai-compatible",
+      package: "@sleepy-ai/ai/providers/openai-compatible",
     },
     models: [
       {
@@ -279,14 +279,14 @@ describe("ModelsDev Service", () => {
         cache,
         ModelsDev.Service.use((service) => service.get()),
       )
-      expect(result[0]?.info.package).toBe("@opencode/ai/providers/openai-compatible")
-      expect(result[0]?.models[0]?.package).toBe("@opencode/ai/providers/openai")
-      expect(result[1]?.info.package).toBe("@opencode/ai/providers/cloudflare-workers-ai")
+      expect(result[0]?.info.package).toBe("@sleepy-ai/ai/providers/openai-compatible")
+      expect(result[0]?.models[0]?.package).toBe("@sleepy-ai/ai/providers/openai")
+      expect(result[1]?.info.package).toBe("@sleepy-ai/ai/providers/cloudflare-workers-ai")
       expect(result[1]?.info.settings).toBeUndefined()
-      expect(result[2]?.info.package).toBe("@opencode/ai/providers/azure/responses")
+      expect(result[2]?.info.package).toBe("@sleepy-ai/ai/providers/azure/responses")
       expect(result[2]?.models.find((model) => model.id === "gpt-5")?.package).toBeUndefined()
       expect(result[2]?.models.find((model) => model.id === "custom-chat")?.package).toBe(
-        "@opencode/ai/providers/azure/chat",
+        "@sleepy-ai/ai/providers/azure/chat",
       )
     }),
   )
@@ -429,7 +429,7 @@ describe("ModelsDev Service", () => {
       const final = yield* Ref.get(state)
       expect(final.calls.length).toBe(1)
       expect(final.calls[0].url).toContain("/api.json")
-      expect(final.calls[0].userAgent).toContain("/opencode")
+      expect(final.calls[0].userAgent).toContain("/sleepycode")
     }),
   )
 

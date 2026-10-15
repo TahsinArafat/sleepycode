@@ -101,7 +101,7 @@ export function toolInputString(text: unknown): string | undefined {
 
 /** True when the shell invocation actually landed, as opposed to being rejected or aborted. */
 export function bashSucceeded(part: SessionMessage.Shell): boolean {
-  return part.exit === 0
+  return part.status === "exited"
 }
 
 /**
@@ -153,6 +153,23 @@ export const firstMutatedMainWorktree = Effect.fn("AutoWorktreeHint.firstMutated
 ) {
   return (yield* sessionMutatedMainWorktrees(messages))[0]
 })
+
+/** Whether this single transcript message is the notice itself, marker line included. */
+export function hasAutoWorktreeNotice(message: SessionMessage.Info): boolean {
+  return message.type === "synthetic" && message.text.includes(AUTO_WORKTREE_NOTICE_MARKER)
+}
+
+/**
+ * Whether the notice already landed in this transcript.
+ *
+ * sleepy: the reference fork answered this with an `auto_worktree_hint_sent` column on the
+ * session table. v2 has no such column and adding one needs a migration, so the transcript is
+ * the ledger: the notice is persisted as a synthetic message carrying the marker, which makes
+ * this scan survive compaction and session rebuild without any extra state.
+ */
+export function sessionHasAutoWorktreeNotice(messages: readonly SessionMessage.Info[]): boolean {
+  return messages.some(hasAutoWorktreeNotice)
+}
 
 /**
  * The user-facing copy. Injected as a user-side `<system-reminder>` so it lands in the

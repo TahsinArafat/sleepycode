@@ -1,3 +1,6 @@
+import fs from "node:fs"
+import os from "node:os"
+import path from "node:path"
 import { Duration, Effect, Equal, Option, Schema, SchemaGetter, Scope, Semaphore, Stream } from "effect"
 import type { IntegrationOAuthMethodRegistration } from "@sleepy-ai/plugin/effect/integration"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
@@ -17,9 +20,14 @@ import { ConfigProvider } from "@sleepy-ai/schema/config/provider"
 import { Mcp } from "@sleepy-ai/schema/mcp"
 import { Money } from "@sleepy-ai/schema/money"
 
-const defaultServer = process.env.SLEEPY_PLATFORM_URL ?? "https://www.sleepyai.org"
+const defaultServer = process.env.SLEEPY_CONSOLE_URL ?? "https://opencode.ai/console"
 const clientID = "sleepycode-cli"
+const sleepyClientID = "sleepy-cli"
 const methodID = Integration.MethodID.make("device")
+
+const isSleepyPlatform = (server: string) =>
+  server.includes("sleepyai.org") ||
+  (process.env.SLEEPY_PLATFORM_URL != null && server === process.env.SLEEPY_PLATFORM_URL)
 // Drop statements whose action or effect is a value this version does not know, so a newer Console can
 // extend either enum. Malformed statements still fail validation.
 const RemotePolicies = Schema.Array(Schema.Unknown).pipe(
@@ -59,7 +67,8 @@ const RemoteResponse = Schema.Struct({
 const Device = Schema.Struct({
   device_code: Schema.String,
   user_code: Schema.String,
-  verification_uri_complete: Schema.String,
+  verification_uri: Schema.optional(Schema.String),
+  verification_uri_complete: Schema.optional(Schema.String),
   expires_in: Schema.Number,
   interval: Schema.Number,
 })
@@ -67,6 +76,10 @@ const Token = Schema.Struct({
   access_token: Schema.String,
   refresh_token: Schema.String,
   expires_in: Schema.Number,
+  token_type: Schema.optional(Schema.String),
+  endpoint: Schema.optional(Schema.NullOr(Schema.String)),
+  tier: Schema.optional(Schema.NullOr(Schema.String)),
+  email: Schema.optional(Schema.NullOr(Schema.String)),
   org_id: Schema.optional(Schema.NullOr(Schema.String)),
 })
 const TokenPending = Schema.Struct({ error: Schema.String })
@@ -79,7 +92,6 @@ const SsoRequired = Schema.Struct({
   orgId: Schema.String,
   connectionId: Schema.String,
 })
-const InvalidGrant = Schema.Struct({ error: Schema.Literal("invalid_grant") })
 // Console's 401 when the session behind the access token was revoked or expired.
 const Unauthorized = Schema.Struct({ _tag: Schema.Literal("Unauthorized") })
 const signedOutMessage = "Reconnect SleepyCode Console to continue"
@@ -122,15 +134,28 @@ function oauth(http: HttpClient.HttpClient) {
     authorize: (answer) =>
       Effect.gen(function* () {
         const server = yield* normalizeServer(answer.server ?? defaultServer)
-        const device = yield* post(
-          http,
-          `${server}/auth/device/code`,
-          { client_id: clientID, supports_org_scope: true },
-          Device,
-        )
+        const isSleepy = isSleepyPlatform(server)
+        const device = isSleepy
+          ? yield* post(
+              http,
+              `${server}/api/auth/oauth/device`,
+              { client_id: sleepyClientID },
+              Device,
+            )
+          : yield* post(
+              http,
+              `${server}/auth/device/code`,
+              { client_id: clientID, supports_org_scope: true },
+              Device,
+            )
+        const verificationUrl =
+          device.verification_uri_complete ||
+          (device.verification_uri
+            ? `${device.verification_uri}?code=${encodeURIComponent(device.user_code)}`
+            : `${server}/auth/device?code=${encodeURIComponent(device.user_code)}`)
         const verification = yield* Effect.try({
           try: () => {
-            const url = new URL(device.verification_uri_complete, `${server}/`)
+            const url = new URL(verificationUrl, `${server}/`)
             if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("expected HTTP(S)")
             return url
           },
@@ -146,26 +171,44 @@ function oauth(http: HttpClient.HttpClient) {
       }),
     refresh: (credential) =>
       Effect.gen(function* () {
-        const response = yield* send(http, `${serverUrl(credential)}/auth/device/token`, {
-          grant_type: "refresh_token",
-          refresh_token: credential.refresh,
-          client_id: clientID,
-        })
-        if (response.status === 400) {
-          const body = yield* HttpClientResponse.schemaBodyJson(InvalidGrant)(response).pipe(Effect.option)
-          if (Option.isSome(body)) return yield* new SignedOutError()
+        const server = serverUrl(credential)
+        const isSleepy = isSleepyPlatform(server)
+        const response = isSleepy
+          ? yield* send(http, `${server}/api/auth/token/refresh`, {
+              refresh_token: credential.refresh,
+            })
+          : yield* send(http, `${server}/auth/device/token`, {
+              grant_type: "refresh_token",
+              refresh_token: credential.refresh,
+              client_id: clientID,
+            })
+        if (response.status === 400 || response.status === 401) {
+          return yield* new SignedOutError()
         }
         const token = yield* HttpClientResponse.filterStatusOk(response).pipe(
           Effect.flatMap(HttpClientResponse.schemaBodyJson(Token)),
         )
-        // Persist rotated tokens without depending on discovery requests.
+        if (isSleepy) {
+          yield* Effect.promise(async () => {
+            try {
+              const file = path.join(os.homedir(), ".config", "sleepy", "gateway.json")
+              if (fs.existsSync(file)) {
+                const current = JSON.parse(await fs.promises.readFile(file, "utf-8"))
+                current.access_token = token.access_token
+                if (token.refresh_token) current.refresh_token = token.refresh_token
+                current.expires_at = Date.now() + token.expires_in * 1000
+                await fs.promises.writeFile(file, JSON.stringify(current, null, 2), "utf-8")
+              }
+            } catch {}
+          })
+        }
         return {
           ...credential,
           access: token.access_token,
-          refresh: token.refresh_token,
+          refresh: token.refresh_token ?? credential.refresh,
           expires: Date.now() + token.expires_in * 1000,
-          metadata:
-            token.org_id == null
+          metadata: {
+            ...(token.org_id == null
               ? credential.metadata
               : {
                   ...credential.metadata,
@@ -174,7 +217,10 @@ function oauth(http: HttpClient.HttpClient) {
                     credential.metadata?.orgID === token.org_id && typeof credential.metadata.orgName === "string"
                       ? credential.metadata.orgName
                       : token.org_id,
-                },
+                }),
+            ...(token.email ? { email: token.email } : {}),
+            ...(token.tier ? { tier: token.tier } : {}),
+          },
         }
       }),
     label: (credential) => (typeof credential.metadata?.orgName === "string" ? credential.metadata.orgName : undefined),
@@ -254,7 +300,7 @@ export const SleepycodePlugin = define<HttpClient.HttpClient | Bus.Service | Man
 
     yield* ctx.integration.transform((editor) => {
       editor.update("sleepycode", (integration) => {
-        integration.name = "SleepyCode Console"
+        integration.name = "Sleepy AI"
       })
       editor.method.update(oauth(http))
       editor.method.update({ integrationID: "sleepycode", method: { type: "key", label: "API key (service account)" } })
@@ -487,10 +533,14 @@ export const SleepycodePlugin = define<HttpClient.HttpClient | Bus.Service | Man
 })
 
 function fetchConfig(http: HttpClient.HttpClient, value: Credential.Key | Credential.OAuth) {
+  const server = serverUrl(value)
+  if (isSleepyPlatform(server)) {
+    return Effect.succeed(undefined)
+  }
   // Scoped so responses whose body is never read (404, errors) are released here instead of by a GC-time abort.
   return HttpClient.withScope(http)
     .execute(
-      HttpClientRequest.get(`${serverUrl(value)}/api/v2/config`).pipe(
+      HttpClientRequest.get(`${server}/api/v2/config`).pipe(
         HttpClientRequest.acceptJson,
         HttpClientRequest.setHeaders(credentialHeaders(value)),
       ),
@@ -582,17 +632,20 @@ function normalizeServer(input: unknown) {
 }
 
 function poll(http: HttpClient.HttpClient, server: string, deviceCode: string, interval: Duration.Duration) {
+  const isSleepy = isSleepyPlatform(server)
+  const endpoint = isSleepy ? `${server}/api/auth/oauth/device/token` : `${server}/auth/device/token`
+  const body = {
+    grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+    device_code: deviceCode,
+    client_id: isSleepy ? sleepyClientID : clientID,
+  }
   const loop = (wait: Duration.Duration): Effect.Effect<Credential.OAuth, unknown> =>
     Effect.gen(function* () {
       yield* Effect.sleep(wait)
       const result = yield* post(
         http,
-        `${server}/auth/device/token`,
-        {
-          grant_type: "urn:ietf:params:oauth:grant-type:device_code",
-          device_code: deviceCode,
-          client_id: clientID,
-        },
+        endpoint,
+        body,
         DeviceToken,
         false,
       )
@@ -608,6 +661,42 @@ function poll(http: HttpClient.HttpClient, server: string, deviceCode: string, i
 
 function credential(http: HttpClient.HttpClient, server: string, token: typeof Token.Type) {
   return Effect.gen(function* () {
+    if (isSleepyPlatform(server)) {
+      yield* Effect.promise(async () => {
+        try {
+          const dir = path.join(os.homedir(), ".config", "sleepy")
+          await fs.promises.mkdir(dir, { recursive: true })
+          const gatewayConfig = {
+            access_token: token.access_token,
+            refresh_token: token.refresh_token,
+            expires_at: Date.now() + token.expires_in * 1000,
+            endpoint: token.endpoint ?? server,
+            dashboard_url: server,
+            email: token.email ?? undefined,
+            tier: token.tier ?? undefined,
+          }
+          await fs.promises.writeFile(
+            path.join(dir, "gateway.json"),
+            JSON.stringify(gatewayConfig, null, 2),
+            "utf-8",
+          )
+        } catch {}
+      })
+
+      return Credential.OAuth.make({
+        type: "oauth" as const,
+        methodID,
+        access: token.access_token,
+        refresh: token.refresh_token,
+        expires: Date.now() + token.expires_in * 1000,
+        metadata: {
+          server,
+          email: token.email ?? undefined,
+          tier: token.tier ?? undefined,
+        },
+      })
+    }
+
     const [user, orgs] = yield* Effect.all(
       [
         get(http, `${server}/api/user`, token.access_token, User),

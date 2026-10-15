@@ -55,26 +55,38 @@ const checkCredentials = (configDir: string) =>
 
 const testGatewayLatency = (endpoint: string) =>
   Effect.gen(function* () {
-    const healthUrl = `${endpoint}/api/monitoring/health`
+    const healthUrls = [`${endpoint}/api/healthz`, `${endpoint}/api/status`, `${endpoint}/api/monitoring/health`]
     const s = spinner()
-    s.start(`Testing Sleepy Gateway connectivity (${healthUrl})...`)
+    s.start(`Testing Sleepy Gateway connectivity...`)
 
-    const start = Date.now()
-    try {
-      const response = yield* Effect.promise(() => fetch(healthUrl))
-      const latency = Date.now() - start
+    let connected = false
+    let latency = 0
+    let lastStatus = 0
+    let testedUrl = healthUrls[0]
 
-      if (response.ok) {
-        s.stop(`Sleepy Gateway is responsive (${latency}ms latency)`)
-        return true
-      }
-
-      s.stop(`Failed to connect to Sleepy Gateway at ${healthUrl} (HTTP ${response.status})`, 1)
-      return false
-    } catch {
-      s.stop(`Failed to connect to Sleepy Gateway at ${healthUrl}`, 1)
-      return false
+    for (const url of healthUrls) {
+      testedUrl = url
+      const start = Date.now()
+      try {
+        const response = yield* Effect.promise(() =>
+          fetch(url, { signal: AbortSignal.timeout(5000) }).catch(() => null),
+        )
+        if (response?.ok) {
+          latency = Date.now() - start
+          connected = true
+          break
+        }
+        if (response) lastStatus = response.status
+      } catch {}
     }
+
+    if (connected) {
+      s.stop(`Sleepy Gateway is responsive (${latency}ms latency)`)
+      return true
+    }
+
+    s.stop(`Failed to connect to Sleepy Gateway at ${testedUrl} (HTTP ${lastStatus})`, 1)
+    return false
   })
 
 const checkWorkspace = () => {

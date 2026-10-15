@@ -152,13 +152,13 @@ export const make = Effect.fn("Session.make")(function* () {
    * for the marker is the ledger and the copy is published as its own persisted synthetic message
    * instead of a user-message part. Advisory only — a failure here must not fail the prompt.
    */
-  const autoWorktreeNotice = Effect.fn("Session.autoWorktreeNotice")((sessionID: SessionSchema.ID) =>
+  const autoWorktreeNotice = Effect.fn("Session.autoWorktreeNotice")((session: SessionSchema.Info) =>
     Effect.gen(function* () {
-      const messages = yield* store.messages({ sessionID })
+      const messages = yield* store.messages({ sessionID: session.id })
       if (AutoWorktreeHint.sessionHasAutoWorktreeNotice(messages)) return
-      const main = yield* AutoWorktreeHint.firstMutatedMainWorktree(messages)
+      const main = yield* AutoWorktreeHint.firstMutatedMainWorktree(messages, session.location.directory)
       if (!main) return
-      yield* synthetic(sessionID, { text: AutoWorktreeHint.buildAutoWorktreeNotice(main) })
+      yield* synthetic(session.id, { text: AutoWorktreeHint.buildAutoWorktreeNotice(main) })
     }).pipe(Effect.catch(() => Effect.void)),
   )
   const prompt = Effect.fn("Session.prompt")((sessionID: SessionSchema.ID, input: PromptRequest) =>
@@ -192,7 +192,7 @@ export const make = Effect.fn("Session.make")(function* () {
         )
         // One-shot auto-worktree notice, published before this turn is handed to the executor so
         // it is already part of the transcript the model builds its request from.
-        yield* autoWorktreeNotice(sessionID)
+        yield* autoWorktreeNotice(session)
         if (input.resume !== false) yield* execution.wake(sessionID)
         return admitted
       }),

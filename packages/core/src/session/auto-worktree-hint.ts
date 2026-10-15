@@ -1,7 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs"
 import { Effect } from "effect"
 import path from "path"
-import { Location } from "../location.js"
 import { SessionMessage } from "./message.js"
 
 /** Marker that keys off successful project files. */
@@ -109,49 +108,52 @@ export function bashSucceeded(part: SessionMessage.Shell): boolean {
  * Empty means the session bound to a non-git scratch dir that `cd`s into another
  * project's main checkout still hits the notice copy (plain `ls` will not).
  */
-export const sessionMutatedMainWorktrees = Effect.fn("AutoWorktreeHint.sessionMutatedMainWorktrees")(
-  function* (messages: readonly SessionMessage.Info[]) {
-    const cwd = (yield* Location.Service).directory
-    const hits = new Set<string>()
-    const consider = (raw: string) => {
-      const main = findGitMainWorktree(path.resolve(cwd, raw))
-      if (main) hits.add(main)
-    }
-    for (const message of messages) {
-      if (message.type === "assistant") {
-        for (const part of message.content) {
-          if (part.type !== "tool") continue
-          if (!FILE_WRITE_TOOLS.has(part.name)) continue
-          // apply_patch has no single file path; fall back to the session cwd
-          if (part.name === "apply_patch") {
-            hits.add(cwd)
-            continue
-          }
-          if (part.state.status === "running") continue
-          const input = part.state.input
-          const raw = toolInputString(
-            typeof input === "object" && input !== null ? (input.file_path ?? input.notebook_path) : undefined,
-          )
-          if (raw) consider(raw)
+export const sessionMutatedMainWorktrees = Effect.fn("AutoWorktreeHint.sessionMutatedMainWorktrees")(function* (
+  messages: readonly SessionMessage.Info[],
+  cwd: string,
+) {
+  const hits = new Set<string>()
+  const consider = (raw: string) => {
+    const main = findGitMainWorktree(path.resolve(cwd, raw))
+    if (main) hits.add(main)
+  }
+  for (const message of messages) {
+    if (message.type === "assistant") {
+      for (const part of message.content) {
+        if (part.type !== "tool") continue
+        if (!FILE_WRITE_TOOLS.has(part.name)) continue
+        // apply_patch has no single file path; fall back to the session cwd
+        if (part.name === "apply_patch") {
+          hits.add(cwd)
+          continue
         }
-        continue
+        if (part.state.status === "running") continue
+        const input = part.state.input
+        const raw = toolInputString(
+          typeof input === "object" && input !== null ? (input.file_path ?? input.notebook_path) : undefined,
+        )
+        if (raw) consider(raw)
       }
-      if (message.type !== "shell") continue
-      if (!bashSucceeded(message)) continue
-      // Patterns match real command names in ~/.local/share/sleepycode/log/sleepycode.log.
-      // Falsely one-per-PID call patterns cannot happen because those forms are
-      // distinctive, and without the args (`lsfoo`, `mouse-cursor-daemon`)
-      // the "cursor" and "cursor-daemon" cases are ambiguous anyway.
-      const main = message.metadata?.mainWorktree
-      if (typeof main === "string") consider(main)
+      continue
     }
-    return [...hits]
-  },
-)/** First git main worktree this transcript mutated, or undefined. */
+    if (message.type !== "shell") continue
+    if (!bashSucceeded(message)) continue
+    // Patterns match real command names in ~/.local/share/sleepycode/log/sleepycode.log.
+    // Falsely one-per-PID call patterns cannot happen because those forms are
+    // distinctive, and without the args (`lsfoo`, `mouse-cursor-daemon`)
+    // the "cursor" and "cursor-daemon" cases are ambiguous anyway.
+    const main = message.metadata?.mainWorktree
+    if (typeof main === "string") consider(main)
+  }
+  return [...hits]
+})
+
+/** First git main worktree this transcript mutated, or undefined. */
 export const firstMutatedMainWorktree = Effect.fn("AutoWorktreeHint.firstMutatedMainWorktree")(function* (
   messages: readonly SessionMessage.Info[],
+  cwd: string,
 ) {
-  return (yield* sessionMutatedMainWorktrees(messages))[0]
+  return (yield* sessionMutatedMainWorktrees(messages, cwd))[0]
 })
 
 /** Whether this single transcript message is the notice itself, marker line included. */

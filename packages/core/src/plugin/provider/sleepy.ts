@@ -34,6 +34,7 @@ const DeviceToken = Schema.Union([Token, TokenPending])
 export interface GatewayConfig {
   access_token?: string
   refresh_token?: string
+  api_key?: string
   expires_at?: number
   endpoint?: string
   dashboard_url?: string
@@ -361,12 +362,28 @@ export const SleepyGatewayPlugin = define({
           startDeviceFlow(typeof answer?.server === "string" ? answer.server.replace(/\/+$/, "") : DEFAULT_PLATFORM_URL),
         refresh: refreshCredential,
       })
+      // Virtual key support: https://www.sleepyai.org issues `sk-…` keys that work as a
+      // plain bearer credential, so no device flow is needed.
+      editor.method.update({
+        integrationID: Integration.ID.make("sleepy"),
+        method: {
+          type: "key",
+          label: "API key",
+          form: [
+            {
+              key: "server",
+              type: "string",
+              format: "uri",
+              hidden: true,
+              default: DEFAULT_PLATFORM_URL,
+            },
+          ],
+        },
+      })
     })
 
     const loaded = yield* Effect.promise(() => readGatewayConfig())
-    if (!loaded) return
-
-    let { path: configPath, config } = loaded
+    let config = loaded?.config ?? ({} satisfies GatewayConfig)
     const dashboardUrl =
       config.endpoint ??
       config.dashboard_url ??
@@ -384,18 +401,18 @@ export const SleepyGatewayPlugin = define({
           refresh_token: refreshed.refresh_token ?? config.refresh_token,
           expires_at: refreshed.expires_at,
         }
-        yield* Effect.promise(() => writeGatewayConfig(configPath, config))
+        yield* Effect.promise(() => writeGatewayConfig(loaded!.path, config))
       }
     }
 
-    const token = config.access_token
-    if (!token) return
-
     if (config.refresh_token) {
-      setupSessionChecker(dashboardUrl, configPath, config.refresh_token)
+      setupSessionChecker(dashboardUrl, loaded!.path, config.refresh_token)
     }
 
-    const rawModels = yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token))
+    // An empty placeholder lets the model resolver swap in the credential connected
+    // through `sleepy auth login` (API key or OAuth) when there is no stored session.
+    const token = config.access_token ?? config.api_key
+    const rawModels = token ? yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token)) : []
     const providerID = Provider.ID.make("sleepy")
 
     // If API returned models, parse them; otherwise provide default sleepy-auto
@@ -413,11 +430,11 @@ export const SleepyGatewayPlugin = define({
           package: "@sleepy-ai/ai/providers/openai-compatible",
           integrationID: Integration.ID.make("sleepy"),
           headers: {
-            Authorization: `Bearer ${token}`,
             "X-Sleepy-Source": "sleepycode-cli",
           },
           settings: {
             baseURL: `${dashboardUrl}/api/v1`,
+            apiKey: token ?? "",
           },
         },
         models,

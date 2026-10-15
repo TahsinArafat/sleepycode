@@ -986,6 +986,16 @@ function App() {
         },
         category: "Integration",
       },
+      {
+        name: "provider.disconnect",
+        title: "Sign out of an integration",
+        suggested: connected(),
+        slash: { name: "logout", aliases: ["signout", "disconnect"] },
+        run: () => {
+          dialog.replace(() => <DialogIntegration connectedOnly />)
+        },
+        category: "Integration",
+      },
       ...(app.highlights?.length
         ? [
             {

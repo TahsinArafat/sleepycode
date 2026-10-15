@@ -988,11 +988,18 @@ function App() {
       },
       {
         name: "provider.disconnect",
-        title: "Sign out of an integration",
-        suggested: connected(),
+        title: "Sign out of Sleepy",
         slash: { name: "logout", aliases: ["signout", "disconnect"] },
         run: () => {
-          dialog.replace(() => <DialogIntegration connectedOnly />)
+          void client.api.sleepy
+            .logout()
+            .then((result) => {
+              toast.show({
+                variant: "success",
+                message: result.email ? `Signed out ${result.email}` : "Already signed out",
+              })
+            })
+            .catch(toast.error)
         },
         category: "Integration",
       },

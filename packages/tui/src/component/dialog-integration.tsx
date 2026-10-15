@@ -87,13 +87,7 @@ export function connectionSummary(integration: IntegrationInfo) {
 }
 
 export function DialogIntegration(
-  props: {
-    onConnected?: OnIntegrationConnected
-    integrationID?: string
-    autoConnect?: boolean
-    /** Restricts the list to integrations that already hold a credential, for signing out. */
-    connectedOnly?: boolean
-  } = {},
+  props: { onConnected?: OnIntegrationConnected; integrationID?: string; autoConnect?: boolean } = {},
 ) {
   const data = useData()
   const currentLocation = useLocation()
@@ -101,9 +95,9 @@ export function DialogIntegration(
   const theme = useTheme().surface("dialog")
   const location = currentLocation.ref ?? data.location.default()
   const integrations = createMemo(() =>
-    integrationOptions(data.location.integration.list(location) ?? [])
-      .filter((integration) => props.integrationID === undefined || integration.id === props.integrationID)
-      .filter((integration) => !props.connectedOnly || credentialConnections(integration).length > 0),
+    integrationOptions(data.location.integration.list(location) ?? []).filter(
+      (integration) => props.integrationID === undefined || integration.id === props.integrationID,
+    ),
   )
 
   createEffect(() => {
@@ -116,15 +110,6 @@ export function DialogIntegration(
       return
     }
     selectMethod(integration, methods, location, dialog, props.onConnected)
-  })
-
-  // A one-row list before the accounts is a wasted keystroke, and with a single
-  // connected integration there is nothing to disambiguate.
-  createEffect(() => {
-    if (!props.connectedOnly || props.integrationID !== undefined) return
-    const list = integrations()
-    if (list.length !== 1) return
-    manageConnections(list[0], connectMethods(list[0]), location, dialog, props.onConnected)
   })
 
   const options = createMemo(() => {
@@ -157,15 +142,11 @@ export function DialogIntegration(
 
   return (
     <DialogSelect
-      title={props.connectedOnly ? "Sign out of an integration" : "Connect an integration"}
+      title="Connect an integration"
       options={options()}
       emptyView={
         <box paddingLeft={4} paddingRight={4}>
-          <text fg={theme.text.muted}>
-            {props.connectedOnly
-              ? "No integrations are signed in — a Sleepy account session is cleared with `sleepy logout`"
-              : "No integrations available"}
-          </text>
+          <text fg={theme.text.muted}>No integrations available</text>
         </box>
       }
       noMatchView={

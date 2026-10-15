@@ -7,6 +7,7 @@ import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
 import { Integration } from "@sleepy-ai/schema/integration"
 import { Credential } from "../../credential.js"
+import { Integration as IntegrationService } from "../../integration.js"
 import { Model } from "../../model.js"
 
 const CLIENT_ID = "sleepy-cli"
@@ -108,55 +109,50 @@ async function refreshGatewayToken(dashboardUrl: string, refreshToken: string): 
   }
 }
 
+/** Mirrors `GET {endpoint}/api/v1/models`, and the public `GET {endpoint}/api/models`. */
 interface RawModelItem {
   id?: string
+  modelId?: string
   name?: string
-  context_length?: number
-  context_window?: number
-  max_tokens?: number
-  max_output_tokens?: number
-  pricing?: {
-    prompt?: number
-    completion?: number
-    input?: number
-    output?: number
-  }
+  created?: number
+  contextWindow?: number
+  maxOutputLimit?: number
+  inputPrice?: number
+  outputPrice?: number
+  cacheReadPrice?: number
+  runnable?: boolean
 }
 
 function parseGatewayModels(items: RawModelItem[], providerID: Provider.ID): Model.Info[] {
-  const now = Date.now()
   return items.map((raw) => {
-    const modelID = Model.ID.make(raw.id ?? "sleepy-auto")
-    const id = modelID
-    const context = raw.context_window ?? raw.context_length ?? 128000
-    const output = raw.max_output_tokens ?? raw.max_tokens ?? 8192
-    const inputCost = raw.pricing?.input ?? raw.pricing?.prompt ?? 0
-    const outputCost = raw.pricing?.output ?? raw.pricing?.completion ?? 0
-
+    const modelID = Model.ID.make(raw.id ?? raw.modelId ?? raw.name ?? "unknown")
     return {
-      id,
+      id: modelID,
       modelID,
       providerID,
-      name: raw.name ?? raw.id ?? "Sleepy Model",
+      name: raw.name ?? raw.id ?? raw.modelId ?? modelID,
       capabilities: {
         tools: true,
         input: ["text", "image"],
         output: ["text"],
       },
       variants: [],
-      time: { released: now },
+      time: { released: raw.created ?? 0 },
       cost: [
         {
-          input: Money.USDPerMillionTokens.make(inputCost),
-          output: Money.USDPerMillionTokens.make(outputCost),
-          cache: { read: Money.USDPerMillionTokens.zero, write: Money.USDPerMillionTokens.zero },
+          input: Money.USDPerMillionTokens.make(raw.inputPrice ?? 0),
+          output: Money.USDPerMillionTokens.make(raw.outputPrice ?? 0),
+          cache: {
+            read: Money.USDPerMillionTokens.make(raw.cacheReadPrice ?? 0),
+            write: Money.USDPerMillionTokens.zero,
+          },
         },
       ],
       status: "active" as const,
-      enabled: true,
+      enabled: raw.runnable ?? true,
       limit: {
-        context,
-        output,
+        context: raw.contextWindow ?? 0,
+        output: raw.maxOutputLimit ?? 0,
       },
     }
   })
@@ -411,15 +407,21 @@ export const SleepyGatewayPlugin = define({
 
     // An empty placeholder lets the model resolver swap in the credential connected
     // through `sleepy auth login` (API key or OAuth) when there is no stored session.
-    const token = config.access_token ?? config.api_key
-    const rawModels = token ? yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token)) : []
+    const integrations = yield* IntegrationService.Service
     const providerID = Provider.ID.make("sleepy")
+    const active = yield* integrations.connection.active(Integration.ID.make("sleepy"))
+    const connected =
+      active?.type === "credential"
+        ? yield* integrations.connection.resolve(active).pipe(Effect.catch(() => Effect.succeed(undefined)))
+        : undefined
+    const token =
+      config.access_token ??
+      config.api_key ??
+      (connected?.type === "key" ? connected.key : connected?.type === "oauth" ? connected.access : undefined)
+    if (!token) return
 
-    // If API returned models, parse them; otherwise provide default sleepy-auto
-    const models =
-      rawModels.length > 0
-        ? parseGatewayModels(rawModels, providerID)
-        : parseGatewayModels([{ id: "sleepy-auto", name: "Sleepy Auto" }], providerID)
+    const models = parseGatewayModels(yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token)), providerID)
+    if (models.length === 0) return
 
     yield* ctx.provider.transform((providers: any) => {
       providers.add({

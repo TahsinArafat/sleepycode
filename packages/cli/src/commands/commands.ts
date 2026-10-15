@@ -561,6 +561,21 @@ const Root = Spec.make(typeof SLEEPYCODE_CLI_NAME === "string" ? SLEEPYCODE_CLI_
         stdio: Flag.Boolean("stdio").pipe(Flag.withDefault(false)),
       },
     }),
+    Spec.make("login", {
+      description: "Log in to Sleepy via OAuth or device code",
+      params: {
+        device: Flag.Boolean("device").pipe(
+          Flag.withDescription("Use device code flow for environments without a browser"),
+          Flag.withDefault(false),
+        ),
+      },
+    }),
+    Spec.make("doctor", {
+      description: "Check Sleepy environment diagnostics and API connectivity",
+    }),
+    Spec.make("init", {
+      description: "Initialize a new Sleepy project in the current directory",
+    }),
   ],
 })
 

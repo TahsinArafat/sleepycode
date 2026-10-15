@@ -5,6 +5,7 @@ import fs from "node:fs/promises"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
+import { Integration } from "@sleepy-ai/schema/integration"
 import { Model } from "../../model.js"
 
 export interface GatewayConfig {
@@ -191,6 +192,21 @@ function setupSessionChecker(dashboardUrl: string, configPath: string, initialRe
 export const SleepyGatewayPlugin = define({
   id: "sleepycode:provider:sleepy",
   effect: Effect.fn(function* (ctx) {
+    yield* ctx.integration.transform((editor) => {
+      editor.update("sleepy", (integration) => {
+        integration.name = "Sleepy AI"
+      })
+      editor.method.update({
+        integrationID: "sleepy",
+        method: {
+          id: Integration.MethodID.make("login"),
+          type: "command",
+          label: "Log in with Sleepy",
+          command: ["sleepy", "login"],
+        },
+      })
+    })
+
     const loaded = yield* Effect.promise(() => readGatewayConfig())
     if (!loaded) return
 
@@ -239,6 +255,7 @@ export const SleepyGatewayPlugin = define({
           name: "Sleepy Gateway",
           activation: "enabled",
           package: "@sleepy-ai/ai/providers/openai-compatible",
+          integrationID: Integration.ID.make("sleepy"),
           headers: {
             Authorization: `Bearer ${token}`,
             "X-Sleepy-Source": "sleepycode-cli",

@@ -18,12 +18,13 @@ import {
 } from "./shared"
 
 const integrationPriority = new Map([
-  ["sleepycode-go", 0],
-  ["sleepycode", 1],
-  ["openai", 2],
-  ["github-copilot", 3],
-  ["anthropic", 4],
-  ["google", 5],
+  ["sleepy", 0],
+  ["sleepycode-go", 1],
+  ["sleepycode", 2],
+  ["openai", 3],
+  ["github-copilot", 4],
+  ["anthropic", 5],
+  ["google", 6],
 ])
 
 export default Runtime.handler(

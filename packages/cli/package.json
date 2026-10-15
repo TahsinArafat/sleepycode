@@ -5,6 +5,7 @@
   "type": "module",
   "license": "MIT",
   "bin": {
+    "sleepy": "./bin/sleepycode.cjs",
     "sleepycode": "./bin/sleepycode.cjs",
     "sleepycode2": "./bin/sleepycode2.cjs"
   },

@@ -49,6 +49,24 @@ describe("SkillPlugin.Plugin", () => {
           description: expect.stringContaining("sleepycode issue"),
         }),
       )
+      expect(skills).toContainEqual(
+        expect.objectContaining({
+          id: "design-blueprint",
+          name: "design-blueprint",
+        }),
+      )
+      expect(skills).toContainEqual(
+        expect.objectContaining({
+          id: "evolve",
+          name: "evolve",
+        }),
+      )
+      expect(skills).toContainEqual(
+        expect.objectContaining({
+          id: "frontend-design",
+          name: "frontend-design",
+        }),
+      )
       expect(report?.content).toContain("- sleepycode version: 1.2.3")
       expect(report?.content).toContain("- install/channel: beta")
     }),

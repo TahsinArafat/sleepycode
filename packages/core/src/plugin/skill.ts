@@ -11,9 +11,16 @@ import { Config } from "../config.js"
 import os from "os"
 import sleepycodeContent from "./skill/sleepycode.md" with { type: "text" }
 import reportContent from "./skill/report.md" with { type: "text" }
+import designBlueprintContent from "./skill/design-blueprint.md" with { type: "text" }
+import evolveContent from "./skill/evolve.md" with { type: "text" }
+import frontendDesignContent from "./skill/frontend-design.md" with { type: "text" }
+import { SkillFile } from "../config/plugin/skill-file.js"
 
 export const SleepycodeContent = sleepycodeContent
 export const ReportContent = reportContent
+export const DesignBlueprintContent = designBlueprintContent
+export const EvolveContent = evolveContent
+export const FrontendDesignContent = frontendDesignContent
 
 export const SleepycodeDescription =
   "Use this skill for any question about SleepyCode itself, including how SleepyCode works, using or configuring it, migrating from V1 to V2, troubleshooting it, developing plugins or integrations, using the SleepyCode SDK, clients, server, or API, and contributing to the SleepyCode codebase. Also use it for SleepyCode agents, commands, skills, tools, permissions, MCP servers, providers, models, themes, keybinds, formatters, the CLI, TUI, desktop app, and web app."
@@ -43,6 +50,16 @@ export const Plugin = define({
           content: reportContent,
         }),
       )
+      for (const [file, content] of [
+        ["/builtin/design-blueprint.md", DesignBlueprintContent],
+        ["/builtin/evolve.md", EvolveContent],
+        ["/builtin/frontend-design.md", FrontendDesignContent],
+      ] as const) {
+        const parsed = SkillFile.parse("/builtin", file, content)
+        if (parsed._tag === "Parsed") {
+          editor.add(parsed.skill)
+        }
+      }
     })
   }),
 })

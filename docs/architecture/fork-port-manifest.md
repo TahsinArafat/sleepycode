@@ -210,3 +210,35 @@ Both tools report them clean. They are nonetheless the most visible MiMo remnant
 - **The 80 real-fork-logic files.** The harder half. Each exists upstream and needs its edits re-applied; they are not additions and carry no keep/drop decision.
 - **A size estimate.** Line counts were not gathered per file, and a total would mislead without them. The dependency graph predicts difficulty here; volume does not.
 - **Any change to the tree.** This document is the triage only. The two drops in Tier 4 that are pure deletions — the fixture leak and the orphaned scratch file — are safe to apply whenever you want them; they were left in place so this stays a read-only artefact.
+---
+
+## Field notes (verified against the fork, 2026-10-15)
+
+Several verdicts above were written from a `git ls-tree` of the wrong branch. The fork-only
+tool files do not exist on any ref tip — they were added by commits on MiMo branches that were
+merged and then rebased away. The authoritative source is commit **`f02ee661a6`**
+(2026-08-28, "fix(session): fire auto-worktree notice on main-worktree mutations by path (#2270)").
+Read files with `git show f02ee661a6:packages/opencode/src/tool/<name>`.
+
+Corrections and additions:
+
+- **`src/agent/prompt/orchestrator.txt` does not exist** in the fork at all. The fork's
+  `src/agent/prompt/` holds only `checkpoint-writer, compaction, distill, dream, explore,
+  general, generate-gpt, summary, title`. Drop this row.
+- **`src/session/prompt/orchestrator.txt` (210 lines) exists but is orphaned.** `git grep -n
+  "orchestrator" f02ee661a6 -- packages/opencode/src` matches exactly two things: a comment in
+  `cli/cmd/tui/app.tsx` and a string in `test/tool/session-gating.test.ts`. The only session
+  prompt any source imports is `./prompt/minimax.txt`. Porting it adds an unread prompt.
+- **`test/tool/session-gating.test.ts` is the real contract, not the prompt.** It asserts the
+  `session` tool refuses the subagent tool names `session`, `task`, `bash`, `plan`, `edit`, and
+  parses `subagent(task_type: explore)` from tool-call args. In v2 `subagent` is the only one of
+  those names that still exists, so the gate is now nearly vacuous. Do not port it as-is.
+- **`src/util/sleepy-process.ts` is absent** at `f02ee661a6`. Nothing to port.
+- **`src/tool/session.md` and `src/tool/cron.shell.txt` are misnamed** in the manifest. The real
+  files are `plan.md`, `plan-enter.md`, and `session.shell.md` (all `.md`, not `.txt`).
+- **`src/tool/websearch/mimo.ts` (118 lines) is real but not mechanical.** It is an Anthropic-
+  Messages streaming search client pointed at `https://mimi.xiaomi.com/v1/api/anthropic` using
+  the server-side `web_search_20250305` tool. Porting it needs a pluggable websearch backend in
+  `packages/core/src/tool/plugin/websearch.ts`, which today has one hardcoded backend. That is a
+  design task, not a port — and the fork's own default backend depends on a Xiaomi-internal
+  endpoint, so it is a poor fit for a Sleepy-branded fork regardless.

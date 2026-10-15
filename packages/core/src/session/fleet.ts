@@ -1,5 +1,3 @@
-export * as Fleet from "./fleet.js"
-
 /**
  * Fleet observability: a single structured view of an orchestrator's children — each session
  * correlated to (a) its liveness and turn telemetry, and (b) the git worktree backing it

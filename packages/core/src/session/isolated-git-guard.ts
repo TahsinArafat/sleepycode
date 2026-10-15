@@ -1,4 +1,3 @@
-export * as IsolatedGitGuard from "./isolated-git-guard.js"
 import { Effect } from "effect"
 import { existsSync, realpathSync } from "node:fs"
 import path from "path"

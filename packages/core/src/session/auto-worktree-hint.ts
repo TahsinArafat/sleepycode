@@ -1,5 +1,3 @@
-export * as AutoWorktreeHint from "./auto-worktree-hint.js"
-
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs"
 import { Effect } from "effect"
 import path from "path"

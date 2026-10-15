@@ -1,10 +1,12 @@
-import { Duration, Effect, Schema } from "effect"
+import { Duration, Effect, Schema, Semaphore, Stream } from "effect"
+import fsSync from "node:fs"
 import path from "node:path"
 import os from "node:os"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
 import { Integration } from "@sleepy-ai/schema/integration"
+import { Bus } from "../../bus.js"
 import { Credential } from "../../credential.js"
 import { Integration as IntegrationService } from "../../integration.js"
 import { Model } from "../../model.js"
@@ -45,6 +47,7 @@ import {
   type GatewayConfig,
   DEFAULT_PLATFORM_URL,
   findGatewayConfigPath,
+  gatewayPaths,
   readGatewayConfig,
   writeGatewayConfig,
 } from "@sleepy-ai/util/gateway"
@@ -339,69 +342,133 @@ export const SleepyGatewayPlugin = define({
       })
     })
 
-    const loaded = yield* Effect.promise(() => readGatewayConfig())
-    let config = loaded?.config ?? ({} satisfies GatewayConfig)
-    const dashboardUrl =
-      config.endpoint ??
-      config.dashboard_url ??
-      process.env.SLEEPY_PLATFORM_URL ??
-      process.env.SLEEPY_DASHBOARD_URL ??
-      DEFAULT_PLATFORM_URL
-
-    // Check expiry on startup and refresh if needed
-    if (config.expires_at && config.expires_at - Date.now() < 5 * 60 * 1000 && config.refresh_token) {
-      const refreshed = yield* Effect.promise(() => refreshGatewayToken(dashboardUrl, config.refresh_token!))
-      if (refreshed?.access_token) {
-        config = {
-          ...config,
-          access_token: refreshed.access_token,
-          refresh_token: refreshed.refresh_token ?? config.refresh_token,
-          expires_at: refreshed.expires_at,
-        }
-        yield* Effect.promise(() => writeGatewayConfig(loaded!.path, config))
-      }
-    }
-
-    if (config.refresh_token) {
-      setupSessionChecker(dashboardUrl, loaded!.path, config.refresh_token)
-    }
-
-    // An empty placeholder lets the model resolver swap in the credential connected
-    // through `sleepy auth login` (API key or OAuth) when there is no stored session.
+    const bus = yield* Bus.Service
     const integrations = yield* IntegrationService.Service
     const providerID = Provider.ID.make("sleepy")
-    const active = yield* integrations.connection.active(Integration.ID.make("sleepy"))
-    const connected =
-      active?.type === "credential"
-        ? yield* integrations.connection.resolve(active).pipe(Effect.catch(() => Effect.succeed(undefined)))
-        : undefined
-    const token =
-      config.access_token ??
-      config.api_key ??
-      (connected?.type === "key" ? connected.key : connected?.type === "oauth" ? connected.access : undefined)
-    if (!token) return
+    const loading = Semaphore.makeUnsafe(1)
 
-    const models = parseGatewayModels(yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token)), providerID)
-    if (models.length === 0) return
+    let activeToken: string | undefined
+    let activeDashboardUrl = DEFAULT_PLATFORM_URL
+    let activeModels: readonly Model.Info[] = []
+
+    const load = Effect.fn("SleepyGatewayPlugin.load")(function* () {
+      const loaded = yield* Effect.promise(() => readGatewayConfig())
+      let config = loaded?.config ?? ({} satisfies GatewayConfig)
+      const dashboardUrl =
+        config.endpoint ??
+        config.dashboard_url ??
+        process.env.SLEEPY_PLATFORM_URL ??
+        process.env.SLEEPY_DASHBOARD_URL ??
+        DEFAULT_PLATFORM_URL
+
+      // Check expiry and refresh if needed
+      if (config.expires_at && config.expires_at - Date.now() < 5 * 60 * 1000 && config.refresh_token && loaded?.path) {
+        const refreshed = yield* Effect.promise(() => refreshGatewayToken(dashboardUrl, config.refresh_token!))
+        if (refreshed?.access_token) {
+          config = {
+            ...config,
+            access_token: refreshed.access_token,
+            refresh_token: refreshed.refresh_token ?? config.refresh_token,
+            expires_at: refreshed.expires_at,
+          }
+          yield* Effect.promise(() => writeGatewayConfig(loaded.path, config))
+        }
+      }
+
+      if (config.refresh_token && loaded?.path) {
+        setupSessionChecker(dashboardUrl, loaded.path, config.refresh_token)
+      }
+
+      const active = yield* integrations.connection.active(Integration.ID.make("sleepy"))
+      const connected =
+        active?.type === "credential"
+          ? yield* integrations.connection.resolve(active).pipe(Effect.catch(() => Effect.succeed(undefined)))
+          : undefined
+
+      const token =
+        config.access_token ??
+        config.api_key ??
+        (connected?.type === "key" ? connected.key : connected?.type === "oauth" ? connected.access : undefined)
+
+      activeDashboardUrl = dashboardUrl
+      activeToken = token
+
+      if (token) {
+        const fetched = yield* Effect.promise(() => fetchGatewayModels(dashboardUrl, token)).pipe(
+          Effect.catch(() => Effect.succeed([])),
+        )
+        const parsed = parseGatewayModels(fetched, providerID)
+        if (parsed.length > 0) {
+          activeModels = parsed
+        }
+      } else {
+        activeModels = []
+      }
+    })
 
     yield* ctx.provider.transform((providers: any) => {
-      providers.add({
-        info: {
-          id: providerID,
-          name: "Sleepy Gateway",
-          activation: "enabled",
-          package: "@sleepy-ai/ai/providers/openai-compatible",
-          integrationID: Integration.ID.make("sleepy"),
-          headers: {
-            "X-Sleepy-Source": "sleepycode-cli",
+      if (activeToken && activeModels.length > 0) {
+        providers.add({
+          info: {
+            id: providerID,
+            name: "Sleepy Gateway",
+            activation: "enabled",
+            package: "@sleepy-ai/ai/providers/openai-compatible",
+            integrationID: Integration.ID.make("sleepy"),
+            headers: {
+              "X-Sleepy-Source": "sleepycode-cli",
+            },
+            settings: {
+              baseURL: `${activeDashboardUrl}/api/v1`,
+              apiKey: activeToken ?? "",
+            },
           },
-          settings: {
-            baseURL: `${dashboardUrl}/api/v1`,
-            apiKey: token ?? "",
-          },
-        },
-        models,
-      })
+          models: activeModels,
+        })
+      } else {
+        providers.remove(providerID)
+      }
     })
+
+    const reload = () => loading.withPermit(load().pipe(Effect.andThen(ctx.provider.reload())))
+
+    yield* load()
+
+    yield* bus.subscribe(Credential.Event.Switched).pipe(
+      Stream.filter((event) => event.data.integrationID === Integration.ID.make("sleepy")),
+      Stream.runForEach(reload),
+      Effect.forkScoped({ startImmediately: true }),
+    )
+
+    const candidateDirs = [...new Set(gatewayPaths().map((p) => path.dirname(p)))]
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined
+    const onFileChange = () => {
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        Effect.runPromise(reload()).catch(() => {})
+      }, 150)
+    }
+
+    for (const dir of candidateDirs) {
+      try {
+        fsSync.mkdirSync(dir, { recursive: true })
+        const watcher = fsSync.watch(dir, (_event, filename) => {
+          if (!filename || filename.includes("gateway")) {
+            onFileChange()
+          }
+        })
+        yield* Effect.addFinalizer(() =>
+          Effect.sync(() => {
+            watcher.close()
+          }),
+        )
+      } catch {}
+    }
+
+    yield* Effect.addFinalizer(() =>
+      Effect.sync(() => {
+        clearTimeout(debounceTimer)
+      }),
+    )
   }),
 })

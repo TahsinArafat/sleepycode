@@ -11,6 +11,7 @@ import { Database } from "../database/database.js"
 import { Instance } from "../instance/service.js"
 import { ShellResult } from "../shell/result.js"
 import type { Skill } from "../skill.js"
+import * as AutoWorktreeHint from "./auto-worktree-hint.js"
 import {
   BusyError,
   CompactionConflictError,
@@ -142,6 +143,24 @@ export const make = Effect.fn("Session.make")(function* () {
     (sessionID: SessionSchema.ID, inboxID: SessionMessage.ID) => mutatePending(sessionID, inboxID, admission.queue),
     Effect.uninterruptible,
   )
+  /**
+   * Tell the agent once that this transcript is writing into a git main worktree.
+   *
+   * sleepy: the reference fork ran this from its prompt assembly behind an
+   * `auto_worktree_hint_sent` DB column and pushed the copy as a synthetic text part on the new
+   * user message. v2 has no such column and adding one means a migration, so the transcript scan
+   * for the marker is the ledger and the copy is published as its own persisted synthetic message
+   * instead of a user-message part. Advisory only — a failure here must not fail the prompt.
+   */
+  const autoWorktreeNotice = Effect.fn("Session.autoWorktreeNotice")((sessionID: SessionSchema.ID) =>
+    Effect.gen(function* () {
+      const messages = yield* store.messages({ sessionID })
+      if (AutoWorktreeHint.sessionHasAutoWorktreeNotice(messages)) return
+      const main = yield* AutoWorktreeHint.firstMutatedMainWorktree(messages)
+      if (!main) return
+      yield* synthetic(sessionID, { text: AutoWorktreeHint.buildAutoWorktreeNotice(main) })
+    }).pipe(Effect.catch(() => Effect.void)),
+  )
   const prompt = Effect.fn("Session.prompt")((sessionID: SessionSchema.ID, input: PromptRequest) =>
     Effect.uninterruptibleMask((restore) =>
       Effect.gen(function* () {
@@ -171,6 +190,9 @@ export const make = Effect.fn("Session.make")(function* () {
         }).pipe(
           Effect.catchTag("SessionInbox.LifecycleConflict", () => new PromptConflictError({ sessionID, messageID })),
         )
+        // One-shot auto-worktree notice, published before this turn is handed to the executor so
+        // it is already part of the transcript the model builds its request from.
+        yield* autoWorktreeNotice(sessionID)
         if (input.resume !== false) yield* execution.wake(sessionID)
         return admitted
       }),

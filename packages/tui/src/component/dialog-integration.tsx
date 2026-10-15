@@ -162,7 +162,9 @@ export function DialogIntegration(
       emptyView={
         <box paddingLeft={4} paddingRight={4}>
           <text fg={theme.text.muted}>
-            {props.connectedOnly ? "No integrations are signed in" : "No integrations available"}
+            {props.connectedOnly
+              ? "No integrations are signed in — a Sleepy account session is cleared with `sleepy logout`"
+              : "No integrations available"}
           </text>
         </box>
       }

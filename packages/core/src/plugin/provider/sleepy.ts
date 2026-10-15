@@ -342,15 +342,6 @@ export const SleepyGatewayPlugin = define({
         integration.name = "Sleepy AI"
       })
       editor.method.update({
-        integrationID: "sleepy",
-        method: {
-          id: Integration.MethodID.make("login"),
-          type: "command",
-          label: "Log in with Sleepy",
-          command: ["sleepy", "login"],
-        },
-      })
-      editor.method.update({
         integrationID: Integration.ID.make("sleepy"),
         method: {
           id: DEVICE_METHOD,

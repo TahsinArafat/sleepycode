@@ -149,4 +149,39 @@ export const sessionMutatedMainWorktrees = Effect.fn("AutoWorktreeHint.sessionMu
     }
     return [...hits]
   },
-)
+)/** First git main worktree this transcript mutated, or undefined. */
+export const firstMutatedMainWorktree = Effect.fn("AutoWorktreeHint.firstMutatedMainWorktree")(function* (
+  messages: readonly SessionMessage.Info[],
+) {
+  return (yield* sessionMutatedMainWorktrees(messages))[0]
+})
+
+/**
+ * The user-facing copy. Injected as a user-side `<system-reminder>` so it lands in the
+ * transcript rather than the system prompt, which keeps it out of compaction and lets
+ * the model treat it as current context instead of a standing rule.
+ *
+ * The two branches exist because the correct instruction is not the same when the repo
+ * already uses worktrees. If it does, the agent can move on its own; if it does not,
+ * creating a worktree is a decision the user makes.
+ */
+export function buildAutoWorktreeNotice(mainWorktreePath: string): string {
+  const body = repoHasLinkedWorktrees(mainWorktreePath)
+    ? [
+        `This session is mutating the git main worktree at \`${mainWorktreePath}\`. Concurrent write/edit or git operations there can interfere with other agents or local changes.`,
+        "",
+        "This repo already uses worktrees. Isolate this task in a new worktree and switch into it before any further write or edit. You do not need to ask the user first.",
+        "",
+        "This rule is not limited to the path above. If you later start writing to another git repository that already uses worktrees, or run git mutations against its main worktree, isolate there the same way without asking.",
+      ]
+    : [
+        `This session is mutating the git main worktree at \`${mainWorktreePath}\`. Concurrent write/edit or git operations there can interfere with other agents or local changes.`,
+        "",
+        "Do NOT create a worktree on your own. Before any further write or edit, ask the user whether they want an isolated worktree.",
+        "",
+        "If the user agrees, isolate this task in a new worktree and switch into it before continuing. If the user declines, continue with the original plan without creating a worktree.",
+        "",
+        "This rule is not limited to the path above. If you later start writing to another git repository, or run git mutations against another repo's main worktree, apply the same check there: ask the user before continuing in that main worktree.",
+      ]
+  return ["<system-reminder>", AUTO_WORKTREE_NOTICE_MARKER, "", ...body, "</system-reminder>"].join("\n")
+}

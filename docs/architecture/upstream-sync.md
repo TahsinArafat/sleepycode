@@ -84,9 +84,17 @@ old `mimo` default belonged to the parent we left. `SLEEPYCODE_UPSTREAM=<id>` ov
 A sync is not done until it passes. Run these from the package directories, never the repo root:
 
 ```bash
-cd packages/core && bun typecheck
+cd packages/core && rm -rf node_modules/.ts-dist && bun typecheck
 cd packages/core && bun test test/plugin/ test/integration.test.ts
 ```
+
+The `rm -rf` is not optional — see the Cautions entry on the `tsgo` cache. A clean `typecheck`
+currently reports **255 errors** (249 × TS2345, 6 × TS2322), all Effect environment-union
+mismatches inside nine `test/session-*.test.ts` files. Those test files, and the session
+`runner` / `context` / `history` / `message` / `prompt` sources they exercise, are byte-identical
+to `refs/remotes/upstream/dev` apart from branding — the signature of inherited debt rather than
+a regression. That has **not** been proven against a clean upstream checkout, so treat it as an
+open item, not a cleared one.
 
 The known baseline is **345 pass / 22 fail**, and the 22 are pre-existing: GitLab OAuth binding
 port 8080, `PluginSupervisor` watcher/reload timing, and a plugin-loader transitive dependency.
@@ -109,6 +117,11 @@ over an edit to theirs. Where an edit is unavoidable, keep it in one contiguous 
 
 ## Cautions
 
+- **`bun typecheck` will lie to you unless you clear the incremental cache.** `tsgo -b` writes
+  `packages/core/node_modules/.ts-dist/{source,tests}.tsbuildinfo` and treats an up-to-date
+  cache as success. A poisoned or stale cache has already produced a false "clean" here. Run
+  `rm -rf packages/core/node_modules/.ts-dist` before believing the result, and after any
+  branch switch — the cache does not know which branch wrote it.
 - **History is full — do not re-shallow it.** The clone was originally shallow, which is what
   made the first push fail: a shallow clone cannot send the ancestry a remote does not already
   have. `git fetch --unshallow upstream` fixed it and `git rev-parse --is-shallow-repository`

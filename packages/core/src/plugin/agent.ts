@@ -3,6 +3,11 @@ export * as AgentPlugin from "./agent.js"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Effect } from "effect"
 import { Agent } from "../agent.js"
+import PROMPT_APEX from "../agent/prompt/apex.txt"
+import PROMPT_FORGE from "../agent/prompt/forge.txt"
+import PROMPT_PHANTOM from "../agent/prompt/phantom.txt"
+import PROMPT_PIVOT from "../agent/prompt/pivot.txt"
+import PROMPT_STACK from "../agent/prompt/stack.txt"
 
 const PROMPT_EXPLORE = `You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
 
@@ -137,6 +142,54 @@ export const Plugin = define({
         item.hidden = true
         item.system = PROMPT_SUMMARY
         item.permissions.push({ action: "*", resource: "*", effect: "deny" })
+      })
+
+      editor.update(Agent.ID.make("apex"), (item) => {
+        item.name = Agent.Name.make("Apex (Builder)")
+        item.color = "#f43f5e"
+        item.description = "Apex (Builder). Advanced primary coding agent for complex implementations."
+        item.system = PROMPT_APEX
+        item.mode = "primary"
+        item.permissions.push({ action: "question", resource: "*", effect: "allow" })
+      })
+
+      editor.update(Agent.ID.make("phantom"), (item) => {
+        item.name = Agent.Name.make("Phantom (Debugger)")
+        item.color = "#9333ea"
+        item.description = "Phantom (Debugger). Forensic bug hunter. Hypotheses-first workflow, no shotgun debugging."
+        item.system = PROMPT_PHANTOM
+        item.mode = "primary"
+        item.permissions.push({ action: "question", resource: "*", effect: "allow" })
+      })
+
+      editor.update(Agent.ID.make("pivot"), (item) => {
+        item.name = Agent.Name.make("Pivot (Prototyper)")
+        item.color = "#eab308"
+        item.description = "Pivot (Prototyper). Extreme bias for action. Ship specialist for rapid prototyping."
+        item.system = PROMPT_PIVOT
+        item.mode = "primary"
+        item.permissions.push({ action: "question", resource: "*", effect: "allow" })
+      })
+
+      editor.update(Agent.ID.make("forge"), (item) => {
+        item.name = Agent.Name.make("Forge (Reviewer)")
+        item.color = "#14b8a6"
+        item.description = "Forge (Reviewer). Adversarial auditor. Findings-first, no cosmetic nitpicks."
+        item.system = PROMPT_FORGE
+        item.mode = "primary"
+        item.permissions.push({ action: "question", resource: "*", effect: "allow" })
+      })
+
+      editor.update(Agent.ID.make("stack"), (item) => {
+        item.name = Agent.Name.make("Stack (Architect)")
+        item.color = "#3b82f6"
+        item.description = "Stack (Architect). Architecture, stack planner, and strict planner mode."
+        item.system = PROMPT_STACK
+        item.mode = "primary"
+        item.permissions.push(
+          { action: "question", resource: "*", effect: "allow" },
+          { action: "edit", resource: "*", effect: "deny" },
+        )
       })
     })
   }),

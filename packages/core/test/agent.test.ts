@@ -178,10 +178,15 @@ describe("Agent", () => {
 
       const agents = yield* agent.list()
       expect(agents.map((item) => String(item.id)).sort()).toEqual([
+        "apex",
         "build",
         "compaction",
         "explore",
+        "forge",
         "general",
+        "phantom",
+        "pivot",
+        "stack",
         "summary",
         "title",
       ])

@@ -242,3 +242,49 @@ Corrections and additions:
   `packages/core/src/tool/plugin/websearch.ts`, which today has one hardcoded backend. That is a
   design task, not a port — and the fork's own default backend depends on a Xiaomi-internal
   endpoint, so it is a poor fit for a Sleepy-branded fork regardless.
+
+---
+
+## Parity audit: stable CLI command surface (2026-10-15)
+
+The 78-file triage above only covers **fork-only** files. It never looked at the command surface,
+so compare the two command tables directly.
+
+Stable (`upstream/feat/host-error-registry`, `packages/opencode/src/index.ts`): `bug-report`,
+`command`, `dev`, `database`, `debug`, `export`, `github`, `github-cli`, `import`, `init`,
+`install`, `logout`, `message`, `models`, `pr`, `run`, `serve`, `share`, `status`, `undo`,
+`upgrade`, `web`, `auth login`.
+
+v2 (`packages/cli/src/commands/commands.ts`): `upgrade`, `uninstall`, `acp`, `api`, `debug`
+(agents/config/paths), `auth` (list/login/logout/export/import/switch), `mcp`, `plugin`, `models`,
+`stats`, `mini`, `run`, `session` (list/delete/export/import), `service`, `reload`, `pair`,
+`serve`, `login`, `doctor`, `init`.
+
+**Covered by a v2 equivalent — not gaps:** `message` → `run`; `web` → `serve` / `mini`;
+`status` → `service status`; `export` / `import` → `session export|import` and `auth
+export|import`; `install` → bootstrap script plus `uninstall`; `logout` → `auth logout`;
+`debug` → `debug paths|config|agents`; `command`, `dev`, `database` → internal, no user surface.
+
+**Genuinely missing from v2:**
+- `undo` — reverse the last message edit in a session. No v2 equivalent at all.
+- `github` / `github-cli` — the fork's GitHub surface.
+- `pr` — open a PR from the current session.
+- `share` — share a session. Partially covered by `session export` and the `api` command.
+- `bug-report` — developer convenience, low value.
+
+## Correction: the "no SIGINT anywhere" claim
+
+An earlier pass reported that v2 has zero `SIGINT` handling in `packages/core/src` and concluded
+this was a safety gap versus stable's 233-line `src/session/shell.ts`. That file does not exist in
+the fork. The real fork file is `src/shell/shell.ts` (126 lines), and it is about **background
+processes**, not stop/resume: a 200 ms detached-spawn guard, `process.platform === "win32"`
+spawning `[cmd, /c, sh, /i, /w]` with `detached: true, stdio: "ignore"`, and `proc.once("kill")`
+/ `proc.once("error")` resolution, plus `backgroundEnv()`.
+
+v2 **already has this**: `packages/core/src/tool/plugin/shell.ts` exposes `background: boolean`
+("Run the command in the background and return immediately") and `timeout` (0 disables; background
+commands default to no timeout), with `jobs.background(job.id)` and `shell.timeout(info.id, 0)`.
+
+So the real remaining gap is narrower and worth stating precisely: **v2 does not deliver an
+interrupt signal to the child's process group**, so aborting a foreground command can orphan
+grandchild processes. That is a genuine but contained gap, not a missing feature.

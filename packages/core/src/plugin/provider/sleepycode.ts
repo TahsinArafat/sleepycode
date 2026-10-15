@@ -17,7 +17,7 @@ import { ConfigProvider } from "@sleepy-ai/schema/config/provider"
 import { Mcp } from "@sleepy-ai/schema/mcp"
 import { Money } from "@sleepy-ai/schema/money"
 
-const defaultServer = "https://opencode.ai/console"
+const defaultServer = process.env.SLEEPY_PLATFORM_URL ?? "https://www.sleepyai.org"
 const clientID = "sleepycode-cli"
 const methodID = Integration.MethodID.make("device")
 // Drop statements whose action or effect is a value this version does not know, so a newer Console can

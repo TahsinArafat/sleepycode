@@ -1,5 +1,9 @@
 export * as Session from "./session.js"
 export * from "./session/schema.js"
+export * as AutoWorktreeHint from "./session/auto-worktree-hint.js"
+export * as ConflictDetection from "./session/conflict-detection.js"
+export * as IsolatedGitGuard from "./session/isolated-git-guard.js"
+export * as Fleet from "./session/fleet.js"
 
 import { Effect, Layer, Schema, Context, Stream } from "effect"
 import { LLMClient } from "@sleepy-ai/ai"

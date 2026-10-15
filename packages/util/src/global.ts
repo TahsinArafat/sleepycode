@@ -9,7 +9,15 @@ import { roots } from "#global-roots"
 import { Flock } from "./flock.js"
 import { makeGlobalNode } from "./effect/app-node.js"
 
-const app = "sleepycode"
+// Canonical application name for Sleepy CLI config/data directories is "sleepy",
+// with fallback to "sleepycode" if ~/.config/sleepy does not exist but ~/.config/sleepycode does.
+const app = (() => {
+  const cfg = process.env.XDG_CONFIG_HOME || (os.homedir() ? path.join(os.homedir(), ".config") : undefined)
+  if (cfg && !fs.existsSync(path.join(cfg, "sleepy")) && fs.existsSync(path.join(cfg, "sleepycode"))) {
+    return "sleepycode"
+  }
+  return "sleepy"
+})()
 const { data, cache, config, state, tmp } = roots(app)
 
 const paths = {

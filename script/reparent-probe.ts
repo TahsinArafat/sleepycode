@@ -19,8 +19,8 @@
  * Plus the two facts needed to compare candidates at all: is the branch still
  * maintained, and how big is the tree.
  *
- * Usage: bun run script/reparent-probe.ts refs/remotes/opencode/v1
- *        bun run script/reparent-probe.ts refs/remotes/opencode/v1 refs/remotes/opencode/dev
+ * Usage: bun run script/reparent-probe.ts refs/remotes/upstream/v1
+ *        bun run script/reparent-probe.ts refs/remotes/upstream/v1 refs/remotes/upstream/dev
  *
  * Pass FULL refnames - see resolveRef() in ./lib/git-tree.ts for why the bare shorthand is
  * unsafe here.
@@ -29,7 +29,7 @@
 import { UPSTREAMS, rebrand, scanTokenCounts, scanTokens, useUpstream } from "./lib/branding"
 
 const refs = process.argv.slice(2)
-if (refs.length === 0) refs.push("refs/remotes/opencode/v1")
+if (refs.length === 0) refs.push("refs/remotes/upstream/v1")
 
 async function git(args: string[]): Promise<Buffer> {
   const p = Bun.spawn(["git", ...args], { stdout: "pipe", stderr: "pipe" })

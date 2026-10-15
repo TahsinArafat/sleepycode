@@ -47,7 +47,7 @@ useUpstream(profileId)
  * The reason the exclusion exists is that a lockfile carries integrity hashes, and this
  * is not ours to change. So the exclusion is replaced by a check rather than by trust:
  * every opaque token of 40+ characters must survive the rewrite, verbatim. Measured on
- * `opencode/dev`: 2,485 such tokens, none lost.
+ * `upstream/dev`: 2,485 such tokens, none lost.
  */
 const LOCKFILE = /(?:^|\/)bun\.lock$/
 

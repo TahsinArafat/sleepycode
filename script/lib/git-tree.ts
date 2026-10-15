@@ -25,16 +25,16 @@ const PSEUDO_REFS = new Set(["HEAD", "FETCH_HEAD", "ORIG_HEAD", "MERGE_HEAD", "C
  * Resolve a ref to exactly one full refname, or refuse to measure anything.
  *
  * This exists because of a silent failure that would have poisoned the whole migration plan.
- * A `git fetch --deepen=600 opencode dev v1` left behind a loose tag `refs/tags/opencode/dev`
+ * A `git fetch --deepen=600 opencode dev v1` left behind a loose tag `refs/tags/upstream/dev`
  * pointing at one of OUR commits. Git resolves an ambiguous shorthand **tags first**, so from
- * that moment every `opencode/dev` in these scripts meant our own tree - 5,513 files - instead
+ * that moment every `upstream/dev` in these scripts meant our own tree - 5,513 files - instead
  * of the candidate's 8,592. Nothing errors. `ls-tree` succeeds, the numbers print, and they are
  * confident and wrong: a port map built that way would claim our files already exist upstream
  * and size the job at nothing.
  *
  * Git only warns on stderr, which a spawned child throws away. So check explicitly.
  * `git show-ref <pattern>` matches on the literal pattern or on a tail starting at a slash, so
- * a qualified `refs/remotes/opencode/dev` matches exactly one ref while the bare shorthand
+ * a qualified `refs/remotes/upstream/dev` matches exactly one ref while the bare shorthand
  * matches both the tag and the branch.
  *
  * Not every multi-match is a trap, so only the dangerous one is refused. Git resolves
@@ -70,7 +70,7 @@ export async function resolveRef(ref: string): Promise<string> {
     `ambiguous ref ${ref}: a TAG shadows the branch, and git prefers the tag.\n` +
       matches.map((m) => `    ${m}`).join("\n") +
       `\n  Measuring "${picked}" instead of the branch would silently size this wrong.\n` +
-      `  Re-run with the full refname, e.g. refs/remotes/opencode/dev.`,
+      `  Re-run with the full refname, e.g. refs/remotes/upstream/dev.`,
   )
 }
 

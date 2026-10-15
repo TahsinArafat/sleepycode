@@ -1,21 +1,21 @@
-# Re-parent target: `opencode/dev`, and why the cheaper-looking base is a trap
+# Re-parent target: `upstream/dev`, and why the cheaper-looking base is a trap
 
-> **Decision.** SleepyCode re-parents onto **`opencode/dev`** (opencode **2.0.29**, released 2026-10-14) in a single jump. Not `opencode/v1` first, and not a merge.
+> **Decision.** SleepyCode re-parents onto **`upstream/dev`** (opencode **2.0.29**, released 2026-10-14) in a single jump. Not `upstream/v1` first, and not a merge.
 >
-> Every number below is reproduced by `bun run script/port-map.ts refs/remotes/opencode/v1 refs/remotes/opencode/dev`. Nothing here is estimated.
+> Every number below is reproduced by `bun run script/port-map.ts refs/remotes/upstream/v1 refs/remotes/upstream/dev`. Nothing here is estimated.
 >
-> **Pass full refnames.** `opencode/dev` is unsafe as a shorthand: a stray
-> `refs/tags/opencode/dev` tag pointing at one of our own commits makes git resolve the
+> **Pass full refnames.** `upstream/dev` is unsafe as a shorthand: a stray
+> `refs/tags/upstream/dev` tag pointing at one of our own commits makes git resolve the
 > shorthand tags-first, so the script would measure our tree as though it were the
 > candidate. `resolveRef` now refuses an ambiguous ref rather than silently picking one.
 
-SleepyCode is currently a fork of **MiMo-Code**, which is itself a fork of **opencode** — so the stated goal ("be a direct opencode fork") was never actually true of the git graph. `git merge-base HEAD opencode/v1` and `git merge-base HEAD opencode/dev` both return **empty**; MiMo's root commit `8e5cc8a8` has no parents. Git can never auto-merge across that boundary. Any re-parent is a manual port, and the only real question is **onto what**.
+SleepyCode is currently a fork of **MiMo-Code**, which is itself a fork of **opencode** — so the stated goal ("be a direct opencode fork") was never actually true of the git graph. `git merge-base HEAD upstream/v1` and `git merge-base HEAD upstream/dev` both return **empty**; MiMo's root commit `8e5cc8a8` has no parents. Git can never auto-merge across that boundary. Any re-parent is a manual port, and the only real question is **onto what**.
 
 ---
 
 ## The two candidates
 
-| | `opencode/v1` | `opencode/dev` |
+| | `upstream/v1` | `upstream/dev` |
 | --- | --- | --- |
 | version | 1.19.0 | **2.0.29** |
 | tip | 2026-10-14 | 2026-10-15 |
@@ -34,8 +34,8 @@ Our real port surface is 80 files (`bun run script/fork-delta.ts` → `script/.f
 
 ```
   ref               same-path  relocated   absent   reconcile   hand-port  generated
-  opencode/v1              39         26       15      45,187       3,570     64,906
-  opencode/dev              9         44       27      39,725       8,493     31,746
+  upstream/v1              39         26       15      45,187       3,570     64,906
+  upstream/dev              9         44       27      39,725       8,493     31,746
 ```
 
 Read on its own, the `same-path` column says **v1**: it leaves 39 of 80 files exactly where they are, against 9 for `dev`. Most of its work is therefore applying a diff we already hold, verifiable file by file.
@@ -47,7 +47,7 @@ That reading is wrong, and the reason it is wrong is that per-candidate cost can
 Porting onto `v1` and then moving to `dev` is two jobs. The second one is the **content drift between the candidates** across exactly the files we would own after the first port — measured by diffing `rebrand(v1's host)` against `rebrand(dev's host)` for each file, which deliberately ignores the path move and counts only what genuinely differs in the code:
 
 ```
-STAIRCASE  opencode/v1 -> opencode/dev
+STAIRCASE  upstream/v1 -> upstream/dev
   content drift across the 52 files BOTH candidates host
   path unchanged in both                         24
   path differs (move only, no content change)    28
@@ -93,7 +93,7 @@ The one commit that appeared to touch all 19 packages at once, `34d8ded0c5`, is 
 
 ## What it does not change
 
-- **Branding is not a risk.** `bun run script/reparent-probe.ts refs/remotes/opencode/v1 refs/remotes/opencode/dev` reports **0 residual tokens and 0 path collisions** on both. The `OPENCODE` profile in `script/lib/branding.ts` rebrands 100% of non-protected tokens, and its map is **injective** — unlike the mimo map, whose collisions make `debrand()` unsound and unusable in a merge.
+- **Branding is not a risk.** `bun run script/reparent-probe.ts refs/remotes/upstream/v1 refs/remotes/upstream/dev` reports **0 residual tokens and 0 path collisions** on both. The `OPENCODE` profile in `script/lib/branding.ts` rebrands 100% of non-protected tokens, and its map is **injective** — unlike the mimo map, whose collisions make `debrand()` unsound and unusable in a merge.
 - **The TUI port is mechanical and identical for both candidates.** Upstream lifted `cli/cmd/tui/` to `packages/tui/src/` in both v1 and dev, so this decision does not make the TUI any harder. 15 of our 25 TUI fork-logic files land at `packages/tui/src/<same relative path>`.
 - **Tier 3 stays blocked either way.** `src/actor/*` and `src/llm-server/` are absent from *both* candidates, so the orchestrator, fleet, cron and audio-e2e features need reimplementation regardless of which base is chosen.
 

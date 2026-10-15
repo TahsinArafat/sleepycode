@@ -15,7 +15,7 @@
  * share it" only shows up in the samples.
  *
  * Usage: bun run script/brand-classify.ts [ref] [--top=N]
- *        bun run script/brand-classify.ts refs/remotes/opencode/dev --top=40
+ *        bun run script/brand-classify.ts refs/remotes/upstream/dev --top=40
  *
  * Pass FULL refnames - see resolveRef() in ./lib/git-tree.ts for why bare shorthands are unsafe.
  */

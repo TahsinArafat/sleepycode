@@ -15,10 +15,10 @@
  * A file with no landing has no base to diff against, so its cost is its own size - it is a
  * hand-port by definition. Reporting that separately keeps "cheap" from hiding "absent".
  *
- * Usage: bun run script/port-map.ts refs/remotes/opencode/v1
- *        bun run script/port-map.ts refs/remotes/opencode/v1 refs/remotes/opencode/dev
+ * Usage: bun run script/port-map.ts refs/remotes/upstream/v1
+ *        bun run script/port-map.ts refs/remotes/upstream/v1 refs/remotes/upstream/dev
  *
- * Pass FULL refnames. `opencode/dev` is not safe: a stray tag of the same name makes git
+ * Pass FULL refnames. `upstream/dev` is not safe: a stray tag of the same name makes git
  * resolve the shorthand to whatever that tag points at, and every number below would then
  * describe our own tree instead of the candidate's - confidently and wrongly. `resolveRef`
  * in ./lib/git-tree.ts refuses an ambiguous ref rather than guessing between them.
@@ -28,9 +28,9 @@
  * tree holds none of our files, and reading ours off disk there prices the whole port at
  * zero without a word of complaint.
  *
- * Usage: bun run script/port-map.ts refs/remotes/opencode/v1
- *        bun run script/port-map.ts refs/remotes/opencode/v1 refs/remotes/opencode/dev
- *        bun run script/port-map.ts refs/remotes/opencode/dev --ours=sync/upstream-2026-09
+ * Usage: bun run script/port-map.ts refs/remotes/upstream/v1
+ *        bun run script/port-map.ts refs/remotes/upstream/v1 refs/remotes/upstream/dev
+ *        bun run script/port-map.ts refs/remotes/upstream/dev --ours=sync/upstream-2026-09
  */
 
 import { rebrand, useUpstream } from "./lib/branding"
@@ -39,7 +39,7 @@ import { BLOB_BATCH, type Entry, diffLines, gitText, listTree, readBlobBatch, sh
 const oursFlag = process.argv.find((a) => a.startsWith("--ours="))
 const OURS = oursFlag ? oursFlag.slice("--ours=".length) : "HEAD"
 const refs = process.argv.slice(2).filter((a) => !a.startsWith("--"))
-if (refs.length === 0) refs.push("refs/remotes/opencode/v1")
+if (refs.length === 0) refs.push("refs/remotes/upstream/v1")
 
 /**
  * Where a candidate's own code lives. Only files under one of these roots can host a port,

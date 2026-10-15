@@ -29,7 +29,7 @@
  * collision set; it is computed from the maps, never asserted in a comment.
  *
  * The opencode map has no such forced collapse. Its upstream spells itself `opencode`
- * and `OpenCode` only (measured: 28226 / 12209 occurrences in `opencode/v1`), so a
+ * and `OpenCode` only (measured: 28226 / 12209 occurrences in `upstream/v1`), so a
  * case-preserving map is injective and `debrand` becomes sound there. That is the single
  * strongest technical argument for re-parenting onto opencode, and it is only visible
  * because the maps are data.
@@ -233,8 +233,8 @@ const MIMO: UpstreamProfile = {
 /**
  * Candidate ancestor: `anomalyco/opencode`.
  *
- * Structural mirror of the mimo profile, derived from measurement of `opencode/v1`
- * (`git grep -o -E '[A-Za-z_]*[Oo]pen[Cc]ode[A-Za-z_]*' opencode/v1`):
+ * Structural mirror of the mimo profile, derived from measurement of `upstream/v1`
+ * (`git grep -o -E '[A-Za-z_]*[Oo]pen[Cc]ode[A-Za-z_]*' upstream/v1`):
  *   `@opencode-ai/*` workspace scope, `.opencode/` config dir, `OPENCODE_*` env prefix,
  *   `x-opencode-directory` header, and the token in exactly two casings.
  *
@@ -246,7 +246,7 @@ const MIMO: UpstreamProfile = {
  *
  * Not yet wired to a working port: PROTECT is still incomplete. `audit()` and
  * `script/brand-classify.ts` are what surface the leftovers, and the port target
- * (`refs/remotes/opencode/dev`) is what the profile has actually been measured against -
+ * (`refs/remotes/upstream/dev`) is what the profile has actually been measured against -
  * not `v1`, whose `@opencode-ai/*` scope this profile used to assume.
  */
 const OPENCODE: UpstreamProfile = {
@@ -281,7 +281,7 @@ const OPENCODE: UpstreamProfile = {
   ],
   protect: [
     // Real service host behind the config endpoint and the Zen gateway. Renaming any of
-    // these re-points live network calls (2224 refs in `opencode/v1`).
+    // these re-points live network calls (2224 refs in `upstream/v1`).
     /opencode\.ai/,
     // The ancestor we fork from, and the thing `install` fetches the CLI from. Same role as
     // MIMO's `XiaomiMiMo\/MiMo-Code` guard, and it has to be a prefix rather than an exact
@@ -305,10 +305,10 @@ const OPENCODE: UpstreamProfile = {
 export const UPSTREAMS: ReadonlyArray<UpstreamProfile> = [MIMO, OPENCODE]
 
 /**
- * Active profile. Defaults to mimo (today's parent); `SLEEPYCODE_UPSTREAM` overrides it so
+ * Active profile. Defaults to opencode (today's parent); `SLEEPYCODE_UPSTREAM` overrides it so
  * a sync run can be pointed at the other ancestor without editing code.
  */
-let active: UpstreamProfile = UPSTREAMS.find((u) => u.id === process.env.SLEEPYCODE_UPSTREAM) ?? MIMO
+let active: UpstreamProfile = UPSTREAMS.find((u) => u.id === process.env.SLEEPYCODE_UPSTREAM) ?? OPENCODE
 
 export function activeUpstream(): UpstreamProfile {
   return active

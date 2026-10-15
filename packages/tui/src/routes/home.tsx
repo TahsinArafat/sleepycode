@@ -101,6 +101,11 @@ export function Home() {
         <box width="100%" maxWidth={75} zIndex={1000} paddingTop={1} flexShrink={0} position="relative">
           <Prompt ref={bind} placeholders={placeholder} disabled={forms().length > 0} />
         </box>
+        <Show when={local.model.empty}>
+          <box paddingTop={1} flexShrink={0}>
+            <SignIn />
+          </box>
+        </Show>
         <box flexGrow={1} minHeight={0} />
       </box>
       <box width="100%" flexShrink={0}>
@@ -119,6 +124,21 @@ export function Home() {
         }}
       </Show>
     </>
+  )
+}
+
+function SignIn() {
+  const theme = useTheme()
+  return (
+    <box flexDirection="column" alignItems="center" gap={1}>
+      <text fg={theme.text.muted}>No models available — you are not signed in.</text>
+      <text fg={theme.text.muted}>
+        Run <span style={{ fg: theme.text.action.primary.selected }}>sleepy login</span> to sign in with your browser
+      </text>
+      <text fg={theme.text.muted}>
+        or <span style={{ fg: theme.text.action.primary.selected }}>sleepy login --device</span> on a machine without one
+      </text>
+    </box>
   )
 }
 

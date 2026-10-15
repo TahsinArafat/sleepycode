@@ -386,6 +386,13 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
         get catalogReady() {
           return models() !== undefined
         },
+        // The catalog arrived and came back empty: no provider has a usable model, so
+        // there is nothing to select and no prompt to send. Distinct from `catalogReady`
+        // being false, which only means the list has not arrived yet.
+        get empty() {
+          const list = models()
+          return list !== undefined && list.length === 0
+        },
         recent() {
           return preferences.recent
         },

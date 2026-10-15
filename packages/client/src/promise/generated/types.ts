@@ -6153,6 +6153,8 @@ export type CredentialRemoveInput = { readonly credentialID: { readonly credenti
 
 export type CredentialRemoveOutput = void
 
+export type SleepyLogoutOutput = { data: { removed: Array<string>; email?: string | undefined } }["data"]
+
 export type ProjectListInput = { readonly archived?: { readonly archived?: boolean | undefined }["archived"] }
 
 export type ProjectListOutput = Array<Project>

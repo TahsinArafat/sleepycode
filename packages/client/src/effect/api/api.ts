@@ -1663,6 +1663,13 @@ export interface CredentialApi<E = never> {
   readonly remove: CredentialRemoveOperation<E>
 }
 
+export type SleepyLogoutOutput = { readonly removed: ReadonlyArray<string>; readonly email?: string | undefined }
+export type SleepyLogoutOperation<E = never> = () => Effect.Effect<SleepyLogoutOutput, E>
+
+export interface SleepyApi<E = never> {
+  readonly logout: SleepyLogoutOperation<E>
+}
+
 export type ProjectListInput = { readonly archived?: boolean | undefined }
 export type ProjectListOutput = ReadonlyArray<Project.Info>
 export type ProjectListOperation<E = never> = (input?: ProjectListInput) => Effect.Effect<ProjectListOutput, E>
@@ -2276,6 +2283,7 @@ export interface AppApi<E = never> {
   readonly integration: IntegrationApi<E>
   readonly mcp: McpApi<E>
   readonly credential: CredentialApi<E>
+  readonly sleepy: SleepyApi<E>
   readonly project: ProjectApi<E>
   readonly form: FormApi<E>
   readonly permission: PermissionApi<E>

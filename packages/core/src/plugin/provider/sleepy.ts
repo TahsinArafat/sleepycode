@@ -88,6 +88,40 @@ async function writeGatewayConfig(configPath: string, config: GatewayConfig): Pr
   } catch {}
 }
 
+async function readGatewayEmail(configPath: string): Promise<string | undefined> {
+  try {
+    return (JSON.parse(await fs.readFile(configPath, "utf-8")) as GatewayConfig).email
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Signs out by removing every stored session, in this module's own search order.
+ * `findGatewayConfigPath` stops at the first hit, so clearing only its answer would
+ * leave an older copy behind and the user still signed in. The account is read
+ * before the files go, so the caller can name who was signed out.
+ */
+export async function clearGatewayConfig(): Promise<{ removed: string[]; email?: string }> {
+  const candidates = [...new Set([process.env.SLEEPY_GATEWAY_CONFIG, ...GATEWAY_PATHS])].filter(
+    (candidate): candidate is string => candidate !== undefined,
+  )
+  const found = await Promise.all(
+    candidates.map(async (candidate) => {
+      try {
+        await fs.access(candidate)
+        return candidate
+      } catch {
+        return undefined
+      }
+    }),
+  )
+  const removed = found.filter((candidate): candidate is string => candidate !== undefined)
+  const email = removed[0] ? await readGatewayEmail(removed[0]) : undefined
+  await Promise.all(removed.map((candidate) => fs.rm(candidate, { force: true })))
+  return { removed, email }
+}
+
 async function refreshGatewayToken(dashboardUrl: string, refreshToken: string): Promise<GatewayConfig | null> {
   try {
     const res = await fetch(`${dashboardUrl}/api/auth/token/refresh`, {
@@ -170,7 +204,7 @@ async function fetchGatewayModels(dashboardUrl: string, token: string): Promise<
       })
       if (!res.ok) continue
       const data = (await res.json()) as any
-      const list = Array.isArray(data) ? data : data?.data ?? data?.models
+      const list = Array.isArray(data) ? data : (data?.data ?? data?.models)
       if (Array.isArray(list) && list.length > 0) {
         return list
       }
@@ -190,17 +224,13 @@ const postJSON = async (url: string, body: Record<string, string>) => {
   return { status: res.status, body: json ?? {} }
 }
 
-const parseDevice = (raw: Record<string, unknown>) =>
-  Schema.decodeUnknownSync(Device)(raw, { errors: "all" })
+const parseDevice = (raw: Record<string, unknown>) => Schema.decodeUnknownSync(Device)(raw, { errors: "all" })
 
-const parseDeviceToken = (raw: Record<string, unknown>) =>
-  Schema.decodeUnknownSync(DeviceToken)(raw, { errors: "all" })
+const parseDeviceToken = (raw: Record<string, unknown>) => Schema.decodeUnknownSync(DeviceToken)(raw, { errors: "all" })
 
 function startDeviceFlow(server: string) {
   return Effect.gen(function* () {
-    const start = yield* Effect.promise(() =>
-      postJSON(`${server}/api/auth/oauth/device`, { client_id: CLIENT_ID }),
-    )
+    const start = yield* Effect.promise(() => postJSON(`${server}/api/auth/oauth/device`, { client_id: CLIENT_ID }))
     const device = parseDevice(start.body)
     const url =
       device.verification_uri_complete ??
@@ -222,14 +252,12 @@ function pollDeviceToken(server: string, deviceCode: string, interval: Duration.
     Effect.gen(function* () {
       yield* Effect.sleep(wait)
       const result = parseDeviceToken(
-        (
-          yield* Effect.promise(() =>
-            postJSON(`${server}/api/auth/oauth/device/token`, {
-              client_id: CLIENT_ID,
-              device_code: deviceCode,
-            }),
-          )
-        ).body,
+        (yield* Effect.promise(() =>
+          postJSON(`${server}/api/auth/oauth/device/token`, {
+            client_id: CLIENT_ID,
+            device_code: deviceCode,
+          }),
+        )).body,
       )
       if ("access_token" in result) return yield* storeCredential(server, result)
       if (result.error === "authorization_pending") return yield* loop(wait)
@@ -306,29 +334,32 @@ let sessionCheckInterval: ReturnType<typeof setInterval> | null = null
 function setupSessionChecker(dashboardUrl: string, configPath: string, initialRefreshToken: string) {
   if (sessionCheckInterval) return
   let currentRefreshToken = initialRefreshToken
-  sessionCheckInterval = setInterval(async () => {
-    try {
-      const current = await readGatewayConfig()
-      if (!current) return
-      const exp = current.config.expires_at
-      const refresh = current.config.refresh_token ?? currentRefreshToken
+  sessionCheckInterval = setInterval(
+    async () => {
+      try {
+        const current = await readGatewayConfig()
+        if (!current) return
+        const exp = current.config.expires_at
+        const refresh = current.config.refresh_token ?? currentRefreshToken
 
-      // Refresh if within 10 minutes of expiry
-      if (exp && exp - Date.now() < 10 * 60 * 1000 && refresh) {
-        const refreshed = await refreshGatewayToken(dashboardUrl, refresh)
-        if (refreshed?.access_token) {
-          const updated: GatewayConfig = {
-            ...current.config,
-            access_token: refreshed.access_token,
-            refresh_token: refreshed.refresh_token,
-            expires_at: refreshed.expires_at,
+        // Refresh if within 10 minutes of expiry
+        if (exp && exp - Date.now() < 10 * 60 * 1000 && refresh) {
+          const refreshed = await refreshGatewayToken(dashboardUrl, refresh)
+          if (refreshed?.access_token) {
+            const updated: GatewayConfig = {
+              ...current.config,
+              access_token: refreshed.access_token,
+              refresh_token: refreshed.refresh_token,
+              expires_at: refreshed.expires_at,
+            }
+            currentRefreshToken = refreshed.refresh_token ?? currentRefreshToken
+            await writeGatewayConfig(configPath, updated)
           }
-          currentRefreshToken = refreshed.refresh_token ?? currentRefreshToken
-          await writeGatewayConfig(configPath, updated)
         }
-      }
-    } catch {}
-  }, 10 * 60 * 1000)
+      } catch {}
+    },
+    10 * 60 * 1000,
+  )
 }
 
 export const SleepyGatewayPlugin = define({
@@ -355,7 +386,9 @@ export const SleepyGatewayPlugin = define({
           ],
         },
         authorize: (answer) =>
-          startDeviceFlow(typeof answer?.server === "string" ? answer.server.replace(/\/+$/, "") : DEFAULT_PLATFORM_URL),
+          startDeviceFlow(
+            typeof answer?.server === "string" ? answer.server.replace(/\/+$/, "") : DEFAULT_PLATFORM_URL,
+          ),
         refresh: refreshCredential,
       })
       // Virtual key support: https://www.sleepyai.org issues `sk-…` keys that work as a

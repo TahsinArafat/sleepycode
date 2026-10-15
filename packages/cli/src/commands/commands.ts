@@ -570,6 +570,9 @@ const Root = Spec.make(typeof SLEEPYCODE_CLI_NAME === "string" ? SLEEPYCODE_CLI_
         ),
       },
     }),
+    Spec.make("logout", {
+      description: "Log out of Sleepy and clear the stored session",
+    }),
     Spec.make("doctor", {
       description: "Check Sleepy environment diagnostics and API connectivity",
     }),

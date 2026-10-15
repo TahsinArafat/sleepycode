@@ -80,6 +80,7 @@ const Handlers = Runtime.handlers(Commands, {
   },
   serve: () => import("./commands/handlers/serve"),
   login: () => import("./commands/handlers/login"),
+  logout: () => import("./commands/handlers/logout"),
   doctor: () => import("./commands/handlers/doctor"),
   init: () => import("./commands/handlers/init"),
 })

@@ -1,33 +1,10 @@
-import fs from "node:fs/promises"
-import { existsSync } from "node:fs"
-import os from "node:os"
-import path from "node:path"
 import { intro, outro, log } from "@clack/prompts"
 import { Effect } from "effect"
 import { Global } from "@sleepy-ai/util/global"
+import { clearGatewayConfig } from "@sleepy-ai/util/gateway"
 import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { handlePromptErrors } from "../../ui/prompt"
-
-/**
- * Every location the Sleepy provider looks in, in its own order. Clearing only the
- * primary path would leave an older copy behind and the user still signed in.
- */
-const stores = (configDir: string) =>
-  [
-    ...new Set([
-      path.join(configDir, "gateway.json"),
-      path.join(os.homedir(), ".config", "sleepy", "gateway.json"),
-      path.join(os.homedir(), ".config", "sleepycode", "gateway.json"),
-      path.join(os.homedir(), ".sleepy", "gateway.json"),
-    ]),
-  ].filter(existsSync)
-
-const readEmail = (file: string) =>
-  Effect.promise(async () => {
-    const parsed = JSON.parse(await fs.readFile(file, "utf-8")) as { email?: string }
-    return parsed.email
-  }).pipe(Effect.catch(() => Effect.succeed(undefined)))
 
 export default Runtime.handler(
   Commands.commands.logout,
@@ -36,24 +13,19 @@ export default Runtime.handler(
       intro("Sleepy Logout")
 
       const global = yield* Global.Service
-      const files = stores(global.config)
+      const result = yield* Effect.promise(() => clearGatewayConfig(global.config))
 
-      if (files.length === 0) {
+      if (result.removed.length === 0) {
         log.warn("No stored Sleepy session was found.")
         outro("Already signed out")
         return
       }
 
-      const email = yield* readEmail(files[0])
+      for (const file of result.removed) {
+        log.success(`Removed ${file}`)
+      }
 
-      yield* Effect.forEach(files, (file) =>
-        Effect.promise(async () => {
-          await fs.rm(file, { force: true })
-          log.success(`Removed ${file}`)
-        }),
-      )
-
-      outro(email ? `Signed out ${email}` : "Signed out")
+      outro(result.email ? `Signed out ${result.email}` : "Signed out")
     }).pipe(handlePromptErrors),
   ),
 )

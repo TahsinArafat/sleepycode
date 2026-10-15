@@ -1,5 +1,4 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http"
-import fs from "node:fs/promises"
 import path from "node:path"
 import { intro, outro, log, spinner, select, isCancel } from "@clack/prompts"
 import { Effect } from "effect"
@@ -7,6 +6,8 @@ import { Global } from "@sleepy-ai/util/global"
 import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { handlePromptErrors, openUrl } from "../../ui/prompt"
+
+import { writeGatewayConfig, type GatewayConfig } from "@sleepy-ai/util/gateway"
 
 const PORT = 40821
 
@@ -43,20 +44,8 @@ export const exchangeCodeForToken = async (code: string, dashboardUrl: string) =
   }>
 }
 
-export const writeConfig = async (
-  configPath: string,
-  data: {
-    access_token: string
-    refresh_token?: string
-    expires_at?: number
-    endpoint: string
-    tier: string
-    email: string
-    dashboard_url?: string
-  },
-) => {
-  await fs.mkdir(path.dirname(configPath), { recursive: true })
-  await fs.writeFile(configPath, JSON.stringify(data, null, 2), "utf-8")
+export const writeConfig = async (configPath: string, data: GatewayConfig) => {
+  await writeGatewayConfig(configPath, data)
 }
 
 let codeResolver: ((code: string) => void) | null = null
@@ -215,10 +204,7 @@ export const startDeviceFlow = async (dashboardUrl: string): Promise<DeviceCodeR
   return res.json()
 }
 
-export const pollDeviceToken = async (
-  dashboardUrl: string,
-  deviceCode: string,
-): Promise<DeviceTokenResponse> => {
+export const pollDeviceToken = async (dashboardUrl: string, deviceCode: string): Promise<DeviceTokenResponse> => {
   const res = await fetch(`${dashboardUrl}/api/auth/oauth/device/token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

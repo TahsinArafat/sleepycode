@@ -1,7 +1,6 @@
 import { Duration, Effect, Schema } from "effect"
 import path from "node:path"
 import os from "node:os"
-import fs from "node:fs/promises"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
@@ -32,95 +31,23 @@ const Token = Schema.Struct({
 const TokenPending = Schema.Struct({ error: Schema.String })
 const DeviceToken = Schema.Union([Token, TokenPending])
 
-export interface GatewayConfig {
-  access_token?: string
-  refresh_token?: string
-  api_key?: string
-  expires_at?: number
-  endpoint?: string
-  dashboard_url?: string
-  email?: string
-  tier?: string
-}
+export {
+  type GatewayConfig,
+  DEFAULT_PLATFORM_URL,
+  findGatewayConfigPath,
+  readGatewayConfig,
+  readGatewayEmail,
+  writeGatewayConfig,
+  clearGatewayConfig,
+} from "@sleepy-ai/util/gateway"
 
-const GATEWAY_PATHS = [
-  path.join(os.homedir(), ".config", "sleepy", "gateway.json"),
-  path.join(os.homedir(), ".config", "sleepycode", "gateway.json"),
-  path.join(os.homedir(), ".sleepy", "gateway.json"),
-]
-
-const DEFAULT_PLATFORM_URL = "https://www.sleepyai.org"
-
-export async function findGatewayConfigPath(): Promise<string | null> {
-  const envPath = process.env.SLEEPY_GATEWAY_CONFIG
-  if (envPath) {
-    try {
-      await fs.access(envPath)
-      return envPath
-    } catch {}
-  }
-  for (const candidate of GATEWAY_PATHS) {
-    try {
-      await fs.access(candidate)
-      return candidate
-    } catch {}
-  }
-  return null
-}
-
-export async function readGatewayConfig(): Promise<{ path: string; config: GatewayConfig } | null> {
-  const configPath = await findGatewayConfigPath()
-  if (!configPath) return null
-  try {
-    const raw = await fs.readFile(configPath, "utf-8")
-    const config = JSON.parse(raw) as GatewayConfig
-    return { path: configPath, config }
-  } catch {
-    return null
-  }
-}
-
-async function writeGatewayConfig(configPath: string, config: GatewayConfig): Promise<void> {
-  try {
-    const tmp = `${configPath}.tmp.${Date.now()}`
-    await fs.writeFile(tmp, JSON.stringify(config, null, 2), "utf-8")
-    await fs.rename(tmp, configPath)
-  } catch {}
-}
-
-async function readGatewayEmail(configPath: string): Promise<string | undefined> {
-  try {
-    return (JSON.parse(await fs.readFile(configPath, "utf-8")) as GatewayConfig).email
-  } catch {
-    return undefined
-  }
-}
-
-/**
- * Signs out by removing every stored session, in this module's own search order.
- * `findGatewayConfigPath` stops at the first hit, so clearing only its answer would
- * leave an older copy behind and the user still signed in. The account is read
- * before the files go, so the caller can name who was signed out.
- */
-export async function clearGatewayConfig(): Promise<{ removed: string[]; email?: string }> {
-  const candidates = [...new Set([process.env.SLEEPY_GATEWAY_CONFIG, ...GATEWAY_PATHS])].filter(
-    (candidate): candidate is string => candidate !== undefined,
-  )
-  const found = await Promise.all(
-    candidates.map(async (candidate) => {
-      try {
-        await fs.access(candidate)
-        return candidate
-      } catch {
-        return undefined
-      }
-    }),
-  )
-  const removed = found.filter((candidate): candidate is string => candidate !== undefined)
-  const email = removed[0] ? await readGatewayEmail(removed[0]) : undefined
-  await Promise.all(removed.map((candidate) => fs.rm(candidate, { force: true })))
-  return { removed, email }
-}
+import {
+  type GatewayConfig,
+  DEFAULT_PLATFORM_URL,
+  findGatewayConfigPath,
+  readGatewayConfig,
+  writeGatewayConfig,
+} from "@sleepy-ai/util/gateway"
 
 async function refreshGatewayToken(dashboardUrl: string, refreshToken: string): Promise<GatewayConfig | null> {
   try {
@@ -269,11 +196,12 @@ function pollDeviceToken(server: string, deviceCode: string, interval: Duration.
 
 function storeCredential(server: string, token: typeof Token.Type) {
   return Effect.gen(function* () {
-    const configPath = path.join(os.homedir(), ".config", "sleepy", "gateway.json")
+    const configPath =
+      (yield* Effect.promise(() => findGatewayConfigPath())) ??
+      path.join(os.homedir(), ".config", "sleepy", "gateway.json")
     const expires = Date.now() + token.expires_in * 1000
-    yield* Effect.promise(async () => {
-      await fs.mkdir(path.dirname(configPath), { recursive: true })
-      await writeGatewayConfig(configPath, {
+    yield* Effect.promise(() =>
+      writeGatewayConfig(configPath, {
         access_token: token.access_token,
         refresh_token: token.refresh_token,
         expires_at: expires,
@@ -281,8 +209,8 @@ function storeCredential(server: string, token: typeof Token.Type) {
         dashboard_url: server,
         email: token.email ?? undefined,
         tier: token.tier ?? undefined,
-      })
-    })
+      }),
+    )
     return Credential.OAuth.make({
       type: "oauth" as const,
       methodID: DEVICE_METHOD,
@@ -308,7 +236,7 @@ function refreshCredential(credential: Credential.OAuth) {
       return yield* Effect.fail(new Error("Sleepy AI session expired, run `sleepy login` again"))
     }
     const token = Schema.decodeUnknownSync(Token)(result.body, { errors: "all" })
-    const configPath = yield* Effect.promise(findGatewayConfigPath)
+    const configPath = yield* Effect.promise(() => findGatewayConfigPath())
     if (configPath) {
       yield* Effect.promise(() =>
         writeGatewayConfig(configPath, {

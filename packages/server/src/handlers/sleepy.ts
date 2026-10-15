@@ -1,4 +1,4 @@
-import { clearGatewayConfig } from "@sleepy-ai/core/plugin/provider/sleepy"
+import { clearGatewayConfig } from "@sleepy-ai/util/gateway"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/http-api"
 import { Api } from "../api"

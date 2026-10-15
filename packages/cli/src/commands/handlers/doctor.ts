@@ -1,9 +1,9 @@
-import fs from "node:fs/promises"
 import { existsSync } from "node:fs"
 import path from "node:path"
 import { intro, outro, log, spinner } from "@clack/prompts"
 import { Effect } from "effect"
 import { Global } from "@sleepy-ai/util/global"
+import { readGatewayConfig } from "@sleepy-ai/util/gateway"
 import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { handlePromptErrors } from "../../ui/prompt"
@@ -15,41 +15,35 @@ const maskToken = (token: string): string => {
 
 const checkCredentials = (configDir: string) =>
   Effect.gen(function* () {
-    const configPath = path.join(configDir, "gateway.json")
+    const loaded = yield* Effect.promise(() => readGatewayConfig(configDir))
 
-    if (!existsSync(configPath)) {
-      log.error(`Credentials config missing at ${configPath}`)
+    if (!loaded) {
+      log.error(`Credentials config missing at ${path.join(configDir, "gateway.json")}`)
       log.message("Please authenticate first by running 'sleepy login'.")
       return null
     }
 
-    try {
-      const raw = yield* Effect.promise(() => fs.readFile(configPath, "utf-8"))
-      const config = JSON.parse(raw)
+    const { config } = loaded
+    const isExpired = config.expires_at ? Date.now() > config.expires_at : false
+    const hasRefresh = !!config.refresh_token
 
-      const isExpired = config.expires_at ? Date.now() > config.expires_at : false
-      const hasRefresh = !!config.refresh_token
+    log.success("Credentials found")
+    log.message(
+      [
+        `  Path:     ${loaded.path}`,
+        `  Endpoint: ${config.endpoint || "default"}`,
+        `  Email:    ${config.email || "unknown"}`,
+        `  Tier:     ${config.tier || "standard"}`,
+        `  Token:    ${maskToken(config.access_token || config.api_key || "")}`,
+        `  Expires:  ${isExpired ? "EXPIRED" : "valid"}`,
+        ...(hasRefresh ? [`  Refresh:  available${isExpired ? " (will auto-refresh)" : ""}`] : []),
+      ].join("\n"),
+    )
 
-      log.success("Credentials found")
-      log.message(
-        [
-          `  Endpoint: ${config.endpoint || "default"}`,
-          `  Email:    ${config.email || "unknown"}`,
-          `  Tier:     ${config.tier || "standard"}`,
-          `  Token:    ${maskToken(config.access_token || config.token || "")}`,
-          `  Expires:  ${isExpired ? "EXPIRED" : "valid"}`,
-          ...(hasRefresh ? [`  Refresh:  available${isExpired ? " (will auto-refresh)" : ""}`] : []),
-        ].join("\n"),
-      )
-
-      return {
-        endpoint: config.endpoint || config.dashboard_url || "https://www.sleepyai.org",
-        email: config.email,
-        tier: config.tier,
-      }
-    } catch {
-      log.error("Failed to read gateway.json. Try re-authenticating with 'sleepy login'.")
-      return null
+    return {
+      endpoint: config.endpoint || config.dashboard_url || "https://www.sleepyai.org",
+      email: config.email,
+      tier: config.tier,
     }
   })
 

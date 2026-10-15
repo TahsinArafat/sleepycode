@@ -164,7 +164,7 @@ it.live("serves the HttpApi and enforces Basic auth like the Node server", () =>
       Effect.flatMap(Schema.decodeUnknownEffect(ServerInfo)),
     )
     expect(body.version).toBe("test-version")
-    expect(body.paths.tmp).toEndWith("sleepycode")
+    expect(body.paths.tmp).toEndWith("sleepy")
     expect(body.capabilities?.persistentPty).toBe(process.platform !== "win32")
   }),
 )
@@ -252,9 +252,12 @@ it.live("applies custom CORS origins to HTTP responses and PTY ticket checks", (
 
           const invalidTicket = yield* Effect.promise(() =>
             handler(
-              new Request("http://sleepycode.local/api/pty/pty_missing/connect?ticket=invalid&location[directory]=/tmp", {
-                headers: { origin },
-              }),
+              new Request(
+                "http://sleepycode.local/api/pty/pty_missing/connect?ticket=invalid&location[directory]=/tmp",
+                {
+                  headers: { origin },
+                },
+              ),
             ),
           )
           expect(invalidTicket.status).toBe(403)

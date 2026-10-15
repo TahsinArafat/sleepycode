@@ -202,7 +202,7 @@ describe("PluginSupervisor", () => {
     }),
   )
 
-  for (const targets of [["sleepycode.config.policy", "sleepycode.provider.sleepycode", "sleepycode.config.agent"], ["*"]]) {
+  for (const targets of [["sleepycode.config.policy", "sleepycode.provider.sleepy", "sleepycode.config.agent"], ["*"]]) {
     it.effect(`keeps policy enforcement and the Console connection through plugin removals: ${targets}`, () =>
       Effect.gen(function* () {
         source.operations = targets.map((target) => ({ type: "remove", target }))
@@ -218,7 +218,7 @@ describe("PluginSupervisor", () => {
         )
         const status = (id: string) => inventory.find((plugin) => plugin.id === id)?.state.status
         expect(status("sleepycode.config.policy")).toBe("active")
-        expect(status("sleepycode.provider.sleepycode")).toBe("active")
+        expect(status("sleepycode.provider.sleepy")).toBe("active")
         // Removals still apply to everything else, including instance and builtin plugins.
         expect(status("sleepycode.config.agent")).toBeUndefined()
         expect(inventory.some((plugin) => plugin.id === id)).toBe(targets[0] !== "*")

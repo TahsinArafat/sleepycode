@@ -20,7 +20,6 @@ import { NvidiaPlugin } from "./provider/nvidia.js"
 import { OllamaPlugin } from "./provider/ollama.js"
 import { OpenAIPlugin } from "./provider/openai.js"
 import { SnowflakeCortexPlugin } from "./provider/snowflake-cortex.js"
-import { SleepycodePlugin } from "./provider/sleepycode.js"
 import { SleepyGatewayPlugin } from "./provider/sleepy.js"
 import { OpenRouterPlugin } from "./provider/openrouter.js"
 import { PerplexityPlugin } from "./provider/perplexity.js"
@@ -54,7 +53,6 @@ export const ProviderPlugins: PluginInternal.InternalPlugin[] = [
   NvidiaPlugin,
   OllamaPlugin,
   SleepyGatewayPlugin,
-  SleepycodePlugin,
   SnowflakeCortexPlugin,
   OpenAIPlugin,
   OpenRouterPlugin,

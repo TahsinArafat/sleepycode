@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Duration, Effect, Schema } from "effect"
 import path from "node:path"
 import os from "node:os"
 import fs from "node:fs/promises"
@@ -6,7 +6,30 @@ import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
 import { Integration } from "@sleepy-ai/schema/integration"
+import { Credential } from "../../credential.js"
 import { Model } from "../../model.js"
+
+const CLIENT_ID = "sleepy-cli"
+const DEVICE_METHOD = Integration.MethodID.make("device")
+
+const Device = Schema.Struct({
+  device_code: Schema.String,
+  user_code: Schema.String,
+  verification_uri: Schema.optional(Schema.String),
+  verification_uri_complete: Schema.optional(Schema.String),
+  expires_in: Schema.Number,
+  interval: Schema.Number,
+})
+const Token = Schema.Struct({
+  access_token: Schema.String,
+  refresh_token: Schema.String,
+  expires_in: Schema.Number,
+  endpoint: Schema.optional(Schema.NullOr(Schema.String)),
+  tier: Schema.optional(Schema.NullOr(Schema.String)),
+  email: Schema.optional(Schema.NullOr(Schema.String)),
+})
+const TokenPending = Schema.Struct({ error: Schema.String })
+const DeviceToken = Schema.Union([Token, TokenPending])
 
 export interface GatewayConfig {
   access_token?: string
@@ -159,6 +182,128 @@ async function fetchGatewayModels(dashboardUrl: string, token: string): Promise<
   return []
 }
 
+const postJSON = async (url: string, body: Record<string, string>) => {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Sleepy-Source": "sleepycode-cli" },
+    body: JSON.stringify(body),
+  })
+  const json = (await res.json().catch(() => null)) as Record<string, unknown> | null
+  if (!res.ok && json == null) throw new Error(`Request failed: HTTP ${res.status} ${url}`)
+  return { status: res.status, body: json ?? {} }
+}
+
+const parseDevice = (raw: Record<string, unknown>) =>
+  Schema.decodeUnknownSync(Device)(raw, { errors: "all" })
+
+const parseDeviceToken = (raw: Record<string, unknown>) =>
+  Schema.decodeUnknownSync(DeviceToken)(raw, { errors: "all" })
+
+function startDeviceFlow(server: string) {
+  return Effect.gen(function* () {
+    const start = yield* Effect.promise(() =>
+      postJSON(`${server}/api/auth/oauth/device`, { client_id: CLIENT_ID }),
+    )
+    const device = parseDevice(start.body)
+    const url =
+      device.verification_uri_complete ??
+      (device.verification_uri
+        ? `${device.verification_uri}?code=${encodeURIComponent(device.user_code)}`
+        : `${server}/auth/device?code=${encodeURIComponent(device.user_code)}`)
+
+    return {
+      mode: "auto" as const,
+      url,
+      instructions: `Enter code: ${device.user_code}`,
+      callback: pollDeviceToken(server, device.device_code, Duration.seconds(device.interval || 5)),
+    }
+  })
+}
+
+function pollDeviceToken(server: string, deviceCode: string, interval: Duration.Duration) {
+  const loop = (wait: Duration.Duration): Effect.Effect<Credential.OAuth, unknown> =>
+    Effect.gen(function* () {
+      yield* Effect.sleep(wait)
+      const result = parseDeviceToken(
+        (
+          yield* Effect.promise(() =>
+            postJSON(`${server}/api/auth/oauth/device/token`, {
+              client_id: CLIENT_ID,
+              device_code: deviceCode,
+            }),
+          )
+        ).body,
+      )
+      if ("access_token" in result) return yield* storeCredential(server, result)
+      if (result.error === "authorization_pending") return yield* loop(wait)
+      if (result.error === "slow_down") return yield* loop(Duration.sum(wait, Duration.seconds(5)))
+      return yield* Effect.fail(new Error(`Device authorization failed: ${result.error}`))
+    })
+  return loop(interval)
+}
+
+function storeCredential(server: string, token: typeof Token.Type) {
+  return Effect.gen(function* () {
+    const configPath = path.join(os.homedir(), ".config", "sleepy", "gateway.json")
+    const expires = Date.now() + token.expires_in * 1000
+    yield* Effect.promise(async () => {
+      await fs.mkdir(path.dirname(configPath), { recursive: true })
+      await writeGatewayConfig(configPath, {
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        expires_at: expires,
+        endpoint: token.endpoint ?? server,
+        dashboard_url: server,
+        email: token.email ?? undefined,
+        tier: token.tier ?? undefined,
+      })
+    })
+    return Credential.OAuth.make({
+      type: "oauth" as const,
+      methodID: DEVICE_METHOD,
+      access: token.access_token,
+      refresh: token.refresh_token,
+      expires,
+      metadata: {
+        server,
+        email: token.email ?? undefined,
+        tier: token.tier ?? undefined,
+      },
+    })
+  })
+}
+
+function refreshCredential(credential: Credential.OAuth) {
+  return Effect.gen(function* () {
+    const server = typeof credential.metadata?.server === "string" ? credential.metadata.server : DEFAULT_PLATFORM_URL
+    const result = yield* Effect.promise(() =>
+      postJSON(`${server}/api/auth/token/refresh`, { refresh_token: credential.refresh }),
+    )
+    if (result.status === 400 || result.status === 401) {
+      return yield* Effect.fail(new Error("Sleepy AI session expired, run `sleepy login` again"))
+    }
+    const token = Schema.decodeUnknownSync(Token)(result.body, { errors: "all" })
+    const configPath = yield* Effect.promise(findGatewayConfigPath)
+    if (configPath) {
+      yield* Effect.promise(() =>
+        writeGatewayConfig(configPath, {
+          ...(typeof credential.metadata?.email === "string" ? { email: credential.metadata.email } : {}),
+          ...(typeof credential.metadata?.tier === "string" ? { tier: credential.metadata.tier } : {}),
+          access_token: token.access_token,
+          refresh_token: token.refresh_token ?? credential.refresh,
+          expires_at: Date.now() + token.expires_in * 1000,
+        }),
+      )
+    }
+    return {
+      ...credential,
+      access: token.access_token,
+      refresh: token.refresh_token ?? credential.refresh,
+      expires: Date.now() + token.expires_in * 1000,
+    }
+  })
+}
+
 let sessionCheckInterval: ReturnType<typeof setInterval> | null = null
 
 function setupSessionChecker(dashboardUrl: string, configPath: string, initialRefreshToken: string) {
@@ -190,7 +335,7 @@ function setupSessionChecker(dashboardUrl: string, configPath: string, initialRe
 }
 
 export const SleepyGatewayPlugin = define({
-  id: "sleepycode:provider:sleepy",
+  id: "sleepycode.provider.sleepy",
   effect: Effect.fn(function* (ctx) {
     yield* ctx.integration.transform((editor) => {
       editor.update("sleepy", (integration) => {
@@ -204,6 +349,26 @@ export const SleepyGatewayPlugin = define({
           label: "Log in with Sleepy",
           command: ["sleepy", "login"],
         },
+      })
+      editor.method.update({
+        integrationID: Integration.ID.make("sleepy"),
+        method: {
+          id: DEVICE_METHOD,
+          type: "oauth",
+          label: "Sleepy AI account",
+          form: [
+            {
+              key: "server",
+              type: "string",
+              format: "uri",
+              hidden: true,
+              default: DEFAULT_PLATFORM_URL,
+            },
+          ],
+        },
+        authorize: (answer) =>
+          startDeviceFlow(typeof answer?.server === "string" ? answer.server.replace(/\/+$/, "") : DEFAULT_PLATFORM_URL),
+        refresh: refreshCredential,
       })
     })
 

@@ -163,6 +163,7 @@ over an edit to theirs. Where an edit is unavoidable, keep it in one contiguous 
 | --- | --- | --- | --- |
 | `3943b84ef0` | 2.0.29 | — | The re-parent base itself. |
 | `c5e513e98e` | 2.0.30 | 82 | 254 conflicted paths, of which **3 were real fork edits**. |
+| `50d4280dbd` | 2.0.30 | 2 | 3 conflicted paths, all branding-only, resolved mechanically. |
 
 The 2.0.30 sync resolved like this, and it is the shape every sync after it should take:
 

@@ -23,8 +23,21 @@ import { unclassifiedUpstreamUrls, shouldSkipContent } from "./lib/branding"
 const TEXT = /\.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|md|mdx|astro|txt|yml|yaml|sh|toml)$/i
 // Paths whose text reaches a user or a running process. Docs sites and deployment config are
 // reported but do not gate: they are a deliberate follow-up, not a shipped-binary defect.
+//
+// `src/content`, `src/asset`, `src/assets` and `src/i18n` are content trees that happen to sit
+// under `src/` in the web/app packages - bundled docs, translations and media, not code paths a
+// binary executes. Without excluding them the gate fires on ~600 translated docs and is useless
+// as a signal.
 const RUNTIME =
-  /^(packages\/(cli|core|tui|server|protocol|schema|ai|desktop|util|plugin|sdk)\/src\/|install$|\.github\/workflows\/)/
+  /^(packages\/(cli|core|tui|server|protocol|schema|ai|desktop|util|plugin|sdk)\/src\/|install$)/
+const CONTENT = /(^|\/)(content|assets?|i18n)\//
+// Tests are not shipped: a URL in a fixture is arbitrary input, and a test asserting URL
+// handling is not a call a binary makes. Both spellings matter - a `test/` directory, and a
+// `*.test.ts` colocated inside `src/`, which is where packages/desktop keeps its renderer
+// tests and would otherwise pass for runtime.
+const TESTS = /(^|\/)(test|tests|e2e|fixture|fixtures)\/|\.(test|spec)\.[cm]?[jt]sx?$/
+
+const isRuntime = (file: string) => RUNTIME.test(file) && !CONTENT.test(file) && !TESTS.test(file)
 
 const runtimeOnly = process.argv.includes("--runtime")
 
@@ -50,19 +63,19 @@ for (const file of files) {
 }
 
 const rows = [...owners.entries()]
-  .filter(([, where]) => !runtimeOnly || where.some((file) => RUNTIME.test(file)))
+  .filter(([, where]) => !runtimeOnly || where.some(isRuntime))
   .sort((a, b) => b[1].length - a[1].length)
 
 console.log(`url-audit: scanned ${files.length} files, ${owners.size} unclassified upstream URLs`)
 console.log(`add a decision to INTENTIONALLY_UPSTREAM in script/lib/branding.ts, or repoint it.`)
 console.log()
 for (const [url, where] of rows) {
-  const runtime = where.some((file) => RUNTIME.test(file))
+  const runtime = where.some(isRuntime)
   console.log(`${runtime ? "RUNTIME" : "other  "} ${String(where.length).padStart(4)}  ${url}`)
   console.log(`                 e.g. ${where[0]}`)
 }
 
-const gating = [...owners.entries()].filter(([, where]) => where.some((file) => RUNTIME.test(file)))
+const gating = [...owners.entries()].filter(([, where]) => where.some(isRuntime))
 if (gating.length > 0) {
   console.log(`\n${gating.length} unclassified URL(s) in shipped-runtime paths.`)
   process.exit(1)

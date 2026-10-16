@@ -374,6 +374,25 @@ export const INTENTIONALLY_UPSTREAM: ReadonlyArray<{ readonly host: string; read
     host: "opencode.ai/v2/llms.txt",
     reason: "Machine-readable docs index referenced by the sleepycode skill. Same open decision as opencode.ai/v2/docs.",
   },
+  {
+    host: "opencode.ai/v2/openapi.json",
+    reason:
+      "The OpenAPI spec the shipped sleepycode skill points at. Same open decision as opencode.ai/v2/docs: our own spec is generated into packages/protocol but is not published at a known path yet.",
+  },
+  {
+    host: "opencode.ai/docs",
+    reason: "Bare docs path in the sleepycode skill, covered by the open docs decision above.",
+  },
+  {
+    host: "opencode.ai/inference",
+    reason:
+      "The SystemOne inference endpoints as they appear in the vendored model snapshot (packages/core/src/models-dev/snapshot.txt). That file is third-party model metadata captured verbatim and is excluded from rebranding.",
+  },
+  {
+    host: "github.com/anomalyco/opencode",
+    reason:
+      "Links to upstream's own project: issue numbers cited in code comments for context, and the storybook fixtures that demonstrate link handling. They are provenance, not calls; the crash reporter's issue form is the one place this mattered, and it now targets our tracker.",
+  },
 ]
 
 /** Whether `url` names a host the fork intentionally leaves pointing at upstream. */

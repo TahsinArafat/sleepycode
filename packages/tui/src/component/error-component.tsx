@@ -219,10 +219,14 @@ export function ErrorComponent(props: { error: Error; reset: () => void; mode?: 
 }
 
 function buildIssueURL(message: string, stack: string, version: string) {
-  // Field keys match the ids in .github/ISSUE_TEMPLATE/bug-report.yml so the issue
+  // Field keys match the ids in our .github/ISSUE_TEMPLATE/bug-report.yml so the issue
   // form opens pre-filled. Populating os/terminal/reproduce keeps the report past
   // the contributing-guidelines compliance check, which pushes for system info.
-  const url = new URL("https://github.com/anomalyco/opencode/issues/new?template=bug-report.yml")
+  //
+  // The target must be our own tracker: the prefilled keys include `sleepycode-version`,
+  // which only our template defines. Pointing at upstream's form silently drops that field
+  // and files SleepyCode crashes against a project that did not build this binary.
+  const url = new URL("https://github.com/TahsinArafat/sleepycode/issues/new?template=bug-report.yml")
   url.searchParams.set("title", `TUI crash: ${message}`)
   url.searchParams.set("sleepycode-version", version)
   url.searchParams.set("os", describeOS())

@@ -101,6 +101,20 @@ published asset, or a link to upstream's own project is allowlisted.** The v1 fo
 same split — it repointed its install/update surface to `www.sleepyai.org` but kept
 `opencode.ai/config.json` as the `$schema` it writes into generated configs.
 
+`--runtime` is the gate. It matches `packages/<shipped>/src/` and the `install` script, minus
+`content`/`assets`/`i18n` trees (bundled docs and translations that happen to live under `src/`
+in the web and app packages) and minus tests in either spelling, because a URL in a fixture is
+arbitrary input rather than a call. Getting that predicate wrong matters: the first version
+matched `packages/web/src/content/docs/**`, and the gate fired on ~600 translated docs, which
+would have taught everyone to ignore it. The gate is green now — no shipped-runtime endpoint
+lacks a decision.
+
+Two things that audit surfaced which were not endpoints but the same defect: the About panel's
+website string existed in 63 locales (one of them hand-translated, and misspelled in Faroese),
+and the crash reporter filed to **upstream's** issue tracker while pre-filling `sleepycode-version`,
+a field only our own `.github/ISSUE_TEMPLATE/bug-report.yml` defines — so the field was silently
+dropped and the report went to the wrong project. Both are now ours.
+
 ### Verification gate
 
 A sync is not done until it passes. Run these from the package directories, never the repo root:
@@ -419,4 +433,26 @@ finding here so the next pass does not re-investigate them:
   resolved by the URL repointing above.** The update check and the `--method curl` installer both
   resolved from upstream until this pass; they now come from `SLEEPYCODE_UPDATE_URL`. What of
   v1's standalone-binary workflow to keep remains an open product decision.
+
+## Deliberately not done this pass
+
+Confirmed with the maintainer rather than assumed, so a later pass does not read these as
+oversights:
+
+- **Mascot (`170cd44208` and its refinement arc) — skipped by decision.** The animated ASCII cat
+  is cosmetic, has zero v2 footprint, and was the inventory item most likely to be rejected. If it
+  is wanted later, the v1 file is
+  `packages/opencode/src/cli/cmd/tui/feature-plugins/sidebar/mascot.tsx` on
+  `chore/sync-mimo-safe-updates`, and it needs a storybook story like any other TUI feature.
+- **VS Code extension / Continue integration (`sdks/vscode/` and six commits) — not started by
+  decision.** It is the largest item and arguably a separate product, and v2 has no `sdks/vscode/`
+  at all. The honest first step is a product decision — reimplement against v2's HTTP API, or drop
+  it and keep only what makes sense in the CLI/TUI — and that has not been made.
+- **Release workflow and theme (`fd1bc53c96` and `055ee90cd6`) — not started by decision.** The
+  release *blocker* (upstream endpoints in the shipped binary) is fixed above; what remains is
+  which of v1's standalone-binary workflow is still wanted. Any theme work is a design change with
+  a screenshot rather than a code fix, and `packages/tui/src/theme/assets/v2/sleepycode.json`
+  already matches the upstream document shape.
+- **Cosmetic `opencode.ai` occurrences in `packages/web`, `packages/console`, `packages/stats` and
+  the translated docs — left as a separate pass**, per the triage in the URL-repointing section.
 

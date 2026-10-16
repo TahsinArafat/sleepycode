@@ -304,8 +304,14 @@ The shipped binary's endpoints were repointed from `opencode.ai` to `www.sleepya
 canonical runtime domain). What changed, and why each is a call rather than a link:
 
 - `packages/cli/src/services/updater.ts` — the update check asked **upstream's** release service
-  about `sleepycode`, an artifact upstream does not publish, so `sleepycode upgrade` could never
-  report an update. The `--method curl` installer download was pointed at upstream's
+  and took its answer at face value. Upstream answers 200 for any artifact name and returns its
+  own release, so `sleepycode upgrade` was being told our current version was `2.0.31` of
+  `@opencode/cli`: `release()` reads the install target straight from `metadata.package`
+  (`packages/cli/src/services/updater.ts:327`) and the npm branch is a bare
+  `npm install --global <package>@<version>` with no package guard, so `--method npm` would
+  install **upstream opencode's CLI globally** on the user's machine. pnpm and yarn refuse the
+  mismatch outright (`:441`), which is why this only bit the default path. The `--method curl`
+  installer download was pointed at upstream's
   `v2/install` and installed upstream's script. Both now come from `SLEEPYCODE_UPDATE_URL`
   (default `https://www.sleepyai.org`, overridable per deployment), added in
   `packages/cli/src/version.ts`.
@@ -334,6 +340,30 @@ the last is an **open decision**, since the fork ships its own docs tree under
 Left alone as cosmetic, per the triage: `packages/web` (its own site config and translated
 `content/docs`), `packages/console`, `packages/stats`, `services/www` docs, READMEs and
 CHANGELOG. They are links and marketing copy, not calls; repointing them is a separate pass.
+
+### Verified endpoint state (checked live, 2026-03)
+
+The repointing is only as good as the endpoints it points at, so they were probed rather than
+assumed:
+
+| Endpoint | State |
+| --- | --- |
+| `https://www.sleepyai.org/install` | **200** — serves the installer, so `curl -fsSL … \| bash` works |
+| `https://www.sleepyai.org/update/api/*` | **404** — a Next.js fallback page, not the update service |
+| `https://www.sleepyai.org/api/v1/models` | 401 after redirect — the gateway API exists and demands auth, as expected |
+| `https://opencode.ai/update/api/latest/cli/npm` | 200, but returns **upstream's** release (`@opencode/cli` 2.0.31) for any artifact name |
+
+So the installer is genuinely fixed, and the updater now **fails closed**: a 404 surfaces as
+`The update service returned HTTP 404` and the background check logs a warning, rather than
+reporting a foreign version and installing it. That is strictly safer than the old behaviour,
+but it is not yet a working update path.
+
+**Operational prerequisite:** Sleepy must serve the update API at
+`https://www.sleepyai.org/update/api/{channel}/{artifact}/{distribution}`, or point
+`SLEEPYCODE_UPDATE_URL` at wherever it is deployed. Until then the CLI reports "Could not check
+for SleepyCode updates" rather than lying. Do not "fix" this by pointing back at
+`opencode.ai` — that path answers 200 with another project's package and is the bug this section
+exists to describe.
 
 ## Plan & Limits sidebar
 
@@ -429,9 +459,11 @@ finding here so the next pass does not re-investigate them:
   metadata as the system prompt. This is a content task, not a code task — the files need
   converting to frontmatter (or a converter written), which is a product decision about whose
   personas they are that this branch should not make unilaterally.
-- **Release and update surface (`fd1bc53c96`, `dc371942d3`, `9e63f2e590`) — the release-blocker is
-  resolved by the URL repointing above.** The update check and the `--method curl` installer both
-  resolved from upstream until this pass; they now come from `SLEEPYCODE_UPDATE_URL`. What of
+- **Release and update surface (`fd1bc53c96`, `dc371942d3`, `9e63f2e590`) — the code-level blocker
+  is resolved; the server side is not.** The update check and the `--method curl` installer both
+  resolved from upstream until this pass, and now come from `SLEEPYCODE_UPDATE_URL`. Per the
+  verified endpoint table above, the installer endpoint is live and the update endpoint is not
+  deployed yet, so updates fail closed rather than reporting another project's release. What of
   v1's standalone-binary workflow to keep remains an open product decision.
 
 ## Deliberately not done this pass

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, jest, test } from "bun:test"
 import { createRoot } from "solid-js"
 import { createMarquee, createTabMarquee } from "../../src/component/session-tabs"
+import { marqueeCycleWidth } from "../../src/util/marquee"
 
 afterEach(() => jest.useRealTimers())
 
@@ -28,7 +29,9 @@ describe("session tab marquee", () => {
     const scope = createRoot((dispose) => ({ marquee: createMarquee(() => false), dispose }))
 
     scope.marquee.enter("first", "sleepycode", 6)
-    jest.advanceTimersByTime(1_400)
+    // The cycle clears on the tick that reaches the full title plus its gap, so
+    // the boundary moves with the title width.
+    jest.advanceTimersByTime(600 + (marqueeCycleWidth("sleepycode") - 1) * 80)
 
     expect(scope.marquee.active()).toBe("first")
     expect(scope.marquee.offset()).toBe(0)

@@ -102,6 +102,13 @@ The known core baseline is **345 pass / 22 fail**, and the 22 are pre-existing: 
 port 8080, `PluginSupervisor` watcher/reload timing, and a plugin-loader transitive dependency.
 **Any other failure is a regression.** `bun ci` installs; never `bun install`/`npm install`.
 
+The TUI baseline at `c5e513e98e` is **1483 pass / 2 skip / 8 fail**, and all 8 are environment, not fork:
+two `test/component/dialog-shell-output.test.tsx` cases need ~5.19 s against the default 5000 ms budget
+(passes under `--timeout 30000`), and the six in `test/plugin-keymap.test.tsx` /
+`test/plugin-source.test.ts` come from a local bun 1.3.14 throwing a non-`Error` `ResolveMessage` for a
+legitimately absent optional plugin entrypoint, which `packages/plugin/src/host.ts` deliberately
+rethrows. Do not weaken that guard or widen those timeouts to make them green.
+
 The lockfile is the one file a sync may have to regenerate. Upstream's `bun.lock` merged cleanly
 and `apply-branding` rewrote it with its integrity check intact, so it did not need one; when
 upstream adds or removes a dependency, the branded lockfile cannot supply the new hashes and
@@ -175,6 +182,13 @@ The 2.0.30 sync resolved like this, and it is the shape every sync after it shou
   types, which do not know about the `server.sleepy` group we added. The `SleepyLogoutOutput` type
   is the canary: if it is missing from `packages/client/src/promise/generated/types.ts`, the client
   is stale.
+- **Then run the TUI suite and treat a rebrand-shaped failure as a fork bug.** The 2.0.30 suite had
+  30 failures. Four were fork debt: `packages/tui/src/theme/assets/v2/sleepycode.json` had drifted
+  out of the upstream document shape (palette under `dark` instead of `light`, dropped `hue` scales);
+  `INTEGRATION_PRIORITY` in `dialog-integration.tsx` still ranked `sleepycode` when the gateway
+  provider id is `sleepy`; and two test artifacts were stale from the rebrand's longer identifiers —
+  the `inline-tool-wrap` snapshot (72-column wrap point moved) and the session-tab marquee boundary,
+  which is now derived from `marqueeCycleWidth(title)` rather than hardcoded.
 
 ### Classify conflicts against the merge base, not the new upstream
 

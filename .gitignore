@@ -40,3 +40,6 @@ tsconfig.tsbuildinfo
 
 # re-parent tooling output (regenerate with script/fork-delta.ts)
 script/.fork-delta-*.txt
+
+# WitDiff receipts are per-checkout artifacts.
+.witdiff/

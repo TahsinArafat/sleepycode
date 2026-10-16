@@ -1,0 +1,15 @@
+# WitDiff transplants changed tests onto a base revision, and that worktree is a
+# plain checkout. Without these two entries it cannot resolve `effect` and every
+# run stops at `base_control_failed` before it attempts a proof.
+#
+# It still cannot finish on this repository: `verification.framework` accepts
+# cargo, pytest, javascript, go, java, ruby and php, and the JavaScript
+# classifier does not read bun's failure output, so a base run that fails on an
+# assertion is reported as `unrecognized_failure_kind`. See
+# docs/architecture/upstream-sync.md.
+[verification]
+language = "javascript"
+framework = "javascript"
+base_dependency_dirs = ["node_modules", "packages/util/node_modules"]
+test_globs = ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"]
+timeout_secs = 1800

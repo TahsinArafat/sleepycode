@@ -157,6 +157,29 @@ over an edit to theirs. Where an edit is unavoidable, keep it in one contiguous 
 - **Kill stale daemons before live checks.** A `serve` process started before a change keeps
   serving the old code, and it is the most convincing way to "prove" a change did nothing.
 
+## WitDiff
+
+`witdiff.toml` at the repo root makes the tool *run* here at all. The load-bearing key is
+`base_dependency_dirs = ["node_modules", "packages/util/node_modules"]`: WitDiff checks the base out into a
+temporary worktree, and without those it dies on `Cannot find package 'effect'` before it attempts anything,
+which surfaces as `base_control_failed` for every possible base. That is a missing dependency, not a
+regression, and it is why a bare `witdiff verify` here says nothing about the branch.
+
+It still cannot finish on this repository, for two independent reasons:
+
+1. **`base_control` must be green before a proof is allowed.** A base run has to pass the base's own tests.
+   So a fix whose test is *red* at the base — which is every fix this branch makes — is rejected before the
+   transplant is even attempted. Only behaviour newly added on an already-green base is provable, and that
+   is a small, artificial slice of what a sync does.
+2. **The runner is `bun test` and the JavaScript classifier does not read bun's output.** A base run that
+   fails on a real assertion is reported as `reason: unrecognized_failure_kind`,
+   `failure_kind: "command_failure"`, even when the output plainly contains the failing test.
+
+So the honest reading of `status: not_verified` here is *unsupported case*, not *pass* and not *regression*.
+`test_source_unparsable` findings mean the structural test-weakening analysis was skipped for those files,
+so integrity coverage is partial there too. The fix, if WitDiff support matters, is upstream in the
+JavaScript classifier — not something this branch can configure around.
+
 ## Completed syncs
 
 | Upstream head | Version | Commits merged | Shape of the merge |

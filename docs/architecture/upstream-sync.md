@@ -371,3 +371,20 @@ email is only reported alongside a credential. Because the read is per-request r
 cached at boot, a session that appears while the process is running is picked up and the nag
 disappears without a restart; signing out brings it back.
 
+## Session token spend in the context panel
+
+v1's `b02ce70391` added a separate sidebar-session-stats plugin listing Input / Output / Total
+tokens. v2 showed neither: `context.tsx` reports the **context window** fill from the last
+assistant step, and `system/stats.tsx` reports cost and pricing. The cumulative split was
+genuinely missing, but a second plugin with its own header would have made two overlapping
+displays, so it is folded into the existing Context section instead:
+
+- `sessionTokens()` in `packages/tui/src/util/session.ts` sums every assistant message, folding
+  reasoning into output. It sits beside `contextUsage()` deliberately: the two numbers answer
+  different questions (**window fill now** vs **session spend so far**) and the panel shows both
+  rather than letting one stand in for the other.
+- The row hides until the session records usage, so a fresh session shows nothing rather than
+  zeroes, matching how the rest of the panel already degrades.
+
+No protocol change: `session.message.list()` and `session.cost()` already carried the data.
+

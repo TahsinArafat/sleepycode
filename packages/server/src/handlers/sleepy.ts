@@ -1,5 +1,5 @@
 import { clearGatewayConfig } from "@sleepy-ai/util/gateway"
-import { fetchGatewayUsage } from "@sleepy-ai/core/plugin/provider/sleepy"
+import { fetchGatewayUsage, readGatewayStatus } from "@sleepy-ai/core/plugin/provider/sleepy"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/http-api"
 import { Api } from "../api"
@@ -18,6 +18,12 @@ export const SleepyHandler = HttpApiBuilder.group(Api, "server.sleepy", (handler
       // error: the panel degrades and the rest of the session is unaffected.
       Effect.fn(function* () {
         return { data: yield* Effect.promise(() => fetchGatewayUsage()) }
+      }),
+    )
+    .handle(
+      "sleepy.status",
+      Effect.fn(function* () {
+        return { data: yield* Effect.promise(() => readGatewayStatus()) }
       }),
     ),
 )

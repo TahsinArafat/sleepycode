@@ -166,6 +166,7 @@ import type {
   CredentialRemoveOutput,
   SleepyLogoutOutput,
   SleepyUsageOutput,
+  SleepyStatusOutput,
   ProjectListInput,
   ProjectListOutput,
   ProjectUpdateInput,
@@ -1121,9 +1122,18 @@ const EndpointSleepyUsage = (raw: RawClient["server.sleepy"]) => () =>
     ),
   )
 
+const EndpointSleepyStatus = (raw: RawClient["server.sleepy"]) => () =>
+  preserveEffect<SleepyStatusOutput>()(
+    raw["sleepy.status"]({}).pipe(
+      Effect.mapError(mapClientError),
+      Effect.map((value) => value.data),
+    ),
+  )
+
 const adaptGroupSleepy = (raw: RawClient["server.sleepy"]) => ({
   logout: EndpointSleepyLogout(raw),
   usage: EndpointSleepyUsage(raw),
+  status: EndpointSleepyStatus(raw),
 })
 
 const EndpointProjectList = (raw: RawClient["server.project"]) => (input?: ProjectListInput) =>

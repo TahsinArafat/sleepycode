@@ -168,6 +168,24 @@ export async function fetchGatewayUsage(): Promise<SleepyUsage.Info | null> {
   }
 }
 
+/**
+ * Whether a Sleepy gateway session is present. A local read of the session file, so it is
+ * cheap enough for the client to consult at startup, unlike {@link fetchGatewayUsage}.
+ *
+ * Either credential counts: the gateway accepts an OAuth `access_token` and a `sk-…` API key
+ * interchangeably. The email is only reported alongside a credential, because an account name
+ * without a usable credential describes nothing.
+ */
+export async function readGatewayStatus(): Promise<SleepyUsage.Status> {
+  const loaded = await readGatewayConfig()
+  const signedIn = loaded !== null && Boolean(loaded.config.access_token ?? loaded.config.api_key)
+  const email = loaded?.config.email
+  return {
+    signedIn,
+    ...(signedIn && typeof email === "string" ? { email } : {}),
+  }
+}
+
 const postJSON = async (url: string, body: Record<string, string>) => {
   const res = await fetch(url, {
     method: "POST",

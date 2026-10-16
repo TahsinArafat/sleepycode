@@ -101,3 +101,42 @@ it.live("GET /api/sleepy/usage degrades to null when the gateway fails", () =>
     }
   }),
 )
+
+it.live("GET /api/sleepy/status reports a local read and follows a session appearing", () =>
+  Effect.gen(function* () {
+    const tmp = yield* Effect.acquireDisposable(Effect.promise(() => tmpdir("sleepy-status-")))
+    const configDir = path.join(tmp.path, "config")
+    const gatewayFile = path.join(configDir, "gateway.json")
+    const prevEnv = process.env.SLEEPY_GATEWAY_CONFIG
+    process.env.SLEEPY_GATEWAY_CONFIG = gatewayFile
+
+    try {
+      const server = yield* startServer(configDir)
+      const client = SleepyCode.make({ baseUrl: server.base, headers: server.headers })
+
+      // No session yet: the status is a plain local read, so it answers without a gateway.
+      expect(yield* Effect.promise(() => client.sleepy.status())).toEqual({ signedIn: false })
+
+      // A session written while the process runs must be picked up: this is the behaviour the
+      // TUI relies on for "signing in restores, signing out re-nags" without a restart.
+      yield* Effect.promise(() =>
+        writeGatewayConfig(gatewayFile, { access_token: "test-access-token", email: "user@example.com" }),
+      )
+      expect(yield* Effect.promise(() => client.sleepy.status())).toEqual({
+        signedIn: true,
+        email: "user@example.com",
+      })
+
+      // An api_key session counts as signed in too; the gateway accepts either credential.
+      yield* Effect.promise(() => writeGatewayConfig(gatewayFile, { api_key: "sk-example" }))
+      expect(yield* Effect.promise(() => client.sleepy.status())).toEqual({ signedIn: true })
+
+      // A session with neither credential is not a signed-in session.
+      yield* Effect.promise(() => writeGatewayConfig(gatewayFile, { email: "user@example.com" }))
+      expect(yield* Effect.promise(() => client.sleepy.status())).toEqual({ signedIn: false })
+    } finally {
+      if (prevEnv !== undefined) process.env.SLEEPY_GATEWAY_CONFIG = prevEnv
+      else delete process.env.SLEEPY_GATEWAY_CONFIG
+    }
+  }),
+)

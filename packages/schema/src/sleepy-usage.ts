@@ -54,3 +54,17 @@ export const windows = [
   spent: keyof UsageByWindow
   label: string
 }>
+
+/**
+ * Whether the Sleepy gateway is signed in, and what to call the account.
+ *
+ * Separate from {@link Info} because they answer different questions with different failure
+ * modes: `Info` is "what does the plan allow" and sits behind a network call that degrades to
+ * null, while this is "is a session present" and is a local read. The TUI leans on this at
+ * startup, where it must not block on the gateway.
+ */
+export const Status = Schema.Struct({
+  signedIn: Schema.Boolean,
+  email: Schema.optional(Schema.String),
+}).annotate({ identifier: "SleepyUsage.Status" })
+export type Status = typeof Status.Type

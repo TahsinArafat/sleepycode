@@ -248,6 +248,8 @@ export type SleepyUsageUsageByWindow = {
   costMonthly?: number | undefined
 }
 
+export type SleepyUsageStatus = { signedIn: boolean; email?: string | undefined }
+
 export type ProjectVcs = string
 
 export type ProjectIcon = { url?: string; override?: string; color?: string }
@@ -6178,6 +6180,8 @@ export type CredentialRemoveOutput = void
 export type SleepyLogoutOutput = { data: { removed: Array<string>; email?: string | undefined } }["data"]
 
 export type SleepyUsageOutput = { data: SleepyUsageInfo | null }["data"]
+
+export type SleepyStatusOutput = { data: SleepyUsageStatus }["data"]
 
 export type ProjectListInput = { readonly archived?: { readonly archived?: boolean | undefined }["archived"] }
 

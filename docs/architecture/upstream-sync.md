@@ -346,3 +346,28 @@ plan field existed anywhere in the protocol or generated types**. The data had t
 when the gateway reports both a limit and a spend, so "not metered" reads differently from
 "unused", and a gateway error degrades to no panel rather than an endpoint error.
 
+## Startup sign-in: nag, not block
+
+**Decision: v2 nags, it does not block.** v1 hard-blocked — `65b2340bf5` replaced the home view
+with a Sign In screen and hid the prompt until a gateway session existed. That decision does not
+survive the re-parent: v2 inherits 75+ upstream providers and a free-model path, so refusing to
+run without a Sleepy gateway session would lock out everyone using a different provider. The
+v1 behaviour was defensible for a product that only had its own gateway; here it would be a
+regression in what the CLI can do.
+
+What is implemented instead:
+
+- `GET /api/sleepy/status` (schema `SleepyUsage.Status`) reports whether a session is present
+  and the account email. It is a **local read** of the session file, deliberately separate from
+  `sleepy.usage` — the client consults it at startup and must not wait on the gateway.
+- The decision lives in `packages/core/src/plugin/provider/sleepy.ts` (`readGatewayStatus`), not
+  the TUI, so the client does not need to know where sessions are stored.
+- `SidebarSignIn` in `packages/tui/src/feature-plugins/sidebar/footer.tsx` renders the reminder
+  beside the existing onboarding card. Nothing is hidden or disabled, so the rest of the TUI is
+  fully usable signed out — that is the property the "does not block" test pins.
+
+Either credential counts as signed in (`access_token` or `api_key`), matching the gateway. The
+email is only reported alongside a credential. Because the read is per-request rather than
+cached at boot, a session that appears while the process is running is picked up and the nag
+disappears without a restart; signing out brings it back.
+

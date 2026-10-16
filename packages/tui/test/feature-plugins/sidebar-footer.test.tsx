@@ -4,7 +4,7 @@ import { RGBA } from "@opentui/core"
 import { testRender } from "@opentui/solid"
 import type { Context } from "@sleepy-ai/plugin/tui/context"
 import { createStore, produce } from "solid-js/store"
-import { SidebarOnboarding } from "../../src/feature-plugins/sidebar/footer"
+import { SidebarOnboarding, SidebarSignIn } from "../../src/feature-plugins/sidebar/footer"
 
 function context(options?: {
   dismissed?: boolean
@@ -120,6 +120,92 @@ test("sidebar onboarding opens integrations and can be dismissed", async () => {
     await app.mockMouse.click(dismiss.x, dismiss.y)
     await app.renderOnce()
     expect(app.captureCharFrame()).not.toContain("Getting started")
+  } finally {
+    app.renderer.destroy()
+  }
+})
+
+function signInContext(options: { signedIn: boolean; email?: string; dispatched?: string[] }) {
+  const color = RGBA.fromInts(200, 200, 200)
+  return {
+    theme: {
+      background: { raised: { high: color } },
+      text: { base: color, muted: color },
+    },
+    client: {
+      sleepy: {
+        status: () =>
+          Promise.resolve({
+            signedIn: options.signedIn,
+            ...(options.email ? { email: options.email } : {}),
+          }),
+      },
+    },
+    keymap: {
+      dispatch: (id: string) => options.dispatched?.push(id),
+    },
+  } as unknown as Context
+}
+
+async function renderSignIn(input: Context, height = 12) {
+  const app = await testRender(
+    () => (
+      <box width={44}>
+        <SidebarSignIn context={input} />
+      </box>
+    ),
+    { width: 44, height },
+  )
+  await app.renderOnce()
+  return app
+}
+
+test("sidebar nags for sign-in when the gateway session is absent", async () => {
+  const dispatched: string[] = []
+  const app = await renderSignIn(signInContext({ signedIn: false, dispatched }))
+
+  try {
+    const frame = app.captureCharFrame()
+    expect(frame).toContain("Sign in to Sleepy")
+    expect(frame).toContain("/connect")
+
+    const action = app.renderer.root.findDescendantById("sidebar.sign-in.action")!
+    await app.mockMouse.click(action.x, action.y)
+    expect(dispatched).toEqual(["provider.connect"])
+  } finally {
+    app.renderer.destroy()
+  }
+})
+
+test("sidebar nags do not block: the rest of the sidebar still renders", async () => {
+  // The enforcement decision is nag, not block. A signed-out session must not remove sibling
+  // sidebar content, which a hard block would.
+  const input = signInContext({ signedIn: false })
+  const app = await testRender(
+    () => (
+      <box width={44} flexDirection="column">
+        <SidebarSignIn context={input} />
+        <text>Sibling content</text>
+      </box>
+    ),
+    { width: 44, height: 12 },
+  )
+
+  try {
+    await app.renderOnce()
+    const frame = app.captureCharFrame()
+    expect(frame).toContain("Sign in to Sleepy")
+    expect(frame).toContain("Sibling content")
+  } finally {
+    app.renderer.destroy()
+  }
+})
+
+test("sidebar drops the sign-in nag once a session is present", async () => {
+  const app = await renderSignIn(signInContext({ signedIn: true, email: "user@example.com" }))
+
+  try {
+    expect(app.captureCharFrame()).not.toContain("Sign in to Sleepy")
   } finally {
     app.renderer.destroy()
   }

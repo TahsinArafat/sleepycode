@@ -1,10 +1,58 @@
 import { Plugin } from "@sleepy-ai/plugin/tui"
-import { createMemo, Show } from "solid-js"
+import { createMemo, createResource, Show } from "solid-js"
 import { useTerminalDimensions } from "@opentui/solid"
 import { FilePath } from "../../ui/file-path"
 import { useWorkingDirectoryActions } from "../../ui/working-directory-actions"
 import { usePromptMove } from "../../component/prompt/move"
 import { hasConnectedProvider } from "../../util/connected-provider"
+
+/**
+ * Startup sign-in reminder for the Sleepy gateway.
+ *
+ * It *nags*, it does not *block*: this fork inherits 75+ upstream providers and a free-model
+ * path, so refusing to run without a gateway session would lock out anyone using another
+ * provider. v1 enforced a hard block; that decision does not survive the re-parent, and the
+ * enforcement level is recorded in `docs/architecture/upstream-sync.md`.
+ *
+ * The status is read from the server (which owns the gateway session file) rather than
+ * checked in the TUI, so a session that appears while the process is running is picked up
+ * without the TUI knowing where sessions live.
+ */
+export function SidebarSignIn(props: { context: Plugin.Context }) {
+  const theme = props.context.theme
+  const [status] = createResource(() => props.context.client.sleepy.status())
+  const signedIn = createMemo(() => status()?.signedIn ?? false)
+
+  return (
+    <Show when={status() && !signedIn()}>
+      <box
+        id="sidebar.sign-in"
+        backgroundColor={theme.background.raised.high}
+        paddingTop={1}
+        paddingBottom={1}
+        paddingLeft={2}
+        paddingRight={2}
+        flexDirection="column"
+        gap={1}
+      >
+        <text fg={theme.text.base}>
+          <b>Sign in to Sleepy</b>
+        </text>
+        <text fg={theme.text.muted}>Sign in to use Sleepy Gateway models and see your plan and limits.</text>
+        <box
+          id="sidebar.sign-in.action"
+          flexDirection="row"
+          gap={1}
+          justifyContent="space-between"
+          onMouseUp={() => props.context.keymap.dispatch("provider.connect")}
+        >
+          <text fg={theme.text.base}>Sign in</text>
+          <text fg={theme.text.muted}>/connect</text>
+        </box>
+      </box>
+    </Show>
+  )
+}
 
 export function SidebarOnboarding(props: { context: Plugin.Context; sessionID: string }) {
   const dimensions = useTerminalDimensions()
@@ -92,6 +140,7 @@ function SidebarFooter(props: { context: Plugin.Context; sessionID: string }) {
   })
   return (
     <box gap={1}>
+      <SidebarSignIn context={props.context} />
       <SidebarOnboarding context={props.context} sessionID={props.sessionID} />
       <Show when={directory()}>
         {(value) => (

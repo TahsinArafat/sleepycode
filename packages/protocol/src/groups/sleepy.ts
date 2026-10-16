@@ -33,4 +33,16 @@ export const SleepyGroup = HttpApiGroup.make("server.sleepy")
       }),
     ),
   )
+  .add(
+    HttpApiEndpoint.get("sleepy.status", "/api/sleepy/status", {
+      success: Schema.Struct({ data: SleepyUsage.Status }),
+    }).annotateMerge(
+      OpenApi.annotations({
+        identifier: "sleepy.status",
+        summary: "Get Sleepy sign-in status",
+        description:
+          "Report whether a Sleepy gateway session is present, and the account email when it is. A local read, so clients can decide what to surface at startup without waiting on the gateway.",
+      }),
+    ),
+  )
   .annotateMerge(OpenApi.annotations({ title: "sleepy" }))

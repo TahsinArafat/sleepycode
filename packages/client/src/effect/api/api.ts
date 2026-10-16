@@ -1690,9 +1690,13 @@ export type SleepyUsageOutput = {
 } | null
 export type SleepyUsageOperation<E = never> = () => Effect.Effect<SleepyUsageOutput, E>
 
+export type SleepyStatusOutput = { readonly signedIn: boolean; readonly email?: string | undefined }
+export type SleepyStatusOperation<E = never> = () => Effect.Effect<SleepyStatusOutput, E>
+
 export interface SleepyApi<E = never> {
   readonly logout: SleepyLogoutOperation<E>
   readonly usage: SleepyUsageOperation<E>
+  readonly status: SleepyStatusOperation<E>
 }
 
 export type ProjectListInput = { readonly archived?: boolean | undefined }

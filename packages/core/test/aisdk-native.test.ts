@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { AISDKNative } from "@sleepy-ai/core/aisdk-native"
+import { Provider } from "@sleepy-ai/core/provider"
 
 function map(
   packageName: string,
@@ -225,6 +226,35 @@ describe("AISDKNative", () => {
       package: "@sleepy-ai/ai/providers/amazon-bedrock/mantle/chat",
       settings: { region: "us-east-1" },
     })
+    expect(
+      map("@ai-sdk/amazon-bedrock/mantle", { region: "us-east-1", profile: "sso" }, "anthropic.claude-opus-4-8"),
+    ).toEqual({
+      package: "@sleepy-ai/ai/providers/amazon-bedrock/mantle/messages",
+      settings: { region: "us-east-1", profile: "sso" },
+    })
+  })
+
+  test("translates settings for every bundled native package named in config", () => {
+    const rewrite = (specifier: string, settings: Record<string, unknown>, modelID = "test-model") => {
+      const target: { package?: string; settings?: Record<string, unknown>; headers?: Record<string, string> } = {
+        package: specifier,
+        settings,
+      }
+      AISDKNative.rewrite(target, { specifier, providerID: "test-provider", modelID })
+      return target
+    }
+
+    for (const specifier of Provider.builtinPackages)
+      expect(rewrite(specifier, { headers: { "x-test": "value" } }).headers).toEqual({ "x-test": "value" })
+    expect(
+      rewrite("@sleepy-ai/ai/providers/amazon-bedrock/mantle", { bearerToken: "token" }, "anthropic.claude-opus-4-8"),
+    ).toMatchObject({
+      package: "@sleepy-ai/ai/providers/amazon-bedrock/mantle/messages",
+      settings: { apiKey: "token" },
+    })
+    expect(rewrite("@sleepy-ai/ai/providers/azure", { useCompletionUrls: true }).package).toBe(
+      "@sleepy-ai/ai/providers/azure/chat",
+    )
   })
 
   test("maps Azure deployments and settings to native routes", () => {

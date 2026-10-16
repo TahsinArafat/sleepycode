@@ -141,11 +141,9 @@ export const dict = {
   "home.faq.a6":
     "SleepyCode er 100% gratis å bruke. Det kommer også med et sett gratis modeller. Det kan være ekstra kostnader hvis du kobler til en annen leverandør.",
   "home.faq.q7": "Hva med data og personvern?",
-  "home.faq.a7.p1": "Dataene dine lagres kun når du bruker våre gratis modeller eller lager delbare lenker.",
+  "home.faq.a7.p1": "Dataene dine lagres kun når du bruker våre gratis modeller.",
   "home.faq.a7.p2.beforeModels": "Les mer om",
   "home.faq.a7.p2.modelsLink": "våre modeller",
-  "home.faq.a7.p2.and": "og",
-  "home.faq.a7.p2.shareLink": "delingssider",
   "home.faq.q8": "Er SleepyCode åpen kildekode?",
   "home.faq.a8.p1": "Ja, SleepyCode er fullt open source. Kildekoden er offentlig på",
   "home.faq.a8.p2": "under",
@@ -221,7 +219,7 @@ export const dict = {
     "Alle Zen-modeller hostes i USA. Leverandører følger en policy om null oppbevaring og bruker ikke dataene dine til modelltrening, med",
   "zen.privacy.exceptionsLink": "følgende unntak",
 
-  "go.promo.gemini": "Gemini 4 Argon er nå tilgjengelig med 2× bruk i en begrenset periode.",
+  "go.promo.step5": "Step 5 Preview er nå tilgjengelig i Go med 4× bruk i en begrenset periode.",
   "go.title": "SleepyCode Go | Rimelige kodemodeller for alle",
   "go.meta.description":
     "Go koster $10/måned, med sjenerøse bruksgrenser og pålitelig tilgang til ledende kodemodeller.",
@@ -376,10 +374,6 @@ export const dict = {
   "download.faq.a5.p2.beforeZen":
     "Eventuelle ekstra kostnader kommer fra abonnementet ditt hos en modellleverandør. Selv om SleepyCode fungerer med enhver modellleverandør, anbefaler vi å bruke",
   "download.faq.a5.p2.afterZen": ".",
-
-  "download.faq.a6.p1": "Dataene og informasjonen din lagres bare når du oppretter delbare lenker i SleepyCode.",
-  "download.faq.a6.p2.beforeShare": "Les mer om",
-  "download.faq.a6.shareLink": "delingssider",
 
   "enterprise.title": "SleepyCode | Enterprise-løsninger for din organisasjon",
   "enterprise.meta.description": "Kontakt SleepyCode for enterprise-løsninger",

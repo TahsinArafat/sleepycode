@@ -345,7 +345,6 @@ sleepycode run --attach http://localhost:4096 "Explain async/await in JavaScript
 | <nobr><code>{"--continue"}</code></nobr> | `-c`     | Продолжить последний сеанс                                                                       |
 | <nobr><code>{"--session"}</code></nobr>  | `-s`     | Идентификатор сеанса для продолжения                                                             |
 | <nobr><code>{"--fork"}</code></nobr>     |          | Разветвить сеанс при продолжении (используйте с `--continue` или `--session`)                    |
-| <nobr><code>{"--share"}</code></nobr>    |          | Поделиться сеансом                                                                               |
 | <nobr><code>{"--model"}</code></nobr>    | `-m`     | Модель для использования в виде поставщика/модели.                                               |
 | <nobr><code>{"--agent"}</code></nobr>    |          | Агент для использования                                                                          |
 | <nobr><code>{"--file"}</code></nobr>     | `-f`     | Файл(ы) для прикрепления к сообщению                                                             |
@@ -442,17 +441,14 @@ sleepycode export [sessionID]
 
 ### import
 
-Импортируйте данные сеанса из файла JSON или URL-адреса общего ресурса sleepycode.
+Импортируйте данные сеанса из файла JSON.
 
 ```bash
 sleepycode import <file>
 ```
 
-Вы можете импортировать из локального файла или URL-адреса общего ресурса sleepycode.
-
 ```bash
 sleepycode import session.json
-sleepycode import https://opncd.ai/s/abc123
 ```
 
 ---
@@ -564,7 +560,6 @@ sleepycode можно настроить с помощью переменных 
 
 | Переменная                            | Тип                 | Описание                                                                         |
 | ------------------------------------- | ------------------- | -------------------------------------------------------------------------------- |
-| `SLEEPYCODE_AUTO_SHARE`                 | логическое значение | Автоматически делиться сеансами                                                  |
 | `SLEEPYCODE_GIT_BASH_PATH`              | строка              | Путь к исполняемому файлу Git Bash в Windows                                     |
 | `SLEEPYCODE_CONFIG`                     | строка              | Путь к файлу конфигурации                                                        |
 | `SLEEPYCODE_TUI_CONFIG`                 | строка              | Путь к файлу конфигурации TUI                                                    |

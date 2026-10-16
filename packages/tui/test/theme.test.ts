@@ -22,6 +22,11 @@ test("registers sleepycode as a native V2 theme", () => {
   expect(parseTheme(getSleepyCodeTheme()).base).toBeDefined()
 })
 
+test("keeps the experimental sleepycode2 theme out of the global theme list", () => {
+  expect(allThemes().sleepycode2).toBeUndefined()
+  expect(hasTheme("sleepycode2")).toBe(false)
+})
+
 test("detects V1 themes from their theme field and caches migrations", () => {
   const unversioned = structuredClone(sleepycodeV1)
   const explicit = { ...structuredClone(sleepycodeV1), version: 1 }

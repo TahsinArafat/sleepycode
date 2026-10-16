@@ -5,7 +5,8 @@
     "bunfig.toml",
     ".npmrc",
     ".github/actions/setup-bun/**",
-    ".github/workflows/test.yml"
+    ".github/workflows/test.yml",
+    "package.json"
   ],
   "globalEnv": ["CI", "SLEEPYCODE_DISABLE_SHARE"],
   "globalPassThroughEnv": ["CI", "SLEEPYCODE_DISABLE_SHARE"],
@@ -17,9 +18,6 @@
     "test:components": {
       "outputs": [],
       "cache": false
-    },
-    "@sleepy-ai/enterprise#typecheck": {
-      "dependsOn": ["@sleepy-ai/core#typecheck"]
     },
     "@sleepy-ai/sdk#typecheck": {
       "dependsOn": ["@sleepy-ai/core#typecheck"]
@@ -34,22 +32,29 @@
       "dependsOn": ["@sleepy-ai/core#typecheck"]
     },
     "build": {
-      "dependsOn": [],
+      "dependsOn": ["transit"],
       "outputs": ["dist/**"]
     },
+    // Workspace packages export their sources, so tests never wait for a dependency's build; the build job in
+    // test.yml checks the library builds. No package has a transit script: it runs nothing and only folds every
+    // workspace dependency into the test hash.
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
     "@sleepy-ai/ai#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/codemode#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/core#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/function#test": {
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/desktop#test": {
@@ -57,34 +62,79 @@
       "cache": false
     },
     "@sleepy-ai/httpapi-codegen#test": {
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/server#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/cli#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/tui#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/latex#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/app#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/ui#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/session-ui#test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/client#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/gui-extensions#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/http-recorder#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/merman#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/plugin#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/plugin-browser#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/script#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/sdk#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/simulation#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/theme#test": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "@sleepy-ai/util#test": {
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "@sleepy-ai/sdk#verify:package": {

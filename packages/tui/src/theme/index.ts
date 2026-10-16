@@ -2,6 +2,7 @@ import { migrateV1, parseThemeDocument, type ThemeDocument, type ModeDefinition 
 import { resolveThemeColors } from "./resolve"
 import { DEFAULT_THEMES, type Theme, type ThemeV1Json } from "./v1"
 import sleepycode from "./assets/v2/sleepycode.json" with { type: "json" }
+import sleepycode2 from "./assets/v2/sleepycode2.json" with { type: "json" }
 
 export { DEFAULT_THEMES, type Theme, type ThemeV1Json } from "./v1"
 
@@ -21,6 +22,15 @@ export function getSleepyCodeTheme() {
   const document = parseThemeDocument(sleepycode, "sleepycode") as NonNullable<typeof sleepycodeTheme>
   sleepycodeTheme = document
   return document
+}
+
+let sleepycode2Theme: ThemeDocument | undefined
+
+// Temporary theme for the "new-designs" experiment. It is not part of allThemes(), so only the
+// TUI theme context offers it, and only while the experiment is enabled.
+export function getSleepyCode2Theme() {
+  sleepycode2Theme ??= parseThemeDocument(sleepycode2, "sleepycode2")
+  return sleepycode2Theme
 }
 
 function listThemes(): Record<string, ThemeDocumentSource> {

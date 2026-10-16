@@ -345,7 +345,6 @@ sleepycode run --attach http://localhost:4096 "Explain async/await in JavaScript
 | <nobr><code>{"--continue"}</code></nobr> | `-c`  | Continuar la última sesión                                                                |
 | <nobr><code>{"--session"}</code></nobr>  | `-s`  | ID de sesión para continuar                                                               |
 | <nobr><code>{"--fork"}</code></nobr>     |       | Bifurcar la sesión al continuar (usar con `--continue` o `--session`)                     |
-| <nobr><code>{"--share"}</code></nobr>    |       | Comparte la sesión                                                                        |
 | <nobr><code>{"--model"}</code></nobr>    | `-m`  | Modelo a utilizar en forma de proveedor/modelo                                            |
 | <nobr><code>{"--agent"}</code></nobr>    |       | Agente a utilizar                                                                         |
 | <nobr><code>{"--file"}</code></nobr>     | `-f`  | Archivo(s) para adjuntar al mensaje                                                       |
@@ -442,17 +441,14 @@ Si no proporciona una ID de sesión, se le pedirá que seleccione entre las sesi
 
 ### import
 
-Importe datos de sesión desde un archivo JSON o una URL compartida SleepyCode.
+Importe datos de sesión desde un archivo JSON.
 
 ```bash
 sleepycode import <file>
 ```
 
-Puede importar desde un archivo local o una URL compartida SleepyCode.
-
 ```bash
 sleepycode import session.json
-sleepycode import https://opncd.ai/s/abc123
 ```
 
 ---
@@ -564,7 +560,6 @@ SleepyCode se puede configurar mediante variables de entorno.
 
 | Variable                              | Type     | Description                                                                     |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------- |
-| `SLEEPYCODE_AUTO_SHARE`                 | booleano | Compartir sesiones automáticamente                                              |
 | `SLEEPYCODE_GIT_BASH_PATH`              | cadena   | Ruta al ejecutable de Git Bash en Windows                                       |
 | `SLEEPYCODE_CONFIG`                     | cadena   | Ruta al archivo de configuración                                                |
 | `SLEEPYCODE_CONFIG_DIR`                 | cadena   | Ruta al directorio de configuración                                             |

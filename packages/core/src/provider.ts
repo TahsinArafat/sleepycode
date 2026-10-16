@@ -46,6 +46,10 @@ export type ProviderPackage = ProviderPackageDefinition
 
 const packages = new Map<string, Promise<unknown>>()
 const builtins = new Map<string, () => Promise<unknown>>([
+  ["@sleepy-ai/ai/providers/alibaba", () => import("@sleepy-ai/ai/providers/alibaba")],
+  ["@sleepy-ai/ai/providers/alibaba/chat", () => import("@sleepy-ai/ai/providers/alibaba/chat")],
+  ["@sleepy-ai/ai/providers/alibaba/messages", () => import("@sleepy-ai/ai/providers/alibaba/messages")],
+  ["@sleepy-ai/ai/providers/alibaba/responses", () => import("@sleepy-ai/ai/providers/alibaba/responses")],
   ["@sleepy-ai/ai/providers/amazon-bedrock", () => import("@sleepy-ai/ai/providers/amazon-bedrock")],
   ["@sleepy-ai/ai/providers/amazon-bedrock/mantle", () => import("@sleepy-ai/ai/providers/amazon-bedrock/mantle")],
   [
@@ -53,12 +57,14 @@ const builtins = new Map<string, () => Promise<unknown>>([
     () => import("@sleepy-ai/ai/providers/amazon-bedrock/mantle/chat"),
   ],
   [
+    "@sleepy-ai/ai/providers/amazon-bedrock/mantle/messages",
+    () => import("@sleepy-ai/ai/providers/amazon-bedrock/mantle/messages"),
+  ],
+  [
     "@sleepy-ai/ai/providers/amazon-bedrock/mantle/responses",
     () => import("@sleepy-ai/ai/providers/amazon-bedrock/mantle/responses"),
   ],
-  ["@sleepy-ai/ai/providers/alibaba/chat", () => import("@sleepy-ai/ai/providers/alibaba/chat")],
-  ["@sleepy-ai/ai/providers/alibaba/messages", () => import("@sleepy-ai/ai/providers/alibaba/messages")],
-  ["@sleepy-ai/ai/providers/alibaba/responses", () => import("@sleepy-ai/ai/providers/alibaba/responses")],
+  ["@sleepy-ai/ai/providers/amazon-bedrock-mantle", () => import("@sleepy-ai/ai/providers/amazon-bedrock-mantle")],
   ["@sleepy-ai/ai/providers/anthropic", () => import("@sleepy-ai/ai/providers/anthropic")],
   ["@sleepy-ai/ai/providers/anthropic-compatible", () => import("@sleepy-ai/ai/providers/anthropic-compatible")],
   ["@sleepy-ai/ai/providers/azure", () => import("@sleepy-ai/ai/providers/azure")],
@@ -77,23 +83,34 @@ const builtins = new Map<string, () => Promise<unknown>>([
   ["@sleepy-ai/ai/providers/google", () => import("@sleepy-ai/ai/providers/google")],
   ["@sleepy-ai/ai/providers/google/interactions", () => import("@sleepy-ai/ai/providers/google/interactions")],
   ["@sleepy-ai/ai/providers/google-vertex", () => import("@sleepy-ai/ai/providers/google-vertex")],
+  ["@sleepy-ai/ai/providers/google-vertex/chat", () => import("@sleepy-ai/ai/providers/google-vertex/chat")],
   ["@sleepy-ai/ai/providers/google-vertex/gemini", () => import("@sleepy-ai/ai/providers/google-vertex/gemini")],
   [
     "@sleepy-ai/ai/providers/google-vertex/interactions",
     () => import("@sleepy-ai/ai/providers/google-vertex/interactions"),
   ],
-  ["@sleepy-ai/ai/providers/google-vertex/chat", () => import("@sleepy-ai/ai/providers/google-vertex/chat")],
-  ["@sleepy-ai/ai/providers/google-vertex/responses", () => import("@sleepy-ai/ai/providers/google-vertex/responses")],
   ["@sleepy-ai/ai/providers/google-vertex/messages", () => import("@sleepy-ai/ai/providers/google-vertex/messages")],
   ["@sleepy-ai/ai/providers/google-vertex/mistral", () => import("@sleepy-ai/ai/providers/google-vertex/mistral")],
+  ["@sleepy-ai/ai/providers/google-vertex/responses", () => import("@sleepy-ai/ai/providers/google-vertex/responses")],
+  ["@sleepy-ai/ai/providers/google-vertex-chat", () => import("@sleepy-ai/ai/providers/google-vertex-chat")],
+  [
+    "@sleepy-ai/ai/providers/google-vertex-interactions",
+    () => import("@sleepy-ai/ai/providers/google-vertex-interactions"),
+  ],
+  ["@sleepy-ai/ai/providers/google-vertex-messages", () => import("@sleepy-ai/ai/providers/google-vertex-messages")],
+  ["@sleepy-ai/ai/providers/google-vertex-mistral", () => import("@sleepy-ai/ai/providers/google-vertex-mistral")],
+  ["@sleepy-ai/ai/providers/google-vertex-responses", () => import("@sleepy-ai/ai/providers/google-vertex-responses")],
   ["@sleepy-ai/ai/providers/groq", () => import("@sleepy-ai/ai/providers/groq")],
+  ["@sleepy-ai/ai/providers/meta", () => import("@sleepy-ai/ai/providers/meta")],
   ["@sleepy-ai/ai/providers/meta/chat", () => import("@sleepy-ai/ai/providers/meta/chat")],
   ["@sleepy-ai/ai/providers/meta/messages", () => import("@sleepy-ai/ai/providers/meta/messages")],
   ["@sleepy-ai/ai/providers/meta/responses", () => import("@sleepy-ai/ai/providers/meta/responses")],
+  ["@sleepy-ai/ai/providers/minimax", () => import("@sleepy-ai/ai/providers/minimax")],
   ["@sleepy-ai/ai/providers/minimax/chat", () => import("@sleepy-ai/ai/providers/minimax/chat")],
   ["@sleepy-ai/ai/providers/minimax/messages", () => import("@sleepy-ai/ai/providers/minimax/messages")],
   ["@sleepy-ai/ai/providers/minimax/responses", () => import("@sleepy-ai/ai/providers/minimax/responses")],
   ["@sleepy-ai/ai/providers/mistral", () => import("@sleepy-ai/ai/providers/mistral")],
+  ["@sleepy-ai/ai/providers/moonshot", () => import("@sleepy-ai/ai/providers/moonshot")],
   ["@sleepy-ai/ai/providers/moonshot/chat", () => import("@sleepy-ai/ai/providers/moonshot/chat")],
   ["@sleepy-ai/ai/providers/moonshot/messages", () => import("@sleepy-ai/ai/providers/moonshot/messages")],
   ["@sleepy-ai/ai/providers/moonshot/responses", () => import("@sleepy-ai/ai/providers/moonshot/responses")],
@@ -113,8 +130,19 @@ const builtins = new Map<string, () => Promise<unknown>>([
   ["@sleepy-ai/ai/providers/togetherai", () => import("@sleepy-ai/ai/providers/togetherai")],
   ["@sleepy-ai/ai/providers/venice", () => import("@sleepy-ai/ai/providers/venice")],
   ["@sleepy-ai/ai/providers/vercel-ai-gateway", () => import("@sleepy-ai/ai/providers/vercel-ai-gateway")],
+  ["@sleepy-ai/ai/providers/vercel-ai-gateway/chat", () => import("@sleepy-ai/ai/providers/vercel-ai-gateway/chat")],
+  [
+    "@sleepy-ai/ai/providers/vercel-ai-gateway/messages",
+    () => import("@sleepy-ai/ai/providers/vercel-ai-gateway/messages"),
+  ],
+  [
+    "@sleepy-ai/ai/providers/vercel-ai-gateway/responses",
+    () => import("@sleepy-ai/ai/providers/vercel-ai-gateway/responses"),
+  ],
   ["@sleepy-ai/ai/providers/xai", () => import("@sleepy-ai/ai/providers/xai")],
+  ["@sleepy-ai/ai/providers/zai", () => import("@sleepy-ai/ai/providers/zai")],
   ["@sleepy-ai/ai/providers/zai/chat", () => import("@sleepy-ai/ai/providers/zai/chat")],
+  ["@sleepy-ai/ai/providers/zai-coding-plan", () => import("@sleepy-ai/ai/providers/zai-coding-plan")],
   ["@sleepy-ai/ai/providers/zai-coding-plan/chat", () => import("@sleepy-ai/ai/providers/zai-coding-plan/chat")],
   ["@sleepy-ai/ai/providers/zai-coding-plan/messages", () => import("@sleepy-ai/ai/providers/zai-coding-plan/messages")],
   [
@@ -122,6 +150,9 @@ const builtins = new Map<string, () => Promise<unknown>>([
     () => import("@sleepy-ai/ai/providers/zai-coding-plan/responses"),
   ],
 ])
+
+/** Native `@sleepy-ai/ai/providers/*` entrypoints bundled with Core and loadable by name from config. */
+export const builtinPackages: ReadonlySet<string> = new Set(builtins.keys())
 
 export const loadPackage = Effect.fn("Provider.loadPackage")(function* (input: string, npm?: Npm.Interface) {
   const specifier = packageName(input)

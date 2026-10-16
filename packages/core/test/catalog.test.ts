@@ -12,6 +12,7 @@ import { Model } from "@sleepy-ai/core/model"
 import { ModelResolver } from "@sleepy-ai/core/model-resolver"
 import { Provider } from "@sleepy-ai/core/provider"
 import { AbsolutePath } from "@sleepy-ai/core/schema"
+import { Money } from "@sleepy-ai/schema/money"
 import { location } from "./fixture/location"
 import { testEffect } from "./lib/effect"
 
@@ -566,6 +567,55 @@ describe("Provider and Model", () => {
       })
 
       expect((yield* models.default())?.id).toMatch("new")
+    }),
+  )
+
+  it.effect("defaults to big-pickle when only free SleepyCode models are available", () =>
+    Effect.gen(function* () {
+      const providers = yield* Provider.Service
+      const models = yield* Model.Service
+      yield* providers.transform((editor) => {
+        editor.update(Provider.ID.sleepycode, () => {})
+        ;["muse-spark-1.3-contributor-free", "new-free", "deepseek-v4.1-flash-free", "big-pickle"].forEach(
+          (id, index) =>
+            editor.models.update(Provider.ID.sleepycode, Model.ID.make(id), (model) => {
+              model.time.released = 4000 - index * 1000
+            }),
+        )
+      })
+
+      expect((yield* models.available()).map((model) => model.id)).toEqual([
+        Model.ID.make("big-pickle"),
+        Model.ID.make("deepseek-v4.1-flash-free"),
+        Model.ID.make("muse-spark-1.3-contributor-free"),
+        Model.ID.make("new-free"),
+      ])
+      expect((yield* models.default())?.id).toBe(Model.ID.make("big-pickle"))
+    }),
+  )
+
+  it.effect("keeps the newest default when a paid model is available", () =>
+    Effect.gen(function* () {
+      const providers = yield* Provider.Service
+      const models = yield* Model.Service
+      yield* providers.transform((editor) => {
+        editor.update(Provider.ID.sleepycode, () => {})
+        editor.models.update(Provider.ID.sleepycode, Model.ID.make("big-pickle"), (model) => {
+          model.time.released = 1000
+        })
+        editor.models.update(Provider.ID.sleepycode, Model.ID.make("paid"), (model) => {
+          model.time.released = 2000
+          model.cost = [
+            {
+              input: Money.USDPerMillionTokens.make(1),
+              output: Money.USDPerMillionTokens.make(1),
+              cache: { read: Money.USDPerMillionTokens.zero, write: Money.USDPerMillionTokens.zero },
+            },
+          ]
+        })
+      })
+
+      expect((yield* models.default())?.id).toBe(Model.ID.make("paid"))
     }),
   )
 

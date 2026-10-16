@@ -1,31 +1,23 @@
 import { describe, expect, test } from "bun:test"
+import path from "node:path"
 import { Effect } from "effect"
 import { Provider } from "@sleepy-ai/core/provider"
 
 describe("Provider", () => {
-  test("loads bundled native provider entrypoints", async () => {
-    const packages = [
-      "@sleepy-ai/ai/providers/baseten",
-      "@sleepy-ai/ai/providers/cerebras",
-      "@sleepy-ai/ai/providers/cloudflare-ai-gateway",
-      "@sleepy-ai/ai/providers/cloudflare-workers-ai",
-      "@sleepy-ai/ai/providers/cohere",
-      "@sleepy-ai/ai/providers/cohere/chat",
-      "@sleepy-ai/ai/providers/deepinfra",
-      "@sleepy-ai/ai/providers/deepseek",
-      "@sleepy-ai/ai/providers/fireworks",
-      "@sleepy-ai/ai/providers/google-vertex",
-      "@sleepy-ai/ai/providers/google-vertex/gemini",
-      "@sleepy-ai/ai/providers/google-vertex/interactions",
-      "@sleepy-ai/ai/providers/google-vertex/chat",
-      "@sleepy-ai/ai/providers/google-vertex/responses",
-      "@sleepy-ai/ai/providers/google-vertex/messages",
-      "@sleepy-ai/ai/providers/groq",
-      "@sleepy-ai/ai/providers/mistral",
-      "@sleepy-ai/ai/providers/togetherai",
-      "@sleepy-ai/ai/providers/vercel-ai-gateway",
-    ]
+  test("bundles every native provider entrypoint that exports model()", async () => {
+    const providers = path.join(import.meta.dir, "../../ai/src/providers")
+    const entrypoints = await Promise.all(
+      Array.from(new Bun.Glob("**/*.ts").scanSync(providers)).map(async (file) => {
+        // Bun.Glob yields native separators, and package specifiers always use "/".
+        const specifier = `@sleepy-ai/ai/providers/${file.replace(/\.ts$/, "").replaceAll(path.sep, "/")}`
+        const module = await import(specifier)
+        return typeof module.model === "function" ? specifier : undefined
+      }),
+    )
+    const packages = entrypoints.filter((specifier) => specifier !== undefined).toSorted()
 
+    expect(packages.filter((specifier) => !Provider.builtinPackages.has(specifier))).toEqual([])
+    expect(Array.from(Provider.builtinPackages).toSorted()).toEqual(packages)
     for (const specifier of packages) {
       const loaded = await Effect.runPromise(Provider.loadPackage(specifier))
       expect(loaded.model).toBeFunction()

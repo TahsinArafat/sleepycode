@@ -192,6 +192,62 @@ test("service config manages environment variables", async () => {
   }
 })
 
+test("managed service loads configured environment", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "sleepycode-service-env-"))
+  const registration = path.join(root, "state", "sleepycode", ServiceConfig.filename())
+  await fs.mkdir(path.join(root, "config"), { recursive: true })
+  await fs.writeFile(
+    path.join(root, "config", ServiceConfig.filename()),
+    JSON.stringify({ env: { SLEEPYCODE_SERVICE_ENV_TEST: "configured", SLEEPYCODE_SERVICE_ENV_EMPTY_TEST: "" } }),
+  )
+  await fs.writeFile(
+    path.join(root, "config", "sleepycode.json"),
+    JSON.stringify({
+      mcp: {
+        servers: {
+          env: {
+            type: "local",
+            command: ["true"],
+            environment: {
+              configured: "{env:SLEEPYCODE_SERVICE_ENV_TEST}",
+              empty: "{env:SLEEPYCODE_SERVICE_ENV_EMPTY_TEST}",
+              inherited: "{env:SLEEPYCODE_SERVICE_ENV_INHERITED_TEST}",
+            },
+          },
+        },
+      },
+    }),
+  )
+  const owner = Bun.spawn(
+    [process.execPath, path.join(import.meta.dir, "../src/index.ts"), "serve", "--service", "--port", "0"],
+    {
+      env: isolatedEnv(root, {
+        SLEEPYCODE_SERVICE_ENV_TEST: "inherited",
+        SLEEPYCODE_SERVICE_ENV_EMPTY_TEST: "inherited",
+        SLEEPYCODE_SERVICE_ENV_INHERITED_TEST: "inherited",
+      }),
+      stderr: "pipe",
+      stdout: "ignore",
+    },
+  )
+  try {
+    const info = await waitForInfo(registration)
+    const url = new URL("/api/config", info.url)
+    url.searchParams.set("location[directory]", root)
+    const response = await fetch(url, { headers: { authorization: "Basic " + btoa(`sleepycode:${info.password}`) } })
+    expect(response.status).toBe(200)
+    expect((await response.json())[0].info.mcp.servers.env.environment).toEqual({
+      configured: "configured",
+      empty: "",
+      inherited: "inherited",
+    })
+  } finally {
+    owner.kill("SIGTERM")
+    await owner.exited
+    await fs.rm(root, { recursive: true, force: true })
+  }
+}, 30_000)
+
 test("service filenames share release channels and identify preview channels", () => {
   expect(ServiceConfig.filename("latest")).toBe("service.json")
   expect(ServiceConfig.filename("dev")).toBe("service.json")

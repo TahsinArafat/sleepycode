@@ -99,9 +99,16 @@ const responsesEffort = (effort: string): Overlay => ({
   settings: { reasoningEffort: effort, reasoningSummary: "auto", include: ENCRYPTED_REASONING },
 })
 
-const xaiResponses: Protocol = (_, support) => {
+const openResponses: Protocol = (_, support) => {
   if (support.type !== "effort") return []
   return efforts(support.values ?? EFFORTS, responsesEffort)
+}
+
+const googleInteractions: Protocol = (_, support) => {
+  if (support.type !== "effort") return []
+  return efforts(support.values ?? EFFORTS, (effort) => ({
+    settings: { thinkingLevel: effort, thinkingSummaries: "auto" },
+  }))
 }
 
 const cloudflareAIGateway: Protocol = (model, support) => {
@@ -466,8 +473,17 @@ const cohere: Protocol = (model, support) => {
 const vercelGateway: Protocol = (model, support) => {
   const id = modelID(model)
   if (id.startsWith("openai/gpt-")) return openaiResponses(model, support)
-  if (id.startsWith("spacexai/grok-")) return xaiResponses(model, support)
-  if (id.startsWith("anthropic/")) return anthropicMessages(model, support)
+  if (id.startsWith("spacexai/grok-")) return openResponses(model, support)
+  return vercelMessages(model, support)
+}
+
+const vercelResponses: Protocol = (model, support) =>
+  modelID(model).startsWith("openai/gpt-") ? openaiResponses(model, support) : openResponses(model, support)
+
+const vercelMessages: Protocol = (model, support) =>
+  modelID(model).startsWith("anthropic/") ? anthropicMessages(model, support) : vercelChat(model, support)
+
+const vercelChat: Protocol = (model, support) => {
   switch (support.type) {
     case "effort":
       return openaiChat(model, support)
@@ -478,7 +494,7 @@ const vercelGateway: Protocol = (model, support) => {
         model,
         support,
         (tokens) => ({ settings: { thinking: { type: "enabled", budgetTokens: tokens } } }),
-        id.startsWith("alibaba/") ? ALIBABA_THINKING_BUDGET_MAX : model.limit.output,
+        modelID(model).startsWith("alibaba/") ? ALIBABA_THINKING_BUDGET_MAX : model.limit.output,
       )
   }
 }
@@ -576,18 +592,32 @@ const gitlab: Protocol = (model, support) => {
 
 const PROTOCOLS: Readonly<Record<string, Protocol>> = {
   "@sleepy-ai/ai/providers/openai": openaiResponses,
+  "@sleepy-ai/ai/providers/openai/responses": openaiResponses,
+  "@sleepy-ai/ai/providers/azure": openaiResponses,
   "@sleepy-ai/ai/providers/azure/responses": openaiResponses,
-  "@sleepy-ai/ai/providers/amazon-bedrock/mantle/chat": openaiResponses,
+  "@sleepy-ai/ai/providers/amazon-bedrock/mantle": openaiResponses,
   "@sleepy-ai/ai/providers/amazon-bedrock/mantle/responses": openaiResponses,
+  "@sleepy-ai/ai/providers/amazon-bedrock-mantle": openaiResponses,
   "@sleepy-ai/ai/providers/alibaba/responses": openaiResponses,
+  "@sleepy-ai/ai/providers/meta": openaiResponses,
   "@sleepy-ai/ai/providers/meta/responses": openaiResponses,
   "@sleepy-ai/ai/providers/minimax/responses": openaiResponses,
   "@sleepy-ai/ai/providers/moonshot/responses": openaiResponses,
   "@sleepy-ai/ai/providers/zai-coding-plan/responses": openaiResponses,
 
+  "@sleepy-ai/ai/providers/openai-compatible/responses": openResponses,
+  "@sleepy-ai/ai/providers/openai-compatible-responses": openResponses,
+  "@sleepy-ai/ai/providers/google-vertex/responses": openResponses,
+  "@sleepy-ai/ai/providers/google-vertex-responses": openResponses,
+  "@sleepy-ai/ai/providers/xai": openResponses,
+
   "@sleepy-ai/ai/providers/openai-compatible": openaiCompatible,
+  "@sleepy-ai/ai/providers/openai/chat": openaiChat,
   "@sleepy-ai/ai/providers/azure/chat": openaiChat,
+  "@sleepy-ai/ai/providers/amazon-bedrock/mantle/chat": openaiChat,
   "@sleepy-ai/ai/providers/google-vertex/chat": vertexChat,
+  "@sleepy-ai/ai/providers/google-vertex-chat": vertexChat,
+  "@sleepy-ai/ai/providers/alibaba": alibabaChat,
   "@sleepy-ai/ai/providers/alibaba/chat": alibabaChat,
   "@sleepy-ai/ai/providers/baseten": basetenChat,
   "@sleepy-ai/ai/providers/cerebras": openaiChat,
@@ -601,24 +631,35 @@ const PROTOCOLS: Readonly<Record<string, Protocol>> = {
   "@sleepy-ai/ai/providers/meta/chat": openaiChat,
   "@sleepy-ai/ai/providers/minimax/chat": openaiChat,
   "@sleepy-ai/ai/providers/mistral": openaiChat,
+  "@sleepy-ai/ai/providers/google-vertex/mistral": openaiChat,
+  "@sleepy-ai/ai/providers/google-vertex-mistral": openaiChat,
+  "@sleepy-ai/ai/providers/moonshot": moonshotChat,
   "@sleepy-ai/ai/providers/moonshot/chat": moonshotChat,
   "@sleepy-ai/ai/providers/togetherai": openaiChat,
   "@sleepy-ai/ai/providers/venice": veniceChat,
-  "@sleepy-ai/ai/providers/xai": xaiResponses,
+  "@sleepy-ai/ai/providers/zai": zaiChat,
   "@sleepy-ai/ai/providers/zai/chat": zaiChat,
+  "@sleepy-ai/ai/providers/zai-coding-plan": zaiChat,
   "@sleepy-ai/ai/providers/zai-coding-plan/chat": zaiChat,
 
   "@sleepy-ai/ai/providers/anthropic": anthropicMessages,
+  "@sleepy-ai/ai/providers/anthropic-compatible": anthropicMessages,
+  "@sleepy-ai/ai/providers/amazon-bedrock/mantle/messages": anthropicMessages,
   "@sleepy-ai/ai/providers/google-vertex/messages": anthropicMessages,
-  "@sleepy-ai/ai/providers/google-vertex/mistral": openaiChat,
+  "@sleepy-ai/ai/providers/google-vertex-messages": anthropicMessages,
   "@sleepy-ai/ai/providers/alibaba/messages": alibabaMessages,
   "@sleepy-ai/ai/providers/meta/messages": anthropicMessages,
+  "@sleepy-ai/ai/providers/minimax": minimaxMessages,
   "@sleepy-ai/ai/providers/minimax/messages": minimaxMessages,
   "@sleepy-ai/ai/providers/moonshot/messages": moonshotMessages,
   "@sleepy-ai/ai/providers/zai-coding-plan/messages": zaiMessages,
 
   "@sleepy-ai/ai/providers/google": gemini,
   "@sleepy-ai/ai/providers/google-vertex": gemini,
+  "@sleepy-ai/ai/providers/google-vertex/gemini": gemini,
+  "@sleepy-ai/ai/providers/google/interactions": googleInteractions,
+  "@sleepy-ai/ai/providers/google-vertex/interactions": googleInteractions,
+  "@sleepy-ai/ai/providers/google-vertex-interactions": googleInteractions,
 
   "@sleepy-ai/ai/providers/amazon-bedrock": bedrockConverse,
   "@sleepy-ai/ai/providers/cohere": cohere,
@@ -627,6 +668,9 @@ const PROTOCOLS: Readonly<Record<string, Protocol>> = {
   [Provider.aisdk("venice-ai-sdk-provider")]: veniceChat,
   "@sleepy-ai/ai/providers/cloudflare-ai-gateway": cloudflareAIGateway,
   "@sleepy-ai/ai/providers/vercel-ai-gateway": vercelGateway,
+  "@sleepy-ai/ai/providers/vercel-ai-gateway/chat": vercelChat,
+  "@sleepy-ai/ai/providers/vercel-ai-gateway/messages": vercelMessages,
+  "@sleepy-ai/ai/providers/vercel-ai-gateway/responses": vercelResponses,
   [Provider.aisdk("@ai-sdk/gateway")]: vercelGateway,
   [Provider.aisdk("@jerome-benoit/sap-ai-provider-v2")]: sapAICore,
   [Provider.aisdk("gitlab-ai-provider")]: gitlab,

@@ -88,18 +88,24 @@ cd packages/core && rm -rf node_modules/.ts-dist && bun typecheck
 cd packages/core && bun test test/plugin/ test/integration.test.ts
 ```
 
-The `rm -rf` is not optional — see the Cautions entry on the `tsgo` cache. A clean `typecheck`
-currently reports **255 errors** (249 × TS2345, 6 × TS2322), all Effect environment-union
-mismatches inside nine `test/session-*.test.ts` files. Those test files, and the session
-`runner` / `context` / `history` / `message` / `prompt` sources they exercise, are byte-identical
-to `refs/remotes/upstream/dev` apart from branding — the signature of inherited debt rather than
-a regression. That has **not** been proven against a clean upstream checkout, so treat it as an
-open item, not a cleared one.
+The `rm -rf` is not optional — see the Cautions entry on the `tsgo` cache. That cache is also why
+a per-package `bun typecheck` can report success it did not earn: `tsgo -b` short-circuits on an
+up-to-date buildinfo. Use `bun typecheck --force` when you need the answer to be real.
 
-The known baseline is **345 pass / 22 fail**, and the 22 are pre-existing: GitLab OAuth binding
+**The canonical gate is `bun run check` from the repository root** — lint plus `turbo typecheck`
+across all 40 packages. It is green on this branch at `c5e513e98e` (2.0.30), including the nine
+`test/session-*.test.ts` files that used to report 255 Effect environment-union errors; that debt
+was resolved upstream and the merge brought the fix with it. Do not reintroduce a per-package-only
+gate: it is what let the inherited debt sit here unnoticed.
+
+The known core baseline is **345 pass / 22 fail**, and the 22 are pre-existing: GitLab OAuth binding
 port 8080, `PluginSupervisor` watcher/reload timing, and a plugin-loader transitive dependency.
-**Any other failure is a regression.** `bun ci` installs; never `bun install`/`npm install`, and
-never let a sync rewrite the lockfile.
+**Any other failure is a regression.** `bun ci` installs; never `bun install`/`npm install`.
+
+The lockfile is the one file a sync may have to regenerate. Upstream's `bun.lock` merged cleanly
+and `apply-branding` rewrote it with its integrity check intact, so it did not need one; when
+upstream adds or removes a dependency, the branded lockfile cannot supply the new hashes and
+`bun install --frozen-lockfile` will say so.
 
 ## What is ours
 
@@ -144,6 +150,50 @@ over an edit to theirs. Where an edit is unavoidable, keep it in one contiguous 
 - **Kill stale daemons before live checks.** A `serve` process started before a change keeps
   serving the old code, and it is the most convincing way to "prove" a change did nothing.
 
+## Completed syncs
+
+| Upstream head | Version | Commits merged | Shape of the merge |
+| --- | --- | --- | --- |
+| `3943b84ef0` | 2.0.29 | — | The re-parent base itself. |
+| `c5e513e98e` | 2.0.30 | 82 | 254 conflicted paths, of which **3 were real fork edits**. |
+
+The 2.0.30 sync resolved like this, and it is the shape every sync after it should take:
+
+- **`git checkout --theirs` + `apply-branding --write` for everything that is branding-only.**
+  Taking upstream's blob and re-running the rebrander reproduces our file exactly, because our only
+  delta on those paths *was* the rebrand. 251 of the 254 conflicts resolved that way with no
+  judgement required.
+- **Accept upstream's deletions.** Upstream retired the enterprise share app
+  (`packages/enterprise/**`, `share.mdx`, `infra/enterprise.ts`) in favour of `infra/share.ts`.
+  Those files were branding-only in our tree, so the merge deleted them; no reference to
+  `packages/enterprise` survives anywhere in the repo.
+- **Three hand-resolved files**: `packages/cli/package.json` (version 2.0.29 → 2.0.30),
+  `packages/util/test/global.test.ts` (upstream's `TEMP`/native-`realpathSync` fixes on top of our
+  `sleepy` directory expectations), and `packages/ai/src/providers/sleepycode.ts` (upstream's
+  `systemone` inference endpoint).
+- **`bun run generate` in `packages/client` afterwards.** The merge restores upstream's generated
+  types, which do not know about the `server.sleepy` group we added. The `SleepyLogoutOutput` type
+  is the canary: if it is missing from `packages/client/src/promise/generated/types.ts`, the client
+  is stale.
+
+### Classify conflicts against the merge base, not the new upstream
+
+`fork-delta.ts` and `port-map.ts` measure our tree against the ref you pass them, so pointing them
+at the **new** upstream makes them report every piece of *upstream's own* content change as our fork
+logic. On the 2.0.30 sync that produced a list of 219 "REAL FORK" conflicts — 216 of them
+translations and docs that differ only because upstream deleted the share feature.
+
+Compare each conflicted path against the **merge base** instead:
+
+```bash
+BASE=$(git merge-base HEAD upstream/dev)
+# ours is branding-only when rebrand($BASE:path) == $HEAD:path
+```
+
+Against the base, the 254 conflicts collapsed to 251 branding-only and 3 real edits. Any triage
+that reads the new upstream's blob as "our side" over-counts the fork surface by an order of
+magnitude, and makes a three-file merge look like a project.
+
 ## State at the wrap-up
 
 `reparent/opencode-v2` is pushed and tracks **`fork/reparent/opencode-v2`** at
@@ -151,12 +201,14 @@ over an edit to theirs. Where an edit is unavoidable, keep it in one contiguous 
 network and the "Sync fork" button apply. The clone is unshallowed (full history), and the
 branding default now resolves to the `opencode` profile.
 
-Landed on the branch, re-parented onto **opencode 2.0.29** and fully branded
+Landed on the branch, re-parented onto **opencode 2.0.30** and fully branded
 (`apply-branding` finds zero files to rewrite on this branch):
 
 - Base re-brand, Sleepy gateway provider (device OAuth, token refresh, API-key login,
-  gateway-driven models), global `sleepy` home/config discovery, TUI theme, three built-in
-  skills, five agent personas, `login`/`doctor`/`init`, integration consolidation.
+  gateway-driven models, live reload on gateway-file change), global `sleepy` home/config discovery,
+  TUI theme, built-in skills, agent personas, `login`/`doctor`/`init`, integration consolidation.
+- Gateway config I/O owned by `packages/util/src/gateway.ts`; `sleepy logout` in the CLI and
+  `POST /api/sleepy/logout` in the server both go through it.
 
 Carried over but **not yet wired into the prompt pipeline** — the session guards are library
 code today, not behaviour:
@@ -168,6 +220,6 @@ code today, not behaviour:
   `auto_worktree_hint_sent` session column that v2 does not have), and `fleet.assembleFleet`.
 - Process-group interrupt on abort in the shell tool: aborting a foreground command can still
   orphan grandchildren.
-- Tests for `login`/`doctor`/`init` (v2 has no `packages/cli/test`), the Claude Code shim, a
-  per-plugin judgement on `todo`/`think`/`lsp`, and release plumbing (`bin/sleepy`, `.npmrc`,
-  README, publish workflow).
+- Tests for `login`/`doctor`/`init` beyond the `logout` round-trip that already exists in
+  `packages/cli/test`, the Claude Code shim, a per-plugin judgement on `todo`/`think`/`lsp`, and
+  release plumbing (`bin/sleepy`, `.npmrc`, README, publish workflow).

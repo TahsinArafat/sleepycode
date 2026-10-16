@@ -345,7 +345,6 @@ sleepycode run --attach http://localhost:4096 "Explain async/await in JavaScript
 | <nobr><code>{"--continue"}</code></nobr> | `-c`     | 最後のセッションを続行                                                                    |
 | <nobr><code>{"--session"}</code></nobr>  | `-s`     | 続行するセッション ID                                                                     |
 | <nobr><code>{"--fork"}</code></nobr>     |          | 続行時にセッションをフォーク (`--continue` または `--session` と併用)                     |
-| <nobr><code>{"--share"}</code></nobr>    |          | セッションを共有する                                                                      |
 | <nobr><code>{"--model"}</code></nobr>    | `-m`     | プロバイダー/モデルの形式で使用するモデル                                                 |
 | <nobr><code>{"--agent"}</code></nobr>    |          | 使用するエージェント                                                                      |
 | <nobr><code>{"--file"}</code></nobr>     | `-f`     | メッセージに添付するファイル                                                              |
@@ -442,17 +441,14 @@ sleepycode export [sessionID]
 
 ### import
 
-JSON ファイルまたは SleepyCode 共有 URL からセッションデータをインポートします。
+JSON ファイルからセッションデータをインポートします。
 
 ```bash
 sleepycode import <file>
 ```
 
-ローカルファイルまたは SleepyCode 共有 URL からインポートできます。
-
 ```bash
 sleepycode import session.json
-sleepycode import https://opncd.ai/s/abc123
 ```
 
 ---
@@ -564,7 +560,6 @@ SleepyCode は環境変数を使用して構成できます。
 
 | 変数                                  | タイプ   | 説明                                                                |
 | ------------------------------------- | -------- | ------------------------------------------------------------------- |
-| `SLEEPYCODE_AUTO_SHARE`                 | ブール値 | セッションを自動的に共有する                                        |
 | `SLEEPYCODE_GIT_BASH_PATH`              | 文字列   | Windows 上で実行可能な Git Bash へのパス                            |
 | `SLEEPYCODE_CONFIG`                     | 文字列   | 構成ファイルへのパス                                                |
 | `SLEEPYCODE_CONFIG_DIR`                 | 文字列   | config ディレクトリへのパス                                         |

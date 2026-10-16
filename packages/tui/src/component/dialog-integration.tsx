@@ -46,8 +46,8 @@ import {
 } from "../util/form"
 
 const INTEGRATION_PRIORITY: Record<string, number> = {
-  sleepy: 0,
-  "sleepycode-go": 1,
+  "sleepycode-go": 0,
+  sleepy: 1,
   openai: 2,
   "github-copilot": 3,
   anthropic: 4,

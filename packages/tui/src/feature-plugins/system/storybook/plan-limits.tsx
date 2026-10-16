@@ -1,5 +1,5 @@
 import type { Plugin } from "@sleepy-ai/plugin/tui"
-import type { SleepyUsageInfo } from "@sleepy-ai/client"
+import type { SessionMessageInfo, SleepyUsageInfo } from "@sleepy-ai/client"
 import { useTerminalDimensions } from "@opentui/solid"
 import { createStore, produce } from "solid-js/store"
 import { RGBA } from "@opentui/core"
@@ -33,6 +33,19 @@ const fixtures: ReadonlyArray<{ key: string; label: string; usage: SleepyUsageIn
   { key: "5", label: "credit only", usage: { limits: { creditUSD: 12 }, monthlyAllowanceUSD: 12 } },
 ]
 
+// One assistant step, so the Context section has real token numbers to sum.
+const tokenFixture = [
+  {
+    id: "storybook-assistant",
+    type: "assistant",
+    agent: "build",
+    model: { providerID: "fixture", id: "fixture" },
+    time: { created: 0, completed: 1 },
+    content: [],
+    tokens: { input: 12_500, output: 3_400, reasoning: 900, cache: { read: 0, write: 0 } },
+  },
+] as unknown as SessionMessageInfo[]
+
 // The panel colours its bars through the theme; the story supplies the resolved role so the
 // three proximity states are visually distinguishable without borrowing production tokens.
 const roleColor = {
@@ -43,7 +56,7 @@ const roleColor = {
 
 function PlanLimitsStory(props: { context: Plugin.Context }) {
   const dimensions = useTerminalDimensions()
-  const [state, setState] = createStore({ index: 2, open: true })
+  const [state, setState] = createStore({ index: 2, open: true, tokens: false })
 
   const current = () => fixtures[state.index]
 
@@ -75,6 +88,17 @@ function PlanLimitsStory(props: { context: Plugin.Context }) {
           setState(
             produce((draft) => {
               draft.open = !draft.open
+            }),
+          ),
+      },
+      {
+        bind: "t",
+        title: "Toggle session token usage",
+        group: "Storybook",
+        run: () =>
+          setState(
+            produce((draft) => {
+              draft.tokens = !draft.tokens
             }),
           ),
       },
@@ -122,6 +146,19 @@ function PlanLimitsStory(props: { context: Plugin.Context }) {
       ...props.context.client,
       sleepy: { usage: () => Promise.resolve(current().usage) },
     },
+    data: {
+      ...props.context.data,
+      session: {
+        ...props.context.data.session,
+        // With `t` on, stand in one assistant step so the Context section shows its token
+        // breakdown; off, the section hides, which is the other state worth seeing.
+        message: {
+          ...props.context.data.session.message,
+          list: (sessionID: string) =>
+            state.tokens ? tokenFixture : props.context.data.session.message.list(sessionID),
+        },
+      },
+    },
   } as unknown as Plugin.Context
 
   return (
@@ -142,11 +179,12 @@ function PlanLimitsStory(props: { context: Plugin.Context }) {
       <StoryFooter
         context={props.context}
         title="storybook / Plan & Limits"
-        details={[current().label, state.open ? "expanded" : "collapsed"]}
+        details={[current().label, state.open ? "expanded" : "collapsed", state.tokens ? "tokens" : "no tokens"]}
         controls={[
           { shortcut: "n/p", label: "next/previous fixture" },
           { shortcut: "1-5", label: "jump to fixture" },
           { shortcut: "c", label: "collapse/expand" },
+          { shortcut: "t", label: "session token usage" },
           { shortcut: "esc", label: "back" },
         ]}
       />

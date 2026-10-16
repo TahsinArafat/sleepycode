@@ -1,6 +1,6 @@
 import { Plugin } from "@sleepy-ai/plugin/tui"
 import { createMemo, createResource, For, Show } from "solid-js"
-import { contextUsage } from "../../util/session"
+import { contextUsage, hasSessionTokens, sessionTokens } from "../../util/session"
 import { creditBalance, progressBar, ratioRole, usageWindows } from "./limits-data"
 
 const money = new Intl.NumberFormat("en-US", {
@@ -17,10 +17,11 @@ export function SidebarContext(props: { context: Plugin.Context; sessionID: stri
   const state = createMemo(() =>
     contextUsage(msg(), props.context.data.location.model.list(session()?.location), session()?.revert?.messageID),
   )
+  const tokens = createMemo(() => sessionTokens(msg(), session()?.revert?.messageID))
 
   return (
     <>
-      <Show when={state() || cost() > 0}>
+      <Show when={state() || cost() > 0 || hasSessionTokens(tokens())}>
         <box>
           <text fg={theme.text.base}>
             <b>Context</b>
@@ -34,6 +35,11 @@ export function SidebarContext(props: { context: Plugin.Context; sessionID: stri
                 </Show>
               </>
             )}
+          </Show>
+          <Show when={hasSessionTokens(tokens())}>
+            <text fg={theme.text.muted}>
+              In {tokens().input.toLocaleString()} / Out {tokens().output.toLocaleString()}
+            </text>
           </Show>
           <Show when={cost() > 0}>
             <text fg={theme.text.muted}>{money.format(cost())} spent</text>

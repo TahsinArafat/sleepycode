@@ -96,6 +96,24 @@ test("sidebar shows available context usage", async () => {
   }
 })
 
+test("sidebar shows the session input/output split, distinct from the context window", async () => {
+  // The two numbers answer different questions - window fill vs session spend - so the panel
+  // must show both rather than letting one stand in for the other.
+  const app = await testRender(() => <SidebarContext context={context({ tokens: 1234 })} sessionID="session" />, {
+    width: 42,
+    height: 8,
+  })
+
+  try {
+    await app.renderOnce()
+    const frame = app.captureCharFrame()
+    expect(frame).toContain("1,234 tokens")
+    expect(frame).toContain("In 1,234 / Out 0")
+  } finally {
+    app.renderer.destroy()
+  }
+})
+
 test("sidebar omits plan and limits when signed out", async () => {
   const app = await testRender(() => <SidebarContext context={context()} sessionID="session" />, {
     width: 42,

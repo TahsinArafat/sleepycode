@@ -64,3 +64,34 @@ export function formatContextUsage(tokens: number, percent?: number) {
   const value = Locale.number(tokens)
   return percent === undefined ? value : `${value} (${percent}%)`
 }
+
+/**
+ * Cumulative token spend across every assistant message in the session.
+ *
+ * `contextUsage` above reports the *last* message against the model's context window, which is
+ * a different number: one is "how full is the window right now", this is "what has this session
+ * cost in tokens". Both are wanted, and the sidebar shows them in separate sections so neither
+ * masquerades as the other.
+ *
+ * Reasoning is folded into output, because providers bill and report it as generated tokens.
+ * Messages after a revert boundary are excluded, matching `contextUsage`.
+ */
+export function sessionTokens(messages: ReadonlyArray<SessionMessageInfo>, boundary?: string) {
+  const end = boundary ? messages.findIndex((message) => message.id === boundary) : -1
+  const visible = end === -1 ? messages : messages.slice(0, end)
+  return visible.reduce(
+    (total, message) => {
+      if (message.type !== "assistant" || !message.tokens) return total
+      return {
+        input: total.input + message.tokens.input,
+        output: total.output + message.tokens.output + message.tokens.reasoning,
+      }
+    },
+    { input: 0, output: 0 },
+  )
+}
+
+/** True when the session has recorded any token usage, so the section can stay hidden. */
+export function hasSessionTokens(usage: { input: number; output: number }) {
+  return usage.input > 0 || usage.output > 0
+}

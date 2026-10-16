@@ -6,8 +6,9 @@ exports[`TUI inline tool wrapping snapshots consecutive grep, glob, and read row
    ✱ Glob "**/*db*" in packages/sleepycode (6 matches)
    → Read packages/sleepycode/src/storage/db.ts [offset=1, limit=130]
    → Read packages/sleepycode/src/index.ts [offset=1, limit=100]
-   ✱ Grep "export const SLEEPYCODE_DB|SLEEPYCODE_DB|SLEEPYCODE_DEV|Global\\.
-     Path\\.data|data =" in packages/sleepycode/src (115 matches)"
+   ✱ Grep "export const
+     SLEEPYCODE_DB|SLEEPYCODE_DB|SLEEPYCODE_DEV|Global\\.Path\\.data|data
+     =" in packages/sleepycode/src (115 matches)"
 `;
 
 exports[`TUI inline tool wrapping snapshots expanded tool errors under the tool text 1`] = `
@@ -17,6 +18,7 @@ exports[`TUI inline tool wrapping snapshots expanded tool errors under the tool 
    → Read packages/sleepycode/src/storage/db.ts [offset=1, limit=130]
    → Read packages/sleepycode/src/index.ts [offset=1, limit=100]
      No LSP server available for this file type.
-   ✱ Grep "export const SLEEPYCODE_DB|SLEEPYCODE_DB|SLEEPYCODE_DEV|Global\\.
-     Path\\.data|data =" in packages/sleepycode/src (115 matches)"
+   ✱ Grep "export const
+     SLEEPYCODE_DB|SLEEPYCODE_DB|SLEEPYCODE_DEV|Global\\.Path\\.data|data
+     =" in packages/sleepycode/src (115 matches)"
 `;

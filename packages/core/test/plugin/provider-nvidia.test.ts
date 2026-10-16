@@ -35,7 +35,7 @@ describe("NvidiaPlugin", () => {
       yield* addPlugin()
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
         Existing: "value",
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
         "X-BILLING-INVOKE-ORIGIN": "SleepyCode",
       })
@@ -55,7 +55,7 @@ describe("NvidiaPlugin", () => {
       yield* addPlugin()
 
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
         "X-BILLING-INVOKE-ORIGIN": "SleepyCode",
       })
@@ -75,7 +75,7 @@ describe("NvidiaPlugin", () => {
       yield* addPlugin()
 
       expect((yield* catalog.get(Provider.ID.make("nvidia")))?.headers).toEqual({
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
         "X-BILLING-INVOKE-ORIGIN": "CustomOrigin",
       })

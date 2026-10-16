@@ -232,6 +232,22 @@ export type McpResourceTemplate = {
   mimeType?: string
 }
 
+export type SleepyUsageLimits = {
+  creditUSD?: number | undefined
+  limit5h?: number | undefined
+  limit24h?: number | undefined
+  limitWeekly?: number | undefined
+  limitMonthly?: number | undefined
+  rpmLimit?: number | undefined
+}
+
+export type SleepyUsageUsageByWindow = {
+  cost5h?: number | undefined
+  cost24h?: number | undefined
+  costWeekly?: number | undefined
+  costMonthly?: number | undefined
+}
+
 export type ProjectVcs = string
 
 export type ProjectIcon = { url?: string; override?: string; color?: string }
@@ -705,6 +721,13 @@ export type McpServer = {
 }
 
 export type McpResourceCatalog = { resources: Array<McpResource>; templates: Array<McpResourceTemplate> }
+
+export type SleepyUsageInfo = {
+  limits?: SleepyUsageLimits | undefined
+  usageByWindow?: SleepyUsageUsageByWindow | undefined
+  monthlyUsageUSD?: number | undefined
+  monthlyAllowanceUSD?: number | undefined
+}
 
 export type Project = {
   id: ProjectID
@@ -6153,6 +6176,8 @@ export type CredentialRemoveInput = { readonly credentialID: { readonly credenti
 export type CredentialRemoveOutput = void
 
 export type SleepyLogoutOutput = { data: { removed: Array<string>; email?: string | undefined } }["data"]
+
+export type SleepyUsageOutput = { data: SleepyUsageInfo | null }["data"]
 
 export type ProjectListInput = { readonly archived?: { readonly archived?: boolean | undefined }["archived"] }
 

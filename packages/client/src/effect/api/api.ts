@@ -1666,8 +1666,33 @@ export interface CredentialApi<E = never> {
 export type SleepyLogoutOutput = { readonly removed: ReadonlyArray<string>; readonly email?: string | undefined }
 export type SleepyLogoutOperation<E = never> = () => Effect.Effect<SleepyLogoutOutput, E>
 
+export type SleepyUsageOutput = {
+  readonly limits?:
+    | {
+        readonly creditUSD?: number | undefined
+        readonly limit5h?: number | undefined
+        readonly limit24h?: number | undefined
+        readonly limitWeekly?: number | undefined
+        readonly limitMonthly?: number | undefined
+        readonly rpmLimit?: number | undefined
+      }
+    | undefined
+  readonly usageByWindow?:
+    | {
+        readonly cost5h?: number | undefined
+        readonly cost24h?: number | undefined
+        readonly costWeekly?: number | undefined
+        readonly costMonthly?: number | undefined
+      }
+    | undefined
+  readonly monthlyUsageUSD?: number | undefined
+  readonly monthlyAllowanceUSD?: number | undefined
+} | null
+export type SleepyUsageOperation<E = never> = () => Effect.Effect<SleepyUsageOutput, E>
+
 export interface SleepyApi<E = never> {
   readonly logout: SleepyLogoutOperation<E>
+  readonly usage: SleepyUsageOperation<E>
 }
 
 export type ProjectListInput = { readonly archived?: boolean | undefined }

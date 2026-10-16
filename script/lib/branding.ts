@@ -290,6 +290,11 @@ const OPENCODE: UpstreamProfile = {
     // `-beta`, `-sdk-js` - plus release, issue and pull-request URLs that must keep
     // resolving to the upstream project rather than to a sleepy-code that does not exist.
     /anomalyco\/opencode/,
+    // Our own branch name, referenced by the remote-install one-liners. It carries the token
+    // because the re-parent branched from `dev` under it, but it is a real git ref: the
+    // rebrander would emit `reparent/sleepycode-v2`, which no remote has, so the installer
+    // would 404 for every SSH and WSL target.
+    /reparent\/opencode-v2/,
     // Published packages on npm under the `opencode-ai` org (@opencode-ai/pty, @opencode-ai/sdk, etc.).
     // They are not ours to re-scope: `@sleepy-ai/*` does not exist on npm, and rewriting them
     // also collides with `@sleepy-ai/*` workspace packages in bun.lock.

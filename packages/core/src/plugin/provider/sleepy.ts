@@ -1,10 +1,11 @@
-import { Duration, Effect, Schema, Semaphore, Stream } from "effect"
+import { Duration, Effect, Option, Schema, Semaphore, Stream } from "effect"
 import fsSync from "node:fs"
 import path from "node:path"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
 import { Integration } from "@sleepy-ai/schema/integration"
+import { SleepyUsage } from "@sleepy-ai/schema/sleepy-usage"
 import { Bus } from "../../bus.js"
 import { Credential } from "../../credential.js"
 import { Integration as IntegrationService } from "../../integration.js"
@@ -131,6 +132,40 @@ async function fetchGatewayModels(dashboardUrl: string, token: string): Promise<
     } catch {}
   }
   return []
+}
+
+/**
+ * Plan spend and allowance for the signed-in account, or `null` when signed out.
+ *
+ * The shape is the gateway's, not ours: the rollout has no pinned contract for `/api/usage`,
+ * so it is decoded with `onExcessProperty: "ignore"` and every window stays optional. A
+ * gateway that answers with something else degrades to `null` rather than throwing, because
+ * this feeds a sidebar panel and must never break the session.
+ */
+export async function fetchGatewayUsage(): Promise<SleepyUsage.Info | null> {
+  const loaded = await readGatewayConfig()
+  const config = loaded?.config
+  if (!config) return null
+  const token = config.access_token ?? config.api_key
+  if (!token) return null
+  const dashboardUrl =
+    config.endpoint ??
+    config.dashboard_url ??
+    process.env.SLEEPY_PLATFORM_URL ??
+    process.env.SLEEPY_DASHBOARD_URL ??
+    DEFAULT_PLATFORM_URL
+  try {
+    const res = await fetch(`${dashboardUrl}/api/usage?days=30`, {
+      headers: { Authorization: `Bearer ${token}`, "X-Sleepy-Source": "sleepycode-cli" },
+    })
+    if (!res.ok) return null
+    const body = await res.json().catch(() => null)
+    // Some deployments wrap the payload in `{ data: ... }`.
+    const raw = body !== null && typeof body === "object" && "data" in body ? (body as { data: unknown }).data : body
+    return Option.getOrNull(Schema.decodeUnknownOption(SleepyUsage.Info)(raw, { onExcessProperty: "ignore" }))
+  } catch {
+    return null
+  }
 }
 
 const postJSON = async (url: string, body: Record<string, string>) => {

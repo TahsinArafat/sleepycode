@@ -159,6 +159,7 @@ import type {
   CredentialRemoveInput,
   CredentialRemoveOutput,
   SleepyLogoutOutput,
+  SleepyUsageOutput,
   ProjectListInput,
   ProjectListOutput,
   ProjectUpdateInput,
@@ -1484,6 +1485,11 @@ export function make(options: ClientOptions) {
             declaredStatuses: [400, 401],
             empty: false,
           },
+          requestOptions,
+        ).then((value) => value.data),
+      usage: (requestOptions?: RequestOptions) =>
+        request<{ readonly data: SleepyUsageOutput }>(
+          { method: "GET", path: `/api/sleepy/usage`, successStatus: 200, declaredStatuses: [400, 401], empty: false },
           requestOptions,
         ).then((value) => value.data),
     },

@@ -321,3 +321,28 @@ Left alone as cosmetic, per the triage: `packages/web` (its own site config and 
 `content/docs`), `packages/console`, `packages/stats`, `services/www` docs, READMEs and
 CHANGELOG. They are links and marketing copy, not calls; repointing them is a separate pass.
 
+## Plan & Limits sidebar
+
+The v1 sidebar showed five rolling spend windows (5h / 24h / weekly / monthly / credit) from
+`GET {dashboard}/api/usage?days=30`. v2 had the panel missing entirely, and — contrary to the
+port inventory, which assumed the data was already on the wire — **no `monthlyAllowance` or
+plan field existed anywhere in the protocol or generated types**. The data had to be added:
+
+- `packages/schema/src/sleepy-usage.ts` — the shared shape, plus the window table. In `schema`
+  and not `protocol` because both the protocol group and the core plugin decode it, and core
+  must not depend on protocol.
+- `packages/protocol/src/groups/sleepy.ts` — `GET /api/sleepy/usage`, `null` when signed out.
+- `packages/server/src/handlers/sleepy.ts` — delegates to `fetchGatewayUsage`.
+- `packages/core/src/plugin/provider/sleepy.ts` — `fetchGatewayUsage()` reads the gateway
+  session the same way the model fetch does, and decodes leniently: the gateway's `/api/usage`
+  has no pinned contract, so unknown properties are ignored and every window is optional.
+- `packages/tui/src/feature-plugins/sidebar/context.tsx` — the collapsible panel, with
+  `limits-data.ts` holding the display rules so they are unit-testable.
+- `packages/tui/src/feature-plugins/system/storybook/plan-limits.tsx` — the story, rendering the
+  real `SidebarContext` with `client.sleepy.usage` swapped for fixtures; `n`/`p` and `1`-`5`
+  walk signed-out, no-plan, mid-plan, near-limit and credit-only.
+
+`bun run generate` in `packages/client` after the protocol change. A window is rendered only
+when the gateway reports both a limit and a spend, so "not metered" reads differently from
+"unused", and a gateway error degrades to no panel rather than an endpoint error.
+

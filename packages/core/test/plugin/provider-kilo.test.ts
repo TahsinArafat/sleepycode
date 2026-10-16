@@ -35,7 +35,7 @@ describe("KiloPlugin", () => {
       yield* addPlugin()
       expect((yield* catalog.get(Provider.ID.make("kilo")))?.headers).toEqual({
         Existing: "value",
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
       })
       expect((yield* catalog.get(Provider.ID.openrouter))?.headers).toBeUndefined()
@@ -54,7 +54,7 @@ describe("KiloPlugin", () => {
       yield* addPlugin()
 
       expect((yield* catalog.get(Provider.ID.make("kilo")))?.headers).toEqual({
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
       })
       expect((yield* catalog.get(Provider.ID.make("kilo")))?.headers).not.toHaveProperty("http-referer")
@@ -79,7 +79,7 @@ describe("KiloPlugin", () => {
 
       expect((yield* catalog.get(Provider.ID.make("kilo")))?.headers).toBeUndefined()
       expect((yield* catalog.get(Provider.ID.make("custom-kilo")))?.headers).toEqual({
-        "HTTP-Referer": "https://opencode.ai/",
+        "HTTP-Referer": "https://www.sleepyai.org/",
         "X-Title": "sleepycode",
       })
     }),

@@ -388,3 +388,35 @@ displays, so it is folded into the existing Context section instead:
 
 No protocol change: `session.message.list()` and `session.cost()` already carried the data.
 
+## Port inventory items checked and closed
+
+Five items from the port inventory needed a determination rather than code. Recording the
+finding here so the next pass does not re-investigate them:
+
+- **Device-code login (`c782727945`) — already present.** `--device` is a real flag
+  (`packages/cli/src/commands/commands.ts:567`) and `runDeviceFlow` implements the flow,
+  including the activation-code prompt, so there is nothing to port.
+- **Skill discovery guard (`e0a924ecc4`) — not applicable.** The v1 bug was a possibly-undefined
+  `Global.Path.cache` in the mimo `Path` service. In v2, `Global.Path.cache` is always a resolved
+  string from `roots(app)` (XDG on node/bun, tmp-rooted on workerd), and skill discovery reads
+  `Global.Service` rather than the path constant, so the failure mode cannot occur.
+- **Token refresh and session-expiry UX (`dce59b105b` and six more) — accounted for, do not add
+  a second path.** v1's seven behaviours are covered structurally by the integration-owned
+  refresh: `refreshCredential` treats only 400/401 as expiry (`sleepy.ts`), so a transient error
+  propagates as an ordinary failure instead of being mistaken for a dead session — the substance
+  of v1's `tryRefresh(1)` guard. The "invalid virtual key" bug is handled by the provider
+  re-reading `activeToken` on every `load()` and re-running it on `Credential.Event.Switched`,
+  so a refreshed token replaces the live auth without the ad-hoc header patching v1 needed.
+- **Personas / custom agents (`c2ada091d7` and five more) — loads, but the existing files are
+  not usable as agents.** v2 does scan `{agent,agents}/**/*.md` under the global config dir
+  (`packages/core/src/config/plugin/agent.ts`), so `~/.config/sleepy/agents/` **is** read. But the
+  five files on this machine are free-form `==== METADATA ====` text, not YAML frontmatter: they
+  parse with empty `data`, so they register with no description, no model, and a 24 KB blob of raw
+  metadata as the system prompt. This is a content task, not a code task — the files need
+  converting to frontmatter (or a converter written), which is a product decision about whose
+  personas they are that this branch should not make unilaterally.
+- **Release and update surface (`fd1bc53c96`, `dc371942d3`, `9e63f2e590`) — the release-blocker is
+  resolved by the URL repointing above.** The update check and the `--method curl` installer both
+  resolved from upstream until this pass; they now come from `SLEEPYCODE_UPDATE_URL`. What of
+  v1's standalone-binary workflow to keep remains an open product decision.
+

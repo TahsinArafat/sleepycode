@@ -488,3 +488,30 @@ oversights:
 - **Cosmetic `opencode.ai` occurrences in `packages/web`, `packages/console`, `packages/stats` and
   the translated docs — left as a separate pass**, per the triage in the URL-repointing section.
 
+## Regression baselines after this pass
+
+Measured, not assumed. Every number below was taken by re-running the suite with this pass's
+changes reverted (`git checkout <pre-session> -- packages/…`) and again with them applied, then
+diffing the failure sets:
+
+| Suite | After this pass | Pre-session | New failures |
+| --- | --- | --- | --- |
+| `bun run check` | 35/35, exit 0 | same | 0 |
+| `packages/tui` | 1498 pass / 10 fail | 1495 pass / 10 fail | 0 (the +3 are the new tests) |
+| `packages/server` | 85 pass / 1 skip / 3 fail | same 3 | 0 |
+| `packages/cli` | 306 pass / 9 skip / 26 fail | 306 pass / 9 skip / **39 fail** | 0 |
+| `script/apply-branding.ts` | 0 rewrites | 3 rewrites | — |
+| `script/url-audit.ts --runtime` | exit 0 | n/a (new) | — |
+
+The CLI baseline is *higher* than the current run: its failures are process- and server-spawning
+tests (`concurrent CLI and client starts converge on one server`, `racing restarts…`, the ACP
+subprocess cases, `method detection … using the V2 package`), which are timing-sensitive and
+vary between runs. Every failure observed with this pass applied also fails at the pre-session
+commit, verified by set difference — `comm -23` reports none. Two concurrent runs of the same
+suite in one directory will corrupt that comparison through port and lock contention, so run
+them one at a time.
+
+`apply-branding` going from 3 rewrites to 0 is not cosmetic: the three were this branch's own
+files, so the tree was not idempotent under the rebrander and every sync would have re-derived
+them.
+

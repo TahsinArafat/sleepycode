@@ -1,5 +1,4 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http"
-import path from "node:path"
 import { intro, outro, log, spinner, select, isCancel } from "@clack/prompts"
 import { Effect } from "effect"
 import { Global } from "@sleepy-ai/util/global"
@@ -7,7 +6,7 @@ import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { handlePromptErrors, openUrl } from "../../ui/prompt"
 
-import { writeGatewayConfig, type GatewayConfig } from "@sleepy-ai/util/gateway"
+import { resolveGatewayConfigPath, writeGatewayConfig, type GatewayConfig } from "@sleepy-ai/util/gateway"
 
 const PORT = 40821
 
@@ -253,7 +252,7 @@ const runAuthCodeFlow = Effect.fn("cli.login.browser")(function* () {
   s.message("Exchanging code for credentials...")
   const tokenData = yield* Effect.promise(() => exchangeCodeForToken(code, dashboardUrl))
 
-  const configPath = path.join(global.config, "gateway.json")
+  const configPath = yield* Effect.promise(() => resolveGatewayConfigPath(global.config))
   yield* Effect.promise(() =>
     writeConfig(configPath, {
       access_token: tokenData.access_token,
@@ -320,7 +319,7 @@ const runDeviceFlow = Effect.fn("cli.login.device")(function* () {
 
   pollSpinner.stop("Authorized!")
 
-  const configPath = path.join(global.config, "gateway.json")
+  const configPath = yield* Effect.promise(() => resolveGatewayConfigPath(global.config))
   yield* Effect.promise(() =>
     writeConfig(configPath, {
       access_token: tokenData!.access_token,

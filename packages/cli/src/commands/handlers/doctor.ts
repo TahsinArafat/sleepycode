@@ -3,7 +3,7 @@ import path from "node:path"
 import { intro, outro, log, spinner } from "@clack/prompts"
 import { Effect } from "effect"
 import { Global } from "@sleepy-ai/util/global"
-import { readGatewayConfig } from "@sleepy-ai/util/gateway"
+import { defaultGatewayConfigPath, readGatewayConfig } from "@sleepy-ai/util/gateway"
 import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { handlePromptErrors } from "../../ui/prompt"
@@ -18,7 +18,7 @@ const checkCredentials = (configDir: string) =>
     const loaded = yield* Effect.promise(() => readGatewayConfig(configDir))
 
     if (!loaded) {
-      log.error(`Credentials config missing at ${path.join(configDir, "gateway.json")}`)
+      log.error(`Credentials config missing at ${defaultGatewayConfigPath(configDir)}`)
       log.message("Please authenticate first by running 'sleepy login'.")
       return null
     }

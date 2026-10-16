@@ -18,6 +18,18 @@ export interface GatewayConfig {
 export const DEFAULT_PLATFORM_URL = "https://www.sleepyai.org"
 
 /**
+ * The path a gateway session is written to when no session exists yet. Every
+ * layer that writes a session asks here, so only this module decides where one
+ * lives.
+ */
+export function defaultGatewayConfigPath(configDir?: string): string {
+  return (
+    process.env.SLEEPY_GATEWAY_CONFIG ??
+    (configDir ? path.join(configDir, "gateway.json") : path.join(Path.config, "gateway.json"))
+  )
+}
+
+/**
  * Returns every known file path where a Sleepy gateway session may be stored,
  * ordered by preference.
  */
@@ -29,7 +41,6 @@ export function gatewayPaths(configDir?: string): string[] {
         envPath,
         configDir ? path.join(configDir, "gateway.json") : undefined,
         path.join(Path.config, "gateway.json"),
-        path.join(os.homedir(), ".config", "sleepy", "gateway.json"),
         path.join(os.homedir(), ".config", "sleepycode", "gateway.json"),
         path.join(os.homedir(), ".sleepy", "gateway.json"),
       ].filter((item): item is string => Boolean(item)),
@@ -50,6 +61,14 @@ export async function findGatewayConfigPath(configDir?: string): Promise<string 
     }),
   )
   return accessible.find((item): item is string => item !== undefined) ?? null
+}
+
+/**
+ * Where a gateway session should be written: a session that already exists
+ * keeps its location, otherwise the highest-priority target wins.
+ */
+export async function resolveGatewayConfigPath(configDir?: string): Promise<string> {
+  return (await findGatewayConfigPath(configDir)) ?? defaultGatewayConfigPath(configDir)
 }
 
 export async function readGatewayConfig(configDir?: string): Promise<{ path: string; config: GatewayConfig } | null> {

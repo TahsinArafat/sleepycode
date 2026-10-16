@@ -1,7 +1,6 @@
 import { Duration, Effect, Schema, Semaphore, Stream } from "effect"
 import fsSync from "node:fs"
 import path from "node:path"
-import os from "node:os"
 import { define } from "@sleepy-ai/plugin/effect/plugin"
 import { Provider } from "@sleepy-ai/schema/provider"
 import { Money } from "@sleepy-ai/schema/money"
@@ -33,22 +32,13 @@ const Token = Schema.Struct({
 const TokenPending = Schema.Struct({ error: Schema.String })
 const DeviceToken = Schema.Union([Token, TokenPending])
 
-export {
-  type GatewayConfig,
-  DEFAULT_PLATFORM_URL,
-  findGatewayConfigPath,
-  readGatewayConfig,
-  readGatewayEmail,
-  writeGatewayConfig,
-  clearGatewayConfig,
-} from "@sleepy-ai/util/gateway"
-
 import {
   type GatewayConfig,
   DEFAULT_PLATFORM_URL,
   findGatewayConfigPath,
   gatewayPaths,
   readGatewayConfig,
+  resolveGatewayConfigPath,
   writeGatewayConfig,
 } from "@sleepy-ai/util/gateway"
 
@@ -199,9 +189,7 @@ function pollDeviceToken(server: string, deviceCode: string, interval: Duration.
 
 function storeCredential(server: string, token: typeof Token.Type) {
   return Effect.gen(function* () {
-    const configPath =
-      (yield* Effect.promise(() => findGatewayConfigPath())) ??
-      path.join(os.homedir(), ".config", "sleepy", "gateway.json")
+    const configPath = yield* Effect.promise(() => resolveGatewayConfigPath())
     const expires = Date.now() + token.expires_in * 1000
     yield* Effect.promise(() =>
       writeGatewayConfig(configPath, {

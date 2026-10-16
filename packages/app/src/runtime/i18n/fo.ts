@@ -732,7 +732,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} onnur",
   "settings.about.firstPublished": "Fyrst útgivið í Missouri í USA",
   "settings.about.firstIllustrated": "Fyrst myndprýdd í London í Onglandi",
-  "settings.about.website": "www.opna koda.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, opna keldukoduumboðnum",
   "settings.about.trademark": "SleepyCode er eitt skrásett vørumerki hjá Anomaly Innovations, Inc.",
   "settings.about.typeset": "Skriftsett í Inter og IBM Plex Mono",

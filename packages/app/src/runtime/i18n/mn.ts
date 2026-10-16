@@ -738,7 +738,7 @@ export const dict = {
   "settings.about.otherContributor.other": "өөр {{count}}",
   "settings.about.firstPublished": "Анх АНУ-ын Миссури мужид хэвлэгдсэн",
   "settings.about.firstIllustrated": "Анх Английн Лондон хотод зурагласан",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, нээлттэй эхийн кодчиллын агент",
   "settings.about.trademark": "SleepyCode нь Anomaly Innovations, Inc.-ийн бүртгэлтэй барааны тэмдэг юм.",
   "settings.about.typeset": "Inter болон IBM Plex Mono үсгийн хэвээр өрсөн",

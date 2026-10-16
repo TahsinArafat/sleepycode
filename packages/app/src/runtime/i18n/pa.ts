@@ -745,7 +745,7 @@ export const dict = {
   "settings.about.otherContributor.other": "\u2068{{count}}\u2069 ہور",
   "settings.about.firstPublished": "پہلی واری میزوری، امریکہ وچ شائع ہویا",
   "settings.about.firstIllustrated": "پہلی واری لندن، انگلینڈ وچ تصویراں بݨیاں",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode، اوپن سورس کوڈنگ ایجنٹ",
   "settings.about.trademark": "SleepyCode، Anomaly Innovations, Inc. دا رجسٹرڈ ٹریڈ مارک اے۔",
   "settings.about.typeset": "Inter تے IBM Plex Mono وچ ٹائپ سیٹ",

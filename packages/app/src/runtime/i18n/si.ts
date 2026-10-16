@@ -732,7 +732,7 @@ export const dict = {
   "settings.about.otherContributor.other": "තවත් {{count}}",
   "settings.about.firstPublished": "මුලින්ම ඇමරිකා එක්සත් ජනපදයේ මිසූරිහි ප්‍රකාශයට පත් කරන ලදී",
   "settings.about.firstIllustrated": "මුලින්ම එංගලන්තයේ ලන්ඩන්හි රූප සටහන් කරන ලදී",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, විවෘත මූලාශ්‍ර කේතකරණ නියෝජිතයා",
   "settings.about.trademark": "SleepyCode යනු Anomaly Innovations, Inc. හි ලියාපදිංචි වෙළඳ ලකුණකි.",
   "settings.about.typeset": "Inter සහ IBM Plex Mono අකුරුවලින් සකසා ඇත",

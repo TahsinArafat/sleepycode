@@ -744,7 +744,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} dalších",
   "settings.about.firstPublished": "Poprvé publikováno v Missouri, USA",
   "settings.about.firstIllustrated": "Poprvé ilustrováno v Londýně, Anglie",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, open source kódovací agent",
   "settings.about.trademark": "SleepyCode je registrovaná ochranná známka společnosti Anomaly Innovations, Inc.",
   "settings.about.typeset": "Typová sada v Inter a IBM Plex Mono",

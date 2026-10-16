@@ -147,7 +147,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} andra",
   "settings.about.firstPublished": "Först publicerad i Missouri, USA",
   "settings.about.firstIllustrated": "Först illustrerad i London, England",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, kodningsagenten med öppen källkod",
   "settings.about.trademark": "SleepyCode är ett registrerat varumärke som tillhör Anomaly Innovations, Inc.",
   "settings.about.typeset": "Satt med Inter och IBM Plex Mono",

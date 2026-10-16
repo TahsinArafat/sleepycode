@@ -158,7 +158,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} weitere",
   "settings.about.firstPublished": "Erstmals veröffentlicht in Missouri, USA",
   "settings.about.firstIllustrated": "Erstmals illustriert in London, England",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, der Open-Source-Coding-Agent",
   "settings.about.trademark": "SleepyCode ist eine eingetragene Marke von Anomaly Innovations, Inc.",
   "settings.about.typeset": "Gesetzt in Inter und IBM Plex Mono",

@@ -79,6 +79,28 @@ is a silent build break, so it is checked before anything is written) and a **bi
 text**. `script/lib/branding.ts` defaults its active profile to `opencode` on this branch — the
 old `mimo` default belonged to the parent we left. `SLEEPYCODE_UPSTREAM=<id>` overrides it.
 
+### Branding does not rewrite URLs — `url-audit` does
+
+`apply-branding` rewrites *identifiers*, never URLs, and `opencode.ai` sits in `PROTECT` as a
+whole host because some of its endpoints genuinely belong to upstream. That combination is why
+the fork could report zero rewrites while 590 files still pointed at upstream. The shield is not
+the bug; the bug is that `PROTECT` cannot distinguish "leave this one" from "nobody has looked
+at this one yet".
+
+```bash
+bun run script/url-audit.ts              # every unclassified upstream URL
+bun run script/url-audit.ts --runtime    # shipped-runtime paths only; exit 1 if any
+```
+
+`INTENTIONALLY_UPSTREAM` in `script/lib/branding.ts` holds the signed-off exceptions with a
+one-line reason each, and `unclassifiedUpstreamUrls` reports everything else. Add to the list
+with a reason, or repoint the URL — do not widen `PROTECT`, which hides the next endpoint too.
+
+The rule for triage: **an endpoint a shipped binary calls is repointed; a schema reference, a
+published asset, or a link to upstream's own project is allowlisted.** The v1 fork reached the
+same split — it repointed its install/update surface to `www.sleepyai.org` but kept
+`opencode.ai/config.json` as the `$schema` it writes into generated configs.
+
 ### Verification gate
 
 A sync is not done until it passes. Run these from the package directories, never the repo root:
@@ -261,3 +283,41 @@ code today, not behaviour:
 - Tests for `login`/`doctor`/`init` beyond the `logout` round-trip that already exists in
   `packages/cli/test`, the Claude Code shim, a per-plugin judgement on `todo`/`think`/`lsp`, and
   release plumbing (`bin/sleepy`, `.npmrc`, README, publish workflow).
+
+## URL repointing
+
+The shipped binary's endpoints were repointed from `opencode.ai` to `www.sleepyai.org` (v1's
+canonical runtime domain). What changed, and why each is a call rather than a link:
+
+- `packages/cli/src/services/updater.ts` — the update check asked **upstream's** release service
+  about `sleepycode`, an artifact upstream does not publish, so `sleepycode upgrade` could never
+  report an update. The `--method curl` installer download was pointed at upstream's
+  `v2/install` and installed upstream's script. Both now come from `SLEEPYCODE_UPDATE_URL`
+  (default `https://www.sleepyai.org`, overridable per deployment), added in
+  `packages/cli/src/version.ts`.
+- `install` — the shipped installer's release-metadata lookup and its usage/docs URLs.
+- `packages/core/src/mcp/oauth.ts` — `CLIENT_METADATA_URL` is fetched *by the MCP server* to
+  validate the client, so it has to be a host we control; `client_uri` names the product.
+- `packages/core/src/plugin/provider/{kilo,llmgateway,nvidia,openrouter,vercel,zenmux}.ts` and
+  `packages/core/src/tool/plugin/webfetch.ts` — `HTTP-Referer` / `X-Title` / `User-Agent`
+  attribution sent on every request to third-party gateways.
+- `packages/desktop/electron-builder.config.ts` — the desktop auto-update feed URL.
+- `packages/gui-extensions/src/{ssh,wsl}/remote-cli.ts` — the remote install one-liners fetched
+  upstream's install script from `raw.githubusercontent.com/anomalyco/opencode`, which installs
+  `opencode`; they now fetch the fork's own `install`.
+- TUI and CLI attribution surfaces: the `docs.open` action, the stats-HUD footer, `sleepycode
+  stats`, the project avatar favicon, and the app's About-panel website (63 locale strings plus
+  its link).
+
+Deliberately **not** changed, each recorded in `INTENTIONALLY_UPSTREAM` with its reason:
+`models.opencode.ai` (overridable via `SLEEPYCODE_MODELS_URL`; the bundled snapshot is generated
+from it), the `systemone` inference endpoint and the `isSleepycode` URL test coupled to it,
+`opencode.ai/{config,tui,theme,desktop-theme}.json` schema references, `api.opencode.ai` and
+`update.opencode.ai` deployment config, and the docs base URL inside the `sleepycode` skill —
+the last is an **open decision**, since the fork ships its own docs tree under
+`services/www/src/docs/content` but the deployed path is not established.
+
+Left alone as cosmetic, per the triage: `packages/web` (its own site config and translated
+`content/docs`), `packages/console`, `packages/stats`, `services/www` docs, READMEs and
+CHANGELOG. They are links and marketing copy, not calls; repointing them is a separate pass.
+

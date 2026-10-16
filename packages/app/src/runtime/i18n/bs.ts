@@ -802,7 +802,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} drugih",
   "settings.about.firstPublished": "Prvi put objavljeno u Missouriju, SAD",
   "settings.about.firstIllustrated": "Prvi put ilustrovan u Londonu, Engleska",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, agent za kodiranje otvorenog koda",
   "settings.about.trademark": "SleepyCode je registrovani zaštitni znak Anomaly Innovations, Inc.",
   "settings.about.typeset": "Postavljen u Inter i IBM Plex Mono",

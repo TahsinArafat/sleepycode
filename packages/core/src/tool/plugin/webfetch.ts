@@ -56,7 +56,7 @@ const headers = (format: Format, userAgent: string) => ({
 })
 
 const sleepyCodeUserAgent =
-  "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; SleepyCode-User/1.0; +https://opencode.ai"
+  "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; SleepyCode-User/1.0; +https://www.sleepyai.org"
 
 const isCloudflareChallenge = (error: HttpClientError.HttpClientError) => {
   if (error.reason._tag !== "StatusCodeError") return false

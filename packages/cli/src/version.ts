@@ -26,3 +26,12 @@ export {
   highlights as SLEEPYCODE_HIGHLIGHTS,
 }
 export const SLEEPYCODE_LOCAL = channel === "local"
+
+// The release service a shipped binary asks about its own updates. It is not upstream
+// opencode's service: that one only knows opencode's artifacts, so asking it about
+// `sleepycode` can never report an update. `SLEEPYCODE_UPDATE_URL` points a build at
+// another deployment without a code change.
+export const SLEEPYCODE_UPDATE_URL = (process.env.SLEEPYCODE_UPDATE_URL || "https://www.sleepyai.org").replace(
+  /\/$/,
+  "",
+)

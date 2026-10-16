@@ -692,7 +692,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} others",
   "settings.about.firstPublished": "First published in Missouri, USA",
   "settings.about.firstIllustrated": "First illustrated in London, England",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, the open source coding agent",
   "settings.about.trademark": "SleepyCode is a registered trademark of Anomaly Innovations, Inc.",
   "settings.about.typeset": "Typeset in Inter and IBM Plex Mono",

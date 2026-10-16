@@ -720,7 +720,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} ሌሎች",
   "settings.about.firstPublished": "መጀመሪያ የታተመው በሚዙሪ፣ አሜሪካ",
   "settings.about.firstIllustrated": "መጀመሪያ ምስል የተሰራለት በለንደን፣ እንግሊዝ",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode፣ ክፍት ምንጭ የኮድ ወኪል",
   "settings.about.trademark": "SleepyCode የAnomaly Innovations, Inc. የተመዘገበ የንግድ ምልክት ነው።",
   "settings.about.typeset": "በInter እና IBM Plex Mono ተሰድሯል",

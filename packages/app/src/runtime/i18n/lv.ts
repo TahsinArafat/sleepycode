@@ -740,7 +740,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} citi",
   "settings.about.firstPublished": "Pirmo reizi publicēts Misūri štatā, ASV",
   "settings.about.firstIllustrated": "Pirmo reizi ilustrēts Londonā, Anglijā",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, atvērtā koda kodēšanas aģents",
   "settings.about.trademark": "SleepyCode ir Anomaly Innovations, Inc. reģistrēta preču zīme.",
   "settings.about.typeset": "Salikums Inter un IBM Plex Mono",

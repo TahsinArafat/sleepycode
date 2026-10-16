@@ -235,7 +235,7 @@ export function getConfig() {
         protocols: { name: "SleepyCode Beta", schemes: ["sleepycode"] },
         publish: {
           provider: "generic",
-          url: "https://opencode.ai/update/api/beta/desktop/sleepycode/",
+          url: "https://www.sleepyai.org/update/api/beta/desktop/sleepycode/",
           channel: "latest",
         },
         deb: { fpm: [metainfoFpm(appId)] },
@@ -251,7 +251,7 @@ export function getConfig() {
         protocols: { name: "SleepyCode", schemes: ["sleepycode"] },
         publish: {
           provider: "generic",
-          url: "https://opencode.ai/update/api/latest/desktop/sleepycode/",
+          url: "https://www.sleepyai.org/update/api/latest/desktop/sleepycode/",
           channel: "latest",
         },
         deb: { fpm: [metainfoFpm(appId), legacyDesktopEntryFpm] },

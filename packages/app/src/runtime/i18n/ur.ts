@@ -746,7 +746,7 @@ export const dict = {
   "settings.about.otherContributor.other": "\u2068{{count}}\u2069 دیگر",
   "settings.about.firstPublished": "پہلی بار میزوری، امریکہ میں شائع ہوا",
   "settings.about.firstIllustrated": "پہلی بار لندن، انگلینڈ میں مصور کیا گیا",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode، اوپن سورس کوڈنگ ایجنٹ",
   "settings.about.trademark": "SleepyCode، Anomaly Innovations, Inc. کا رجسٹرڈ ٹریڈ مارک ہے۔",
   "settings.about.typeset": "Inter اور IBM Plex Mono میں ٹائپ سیٹ",

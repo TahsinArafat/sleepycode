@@ -743,7 +743,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} người khác",
   "settings.about.firstPublished": "Xuất bản lần đầu ở Missouri, Mỹ",
   "settings.about.firstIllustrated": "Minh họa đầu tiên ở London, Anh",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, tác nhân mã hóa nguồn mở",
   "settings.about.trademark": "SleepyCode là nhãn hiệu đã đăng ký của Anomaly Innovations, Inc.",
   "settings.about.typeset": "Bộ sắp chữ trong Inter và IBM Plex Mono",

@@ -733,7 +733,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} të tjerët",
   "settings.about.firstPublished": "Botuar për herë të parë në Misuri, SHBA",
   "settings.about.firstIllustrated": "Ilustruar për herë të parë në Londër, Angli",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, agjenti kodues me burim të hapur",
   "settings.about.trademark": "SleepyCode është një markë e regjistruar e Anomaly Innovations, Inc.",
   "settings.about.typeset": "Llojet në Inter dhe IBM Plex Mono",

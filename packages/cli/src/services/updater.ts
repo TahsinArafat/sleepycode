@@ -1,7 +1,13 @@
 import { Global } from "@sleepy-ai/util/global"
 import { AppProcess } from "@sleepy-ai/util/process"
 import { EffectFlock } from "@sleepy-ai/util/effect-flock"
-import { SLEEPYCODE_ARTIFACT, SLEEPYCODE_CHANNEL, SLEEPYCODE_LOCAL, SLEEPYCODE_VERSION } from "../version"
+import {
+  SLEEPYCODE_ARTIFACT,
+  SLEEPYCODE_CHANNEL,
+  SLEEPYCODE_LOCAL,
+  SLEEPYCODE_UPDATE_URL,
+  SLEEPYCODE_VERSION,
+} from "../version"
 import { Context, Duration, Effect, FileSystem, Layer, Option, Ref, Schema } from "effect"
 import { ChildProcess } from "effect/process"
 import { parse, type ParseError } from "jsonc-parser"
@@ -281,7 +287,7 @@ const make = Effect.gen(function* () {
         fetch(
           core
             ? "https://formulae.brew.sh/api/formula/sleepycode.json"
-            : `https://opencode.ai/update/api/${encodeURIComponent(channel)}/${encodeURIComponent(SLEEPYCODE_ARTIFACT)}/${distribution}?current=${encodeURIComponent(SLEEPYCODE_VERSION)}`,
+            : `${SLEEPYCODE_UPDATE_URL}/update/api/${encodeURIComponent(channel)}/${encodeURIComponent(SLEEPYCODE_ARTIFACT)}/${distribution}?current=${encodeURIComponent(SLEEPYCODE_VERSION)}`,
           {
             signal: AbortSignal.any([signal, AbortSignal.timeout(10_000)]),
           },
@@ -479,8 +485,8 @@ const make = Effect.gen(function* () {
           const installer = path.join(directory, "install")
           yield* runUpgrade({
             method,
-            command: ["curl", "-fsSL", "-o", installer, "https://opencode.ai/v2/install"],
-            displayCommand: ["curl", "-fsSL", "https://opencode.ai/v2/install"],
+            command: ["curl", "-fsSL", "-o", installer, `${SLEEPYCODE_UPDATE_URL}/install`],
+            displayCommand: ["curl", "-fsSL", `${SLEEPYCODE_UPDATE_URL}/install`],
             title: "Could not download the SleepyCode installer",
             retry: "Check your network, then run sleepycode upgrade again.",
           })

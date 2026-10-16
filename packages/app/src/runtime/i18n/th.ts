@@ -796,7 +796,7 @@ export const dict = {
   "settings.about.otherContributor.other": "อีก {{count}} คน",
   "settings.about.firstPublished": "ตีพิมพ์ครั้งแรกในรัฐมิสซูรี สหรัฐอเมริกา",
   "settings.about.firstIllustrated": "ภาพประกอบครั้งแรกในลอนดอน ประเทศอังกฤษ",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode เอเจนต์การเข้ารหัสโอเพ่นซอร์ส",
   "settings.about.trademark": "SleepyCode เป็นเครื่องหมายการค้าจดทะเบียนของ Anomaly Innovations, Inc.",
   "settings.about.typeset": "เรียงพิมพ์ใน Inter และ IBM Plex Mono",

@@ -302,6 +302,103 @@ const OPENCODE: UpstreamProfile = {
   mapPathTokens: true,
 }
 
+/**
+ * Upstream URLs the fork deliberately keeps pointing at opencode, with the reason.
+ *
+ * `PROTECT` is all-or-nothing: a pattern there shields a whole token class, so the
+ * rebrander can never distinguish "repoint this runtime call" from "leave this upstream
+ * link alone". That distinction is a *decision*, and an undocumented one gets silently
+ * reverted by the next person who runs a sweep. So it lives here as data: each entry is a
+ * host plus the one-line reason it must survive, and `brand-classify`/review can check
+ * against it instead of re-arguing every occurrence.
+ *
+ * Anything a shipped binary *calls* is not in here - those are repointed to the Sleepy
+ * host. This list is upstream's own public services and links to upstream's project.
+ */
+export const INTENTIONALLY_UPSTREAM: ReadonlyArray<{ readonly host: string; readonly reason: string }> = [
+  {
+    host: "models.opencode.ai",
+    reason:
+      "Upstream's public model-metadata service. Already overridable via SLEEPYCODE_MODELS_URL; the bundled snapshot is generated from it, so renaming the default would make every refresh 404.",
+  },
+  {
+    host: "opencode.ai/inference/systemone",
+    reason:
+      "Upstream's SystemOne inference endpoint, taken verbatim from upstream/dev in packages/ai/src/providers/sleepycode.ts. The `isSleepycode` URL test in packages/ai/src/protocols/openai-chat.ts matches this same host and must move in lockstep with it, so it is recorded here too.",
+  },
+  {
+    host: "api.opencode.ai",
+    reason:
+      "Upstream's GitHub App token-exchange API, called by the github/ action package, which is not part of the shipped CLI.",
+  },
+  {
+    host: "update.opencode.ai",
+    reason:
+      "Audience and hostname of the update Worker's own deployment config (services/update, infra/stage); it is the operator side, not a client call.",
+  },
+  {
+    host: "opencode.ai/config.json",
+    reason:
+      "The `$schema` written into generated configs. The v1 fork deliberately kept this pointing at upstream too (packages/opencode/src/config/config.ts wrote the same URL), and it is a schema reference, not a call: it resolves to upstream's published JSON Schema, which our config still conforms to.",
+  },
+  {
+    host: "opencode.ai/v2/cli.json",
+    reason:
+      "Same decision as opencode.ai/config.json, for the CLI config schema in packages/cli/src/config/schema.ts. A schema reference a shipped binary publishes, not an endpoint it calls.",
+  },
+  {
+    host: "opencode.ai/favicon",
+    reason:
+      "Desktop notification icon. It is upstream's published asset; the fork does not host an equivalent yet, and a missing icon degrades to the OS default rather than breaking the notification.",
+  },
+  {
+    host: "opencode.ai/theme.json",
+    reason:
+      "`$schema` of every bundled TUI theme asset. Same class as opencode.ai/config.json: a schema reference, not a call. Declared here rather than per asset because it covers ~120 files at once.",
+  },
+  {
+    host: "opencode.ai/desktop-theme.json",
+    reason: "`$id` of the desktop theme JSON Schema in packages/ui, the same schema-reference class as theme.json.",
+  },
+  {
+    host: "opencode.ai/v2/docs",
+    reason:
+      "Documentation base URL inside the shipped sleepycode skill and other prose. OPEN DECISION: the fork ships its own docs tree under services/www/src/docs/content, so these should eventually point at the Sleepy docs host; the deployed path is not established yet. Allowlisted so the sweep does not flip them to www.sleepyai.org/docs, which does not resolve. Repoint when the docs deployment is known.",
+  },
+  {
+    host: "opencode.ai/v2/llms.txt",
+    reason: "Machine-readable docs index referenced by the sleepycode skill. Same open decision as opencode.ai/v2/docs.",
+  },
+]
+
+/** Whether `url` names a host the fork intentionally leaves pointing at upstream. */
+export function isIntentionallyUpstream(url: string): boolean {
+  return INTENTIONALLY_UPSTREAM.some((entry) => url.includes(entry.host))
+}
+
+/**
+ * Upstream URLs in `text` that the allowlist does NOT cover, with their occurrence counts.
+ *
+ * `audit()` answers "did the token map have a gap" and stops at the protected class, which is
+ * why `opencode.ai` never showed up there even while 590 files were full of it. This answers
+ * the separate question: *which upstream endpoints did nobody make a decision about*. A newly
+ * added upstream URL lands here, so the next sync sees it instead of inheriting it silently.
+ *
+ * URLs matching an allowlist host are dropped, so a signed-off decision stays signed off.
+ * Extended hosts are matched one label at a time, so `x.opencode.ai` is reported separately
+ * from `opencode.ai` and cannot hide behind it.
+ */
+export function unclassifiedUpstreamUrls(text: string, profile: UpstreamProfile = active): string[] {
+  const found = new Map<string, number>()
+  for (const match of text.matchAll(/https?:\/\/[^\s"'`()<>\\]+/g)) {
+    const url = match[0]
+    if (!profile.protect.some((re) => new RegExp(re.source, "i").test(url))) continue
+    if (isIntentionallyUpstream(url)) continue
+    found.set(url, (found.get(url) ?? 0) + 1)
+  }
+  return [...found.entries()].sort((a, b) => b[1] - a[1]).map(([t, n]) => `${t} (${n})`)
+}
+
 export const UPSTREAMS: ReadonlyArray<UpstreamProfile> = [MIMO, OPENCODE]
 
 /**
@@ -447,7 +544,7 @@ export const SKIP_CONTENT: ReadonlyArray<RegExp> = [
   // Architectural records and migration tooling measure and map the ancestor;
   // rewriting their text would destroy the profiles, references, and records they declare.
   /^docs\/architecture\//,
-  /^script\/(?:lib\/(?:branding|git-tree)|apply-branding|brand-classify|fork-delta|port-map|reparent-probe)\.ts$/,
+  /^script\/(?:lib\/(?:branding|git-tree)|apply-branding|brand-classify|fork-delta|port-map|reparent-probe|url-audit)\.ts$/,
 ]
 
 export function shouldSkipContent(path: string): boolean {

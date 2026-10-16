@@ -10,7 +10,7 @@ export const ZenmuxPlugin = define({
         if (item.provider.settings?.baseURL !== "https://zenmux.ai/api/v1") continue
         evt.update(item.provider.id, (provider) => {
           provider.headers = {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://www.sleepyai.org/",
             "X-Title": "sleepycode",
             ...provider.headers,
           }

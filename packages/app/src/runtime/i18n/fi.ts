@@ -143,7 +143,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} muuta",
   "settings.about.firstPublished": "Julkaistu ensimmäisen kerran Missourissa, Yhdysvalloissa",
   "settings.about.firstIllustrated": "Kuvitettu ensimmäisen kerran Lontoossa, Englannissa",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, avoimen lähdekoodin koodausagentti",
   "settings.about.trademark": "SleepyCode on Anomaly Innovations, Inc:n rekisteröity tavaramerkki.",
   "settings.about.typeset": "Kirjasinlajit Inter ja IBM Plex Mono",

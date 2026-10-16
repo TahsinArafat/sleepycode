@@ -9,7 +9,7 @@ export const OpenRouterPlugin = define({
       for (const item of evt.list()) {
         if (item.provider.package !== "@sleepy-ai/ai/providers/openrouter") continue
         evt.update(item.provider.id, (provider) => {
-          provider.headers = { ...provider.headers, "HTTP-Referer": "https://opencode.ai/", "X-Title": "sleepycode" }
+          provider.headers = { ...provider.headers, "HTTP-Referer": "https://www.sleepyai.org/", "X-Title": "sleepycode" }
         })
       }
     })

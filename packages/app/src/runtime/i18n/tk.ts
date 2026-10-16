@@ -731,7 +731,7 @@ export const dict = {
   "settings.about.otherContributor.other": "{{count}} başga",
   "settings.about.firstPublished": "Ilkinji gezek Missuri, ABŞ-da neşir edildi",
   "settings.about.firstIllustrated": "Ilkinji gezek London, Angliýada suratlandyryldy",
-  "settings.about.website": "www.opencode.ai",
+  "settings.about.website": "www.sleepyai.org",
   "settings.about.description": "SleepyCode, açyk çeşmeli kodlaşdyrma agenti",
   "settings.about.trademark": "SleepyCode Anomaly Innovations, Inc. kompaniýasynyň bellige alnan söwda nyşanydyr.",
   "settings.about.typeset": "Inter we IBM Plex Mono bilen düzüldi",
